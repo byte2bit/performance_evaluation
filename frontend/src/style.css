@@ -1,0 +1,78 @@
+@import "tailwindcss";
+@import "flowbite/src/themes/default";
+@plugin "flowbite/plugin";
+@source "../node_modules/flowbite";
+
+html, body, #app {
+  height: 100%;
+  min-height: 100vh;
+  width: 100%;
+  min-width: 100vw;
+  margin: 0;
+  overflow-x: hidden;
+  
+}
+
+p {
+  line-height: 1.2;
+  margin-bottom: 0.8rem;
+}
+label, p {
+  font-size: 0.75rem;
+}
+label {
+  font-weight: bold;
+}
+h4{
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.inputs input {
+  font-weight: bold;
+  min-height: 1rem;
+  font-size: 1rem;
+  width: 90%;
+  text-align: center;
+  padding: 4px 6px;
+  border: 0;
+}
+
+.chkbox {
+@apply w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm;
+}
+
+
+.form-check input {
+  margin-right: 10px;
+}
+
+.form-check label {
+  line-height: 0.8 !important;
+  font-weight: normal;
+}
+
+.vue-star-rating-rating-text {
+  font-weight: bold !important;
+}
+
+@media(min-width: 768px) {
+  .star-title {
+      min-height: 60px;
+  }
+}
+
+@media(max-width: 768px) {
+  .star-title {
+      margin-top: 50px;
+  }
+
+  .inputs {
+      margin-top: 20px;
+
+      input {
+          width: 100%;
+      }
+
+  }
+}
