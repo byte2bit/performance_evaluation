@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from "vue"
-import axios from 'axios'
+import axios from '@/plugins/axios.js'
 
 export const useColabStore = defineStore('colabs', () => {
     const chkColabs = ref([])
@@ -9,7 +9,7 @@ export const useColabStore = defineStore('colabs', () => {
     // Carrega colaboradores da API
     const loadColabs = async () => {
         try {
-            const res = await axios.get("https://api.nucleoengenharia.com.br:8000/colab")
+            const res = await axios.get('/colab')
             colabs.value = res.data
         } catch (e) {
             console.error("Erro ao carregar colaboradores", e)

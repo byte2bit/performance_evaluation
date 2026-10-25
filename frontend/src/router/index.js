@@ -1,8 +1,8 @@
 import { createWebHistory, createRouter } from "vue-router"
 
 
-// import Form from '@/components/pages/Form.vue'
-const Form = () => import(/* webpackChunkName: "main" */ '@/components/pages/Form.vue')
+// import Home from '@/components/pages/Home.vue'
+const Home = () => import(/* webpackChunkName: "main" */ '@/components/pages/Home.vue')
 
 // import Inserir from "@/components/pages/Inserir.vue"
 const Inserir = () => import(/* webpackChunkName: "inserir" */ '@/components/pages/Inserir.vue')
@@ -24,7 +24,7 @@ const routes = [
     {
         path: "/",
         name: "Form",
-        component: Form,
+        component: Home,
     },
     {
         path: "/inserir",

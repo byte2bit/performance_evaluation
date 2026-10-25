@@ -1,5 +1,4 @@
 const app = require('express')()
-var cors = require('cors')
 
 /* var https = require('https')
 var http = require('http')
@@ -17,12 +16,13 @@ var options = {
 } */
 
 var vhost = require('vhost')
-app.use(cors())
 app.use(vhost('api.nucleoengenharia.com.br', require('./index.js')))
     // .use(vhost('sync.mysite.com', require('/path/to/sync').app))
     // https.createServer(options, app)
-    .listen(8000)
+if (require.main === module) {
+    app.listen(8000, () => {
+        console.log("Backend executando na porta 8000")
+    })
+}
 
-app.listen(() => {
-    console.log("Backend executando na porta 8000")
-})
+module.exports = app

@@ -6,15 +6,15 @@
         </div>
         <div>
             <star-rating v-model:rating="postData.nota_dispon" :increment="0.5" active-border-color="#1a00ab"
-                active-color="#1a00ab" :star-size="25" data-modal-show="sub-modal"
-                data-modal-target="sub-modal" />
+                active-color="#1a00ab" :star-size="25"
+                @click="showSubModal = postData.nota_dispon <= 3" />
             <div class="my-3 flex flex-col">
                 <label for="obs_dispon">Observações:</label>
                 <textarea v-sanitize="text" id="obs_dispon" rows="3" v-model="postData.obs_dispon"></textarea>
             </div>
         </div>
 
-        <SubModal v-model="showSubModal">
+        <SubModal id="dispon-modal" v-model:simpleModalFlag="showSubModal">
             
             <template #headerModal>
                 <div class="px-3 px-sm-5 text-center">
@@ -50,14 +50,14 @@ const text = ref("")
 const showSubModal = ref(false)
 
 // Abre ou fecha o modal automaticamente ao mudar a nota
-watch(() => postData.nota_dispon, (newVal) => {
+watch(() => postData.value.nota_dispon, (newVal) => {
     if (newVal <= 3) {
         showSubModal.value = true
     } else {
         showSubModal.value = false
         iDispon.value = []
     }
-})
+}, { immediate: true })
 
 </script>
 

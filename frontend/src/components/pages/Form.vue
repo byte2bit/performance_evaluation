@@ -1,12 +1,12 @@
-    <script setup>
+<script setup>
 import Respon from './form/Respon.vue'
 import Dispon from './form/Dispon.vue'
 import Qualidade from './form/Qualidade.vue'
 import Prazo from './form/Prazo.vue'
 
 import ChecksModal from '../utils/ChecksModal.vue'
-// import { initModals } from 'flowbite'
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed } from 'vue'
+import { storeToRefs } from 'pinia'
 
 import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
@@ -23,12 +23,11 @@ import { useColabStore } from '@/stores/colabStore'
 const colabStore = useColabStore()
 
 //colabs selecionados, vindo do store
-const chkColabs = colabStore.chkColabs
+const { chkColabs } = storeToRefs(colabStore)
 
 // console.log('Colaboradores selecionados:', chkColabs)
 
-const iQualidade = ref([])
-const iDispon = ref([])
+const showReview = ref(false)
 const isLoading = ref(false)
 const fullPage = ref(true)
 
@@ -49,6 +48,15 @@ const postData = reactive({
     itensQualidade: [],
     itensDispon: [],
     liderancas: '',
+})
+
+const iQualidade = computed({
+    get: () => postData.itensQualidade,
+    set: value => { postData.itensQualidade = value }
+})
+const iDispon = computed({
+    get: () => postData.itensDispon,
+    set: value => { postData.itensDispon = value }
 })
 
 const optQualidade = [
@@ -194,14 +202,9 @@ function reset() {
         liderancas: '',
     })
 
-    iQualidade.value = []
-    iDispon.value = []
-    chkColabs.value = []
+    colabStore.clearSelection()
+    showReview.value = false
 }
-onMounted(async () => {
-    await colabStore.loadColabs()
-    // initModals()
-})
 </script>
 
 <template>
@@ -240,11 +243,11 @@ onMounted(async () => {
                 <!-- Perguntas com estrelas -->
                 <div class="flex gap-x-4 mt-4 sm:gap-y-3 pb-4">
 
-                    <Qualidade :postData="postData" :iQualidade="iQualidade" :optQualidade="optQualidade" />
+                    <Qualidade :postData="postData" v-model:iQualidade="iQualidade" :optQualidade="optQualidade" />
 
                     <Prazo :postData="postData" />
 
-                    <Dispon :postData="postData" :iDispon="iDispon" :optDispon="optDispon" />
+                    <Dispon :postData="postData" v-model:iDispon="iDispon" :optDispon="optDispon" />
 
                     <Respon :postData="postData" />
                 </div>
@@ -253,7 +256,8 @@ onMounted(async () => {
                 <div class="border-top mt-auto pb-3 flex justify-between items-center">
 
                     <!-- Modal toggle -->
-                    <button data-modal-target="large-modal" data-modal-toggle="large-modal"
+                    <button @click="showReview = true" aria-haspopup="dialog"
+                        aria-controls="default-modal" :aria-expanded="showReview"
                         class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center "
                         type="button">
                         Resumo
@@ -265,7 +269,7 @@ onMounted(async () => {
                     </button>
                 </div>
 
-                <ChecksModal id="default-modal">
+                <ChecksModal id="default-modal" v-model="showReview">
                     <template #bodyModal>
                         <div class="modal-dados flex">
 
@@ -274,7 +278,7 @@ onMounted(async () => {
                                 <h2 class="mb-4 font-bold">Colaborador(es) selecionado(s): </h2>
 
                                 <div class="flex flex-col flex-wrap md:max-h-150 md:max-w-230 overflow-auto me-12">
-                                    <ul class="text-sm" v-for="(colabs, index) in colabStore.chkColabs" :key="index">
+                                    <ul class="text-sm" v-for="(colabs, index) in chkColabs" :key="index">
                                         <li class="me-4">{{ index + 1 + ' - ' + colabs }}</li>
                                     </ul>
                                 </div>

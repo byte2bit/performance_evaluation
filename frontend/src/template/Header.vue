@@ -31,39 +31,34 @@
                     <ul
                         class="text-sm flex flex-col p-4 md:p-0 mt-4 border  text-white border-gray-100 rounded-lg md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0">
                         <li>
-                            <a href="#"
+                            <router-link to="/"
                                 class="block py-2 px-3 rounded-sm md:bg-transparent md:p-0 hover:text-yellow-200"
-                                aria-current="page">
-                                <router-link to="/">
+                                aria-label="Início">
                                     <svg class="ms-1 h-5 w-5 fill-white hover:fill-yellow-200"
                                         viewBox="0 0 576 512" alt="Início"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.-->
                                         <path
                                             d="M575.8 255.5c0 18-15 32.1-32 32.1h-32l.7 160.2c0 2.7-.2 5.4-.5 8.1v16.2c0 22.1-17.9 40-40 40h-16c-1.1 0-2.2 0-3.3-.1-1.4.1-2.8.1-4.2.1L416 512h-24c-22.1 0-40-17.9-40-40v-88c0-17.7-14.3-32-32-32h-64c-17.7 0-32 14.3-32 32v88c0 22.1-17.9 40-40 40h-55.9c-1.5 0-3-.1-4.5-.2-1.2.1-2.4.2-3.6.2h-16c-22.1 0-40-17.9-40-40V360c0-.9 0-1.9.1-2.8v-69.7h-32c-18 0-32-14-32-32.1 0-9 3-17 10-24L266.4 8c7-7 15-8 22-8s15 2 21 7l255.4 224.5c8 7 12 15 11 24z" />
                                     </svg>
-                                </router-link>
-                            </a>
+                            </router-link>
                         </li>
                         <li>
-                            <a href="#"
-                                class="block py-2 px-3 rounded-sm md:bg-transparent md:p-0 hover:text-yellow-200"
-                                aria-current="page">
-                                <router-link to="/registros">Registros</router-link>
-                            </a>
+                            <router-link to="/registros"
+                                class="block py-2 px-3 rounded-sm md:bg-transparent md:p-0 hover:text-yellow-200">
+                                Registros
+                            </router-link>
                         </li>
                         <li>
-                            <a href="#"
+                            <router-link to="/colabs"
                                 class="block py-2 px-3 text-white rounded-sm md:border-0 hover:text-yellow-200 md:p-0  ">
                                 <!-- class="block py-2 px-3 text-white rounded-sm hover:bg-blue-900  md:border-0 md:hover:text-yellow-200 md:p-0  "> -->
-                                <!-- <router-link v-if="admin" to="/colabs">Lista de profissionais</router-link> -->
-                                <router-link to="/colabs">Lista de profissionais</router-link>
-                            </a>
+                                Lista de profissionais
+                            </router-link>
                         </li>
                         <li>
-                            <a href="#"
+                            <router-link to="/inserir"
                                 class="block py-2 px-3 text-white rounded-sm  md:border-0 hover:text-yellow-200 md:p-0  ">
-                                <!-- <router-link v-if="admin" to="/inserir">Inserir profissional</router-link> -->
-                                <router-link to="/inserir">Inserir profissional</router-link>
-                            </a>
+                                Inserir profissional
+                            </router-link>
                         </li>
 
                     </ul>

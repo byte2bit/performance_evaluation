@@ -1,5 +1,5 @@
 <script>
-import axios from 'axios'
+import axios from '@/plugins/axios.js'
 import exportFromJSON from "export-from-json"
 import { excelParser } from "../utils/excel-parser"
 import { dados } from '../../js/store.js'
@@ -20,7 +20,7 @@ export default {
     },
     methods: {
         loadRegs() {
-            axios.get("registros")
+            axios.get('/registros')
                 .then(res => {
                     this.listData = res.data
 

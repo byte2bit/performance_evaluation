@@ -1,5 +1,5 @@
 <script>
-import axios from 'axios'
+import axios from '@/plugins/axios.js'
 import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
 
@@ -29,7 +29,7 @@ export default {
             })
         },
         save: function () {
-            axios.post("newcolab", this.postData)
+            axios.post('/colab', this.postData)
                 .then(() => {
                     this.reset()
                     // console.log(this.postData)

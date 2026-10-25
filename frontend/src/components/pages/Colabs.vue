@@ -52,7 +52,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import axios from '@/plugins/axios.js'
 import Vue3EasyDataTable from 'vue3-easy-data-table'
 import 'vue3-easy-data-table/dist/style.css'
 
@@ -93,7 +93,7 @@ export default {
             })
         },
         loadColabs() {
-            axios.get("colab")
+            axios.get('/colab')
                 .then(res => {
                     this.colabs = res.data
                 }).catch("Erro")
@@ -111,7 +111,7 @@ export default {
 
             this.colabs = this.colabs.filter((item) => item.id !== this.colabId);
 
-            axios.delete(`colab/${this.colabId}`)
+            axios.delete(`/colab/${this.colabId}`)
                 .then(() => {
                     this.notify()
                 })

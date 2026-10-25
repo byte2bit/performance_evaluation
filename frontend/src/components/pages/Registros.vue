@@ -99,7 +99,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import axios from "@/plugins/axios.js";
 import Vue3EasyDataTable from "vue3-easy-data-table";
 import "vue3-easy-data-table/dist/style.css";
 
@@ -158,7 +158,7 @@ export default {
     },
     loadRegs() {
       axios
-        .get("registros")
+        .get("/registros")
         .then((res) => {
           this.registros = res.data;
 
@@ -198,7 +198,7 @@ export default {
       this.registros = this.registros.filter((item) => item.id !== this.regId);
 
       axios
-        .delete(`registros/${this.regId}`)
+        .delete(`/registros/${this.regId}`)
         .then(() => {
           this.notify();
         })

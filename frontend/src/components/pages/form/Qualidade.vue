@@ -6,14 +6,15 @@
         </div>
         <div>
             <star-rating v-model:rating="postData.nota_qualidade" :increment="0.5" active-border-color="#1a00ab"
-                active-color="#1a00ab" :star-size="25" data-modal-show="sub-modal" data-modal-target="sub-modal" />
+                active-color="#1a00ab" :star-size="25"
+                @click="showSubModal = postData.nota_qualidade <= 3" />
             <div class="my-3 flex flex-col">
                 <label for="obs_qualidade">Observações:</label>
                 <textarea v-sanitize="text" id="obs_qualidade" rows="3" v-model="postData.obs_qualidade"></textarea>
             </div>
         </div>
 
-        <SubModal v-model="showSubModal">
+        <SubModal id="qualidade-modal" v-model:simpleModalFlag="showSubModal">
             <template #headerModal>
                 <div class="px-3 px-sm-5 text-center">
                     <h3 class="font-bold mb-2">Qualidade de serviço:</h3>
@@ -25,9 +26,9 @@
             <template #bodyModal>
                 <div class="flex flex-col">
                     <div class="form-check d-flex align-items-start mt-3" v-for="option in optQualidade" :key="option.id">
-                        <input type="checkbox" :value="option.name" :id="`check-dispon-${option.id}`"
+                        <input type="checkbox" :value="option.name" :id="`check-qualidade-${option.id}`"
                             v-model="iQualidade" />
-                        <label :for="`check-dispon-${option.id}`">{{ option.name }}</label>
+                        <label :for="`check-qualidade-${option.id}`">{{ option.name }}</label>
                     </div>
                 </div>
             </template>
@@ -47,14 +48,14 @@ const text = ref("")
 const showSubModal = ref(false)
 
 // Abre ou fecha o modal automaticamente ao mudar a nota
-watch(() => postData.nota_qualidade, (newVal) => {
+watch(() => postData.value.nota_qualidade, (newVal) => {
     if (newVal <= 3) {
         showSubModal.value = true
     } else {
         showSubModal.value = false
         iQualidade.value = []
     }
-})
+}, { immediate: true })
 
 </script>
 
