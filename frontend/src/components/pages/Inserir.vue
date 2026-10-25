@@ -29,13 +29,15 @@ export default {
             })
         },
         save: function () {
-            axios.post('/colab', this.postData)
+            return axios.post('/colab', this.postData)
                 .then(() => {
                     this.reset()
                     // console.log(this.postData)
                     this.notify()
                 })
-                .catch(console.log("Erro"))
+                .catch(() => {
+                    toast.error('Não foi possível registrar o profissional. Tente novamente.', { theme: 'colored' })
+                })
         },
         reset() {
             this.postData.matricula = "",

@@ -93,14 +93,15 @@ export default {
             })
         },
         loadColabs() {
-            axios.get('/colab')
+            return axios.get('/colab')
                 .then(res => {
                     this.colabs = res.data
-                }).catch("Erro")
+                }).catch(() => {
+                    toast.error('Não foi possível carregar os profissionais.', { theme: 'colored' })
+                })
         },
         loadColab(colab) {
             this.colab = { ...colab }
-            console.log("colab: " + this.colab)
         },
         modal(colab) {
             this.lColab = { ...colab }
@@ -109,13 +110,16 @@ export default {
         },
         deleteItem() {
 
-            this.colabs = this.colabs.filter((item) => item.id !== this.colabId);
+            const colabId = this.colabId
 
-            axios.delete(`/colab/${this.colabId}`)
+            return axios.delete(`/colab/${colabId}`)
                 .then(() => {
+                    this.colabs = this.colabs.filter(item => item.id !== colabId)
                     this.notify()
                 })
-                .catch("Erro")
+                .catch(() => {
+                    toast.error('Não foi possível remover o profissional.', { theme: 'colored' })
+                })
         },
     },
     mounted() {

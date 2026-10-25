@@ -15,24 +15,17 @@ module.exports = app => {
         const limit = req.query.limit
         const offset = (page - 1) * limit
 
-        // try {
-           const total = await app.db("registros").count("id as count").first()
+        try {
             const registros = await app.db("registros")
                 .select("id","colab", "avaliacao", "nivel", "desconto", "demandante", "liderancas", "nota_qualidade", "obs_qualidade", "nota_prazo", "obs_prazo", "nota_dispon", "obs_dispon", "nota_respon", "obs_respon", "created_at", "updated_at", "itensQualidade", "itensDispon")
                 .orderBy("created_at", "desc")
                 .limit(limit)
                 .offset(offset)
-                .then(registros => res.json(registros))
 
-            res.json({
-                data: registros,
-                total: total.count
-            })
-            .catch(err => res.status(500).send(err))
-        // } 
-/*         .catch (err) {
-            res.status(500).send(err)
-        } */
+            return res.json(registros)
+        } catch {
+            return res.status(500).send('Não foi possível carregar os registros.')
+        }
     }
    
  /*    const getReg = (req, res) => {

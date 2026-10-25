@@ -157,7 +157,7 @@ export default {
       });
     },
     loadRegs() {
-      axios
+      return axios
         .get("/registros")
         .then((res) => {
           this.registros = res.data;
@@ -181,7 +181,9 @@ export default {
             return registro.created_at;
           });
         })
-        .catch("Erro");
+        .catch(() => {
+          toast.error('Não foi possível carregar os registros.', { theme: 'colored' });
+        });
     },
     loadReg(registro) {
       this.registro = { ...registro };
@@ -195,14 +197,18 @@ export default {
     deleteItem() {
       // console.log("lReg: " + JSON.stringify(this.lReg))
 
-      this.registros = this.registros.filter((item) => item.id !== this.regId);
+      const regId = this.regId;
 
-      axios
-        .delete(`/registros/${this.regId}`)
+      return axios
+        .delete(`/registros/${regId}`)
         .then(() => {
+          this.registros = this.registros.filter(item => item.id !== regId);
+          this.colabcUser = this.colabcUser.filter(item => item.id !== regId);
           this.notify();
         })
-        .catch("Erro");
+        .catch(() => {
+          toast.error('Não foi possível remover o registro.', { theme: 'colored' });
+        });
     },
   },
   mounted() {

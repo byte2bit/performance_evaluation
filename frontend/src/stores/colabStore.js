@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from "vue"
 import axios from '@/plugins/axios.js'
+import { toast } from 'vue3-toastify'
 
 export const useColabStore = defineStore('colabs', () => {
     const chkColabs = ref([])
@@ -11,8 +12,8 @@ export const useColabStore = defineStore('colabs', () => {
         try {
             const res = await axios.get('/colab')
             colabs.value = res.data
-        } catch (e) {
-            console.error("Erro ao carregar colaboradores", e)
+        } catch {
+            toast.error('Não foi possível carregar os profissionais.', { theme: 'colored' })
         }
     }
 

@@ -11,11 +11,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "argon2": "0.45.1",
     "bcrypt-nodejs": "*",
-    "body-parser": "*",
+    "body-parser": "1.20.9",
+    "connect-session-knex": "5.0.0",
     "consign": "*",
     "cors": "^2.8.5",
-    "express": "*",
+    "express": "4.22.3",
+    "express-session": "1.19.0",
     "jwt-simple": "*",
     "knex": "^3.1.0",
     "moment": "*",
@@ -24,8 +27,16 @@
     "nodemailer": "^6.9.14",
     "passport": "*",
     "passport-jwt": "*",
+    "passport-local": "1.0.0",
     "pm2": "*",
+    "rate-limiter-flexible": "11.2.3",
     "vhost": "^3.0.2"
+  },
+  "overrides": {
+    "proxy-addr": "2.0.8",
+    "get-uri@6.0.3": {
+      "basic-ftp": "6.2.3"
+    }
   },
   "devDependencies": {
     "@types/bcrypt-nodejs": "^0.0.31",

@@ -3,6 +3,7 @@ import axios from '@/plugins/axios.js'
 import exportFromJSON from "export-from-json"
 import { excelParser } from "../utils/excel-parser"
 import { dados } from '../../js/store.js'
+import { toast } from 'vue3-toastify'
 
 export default {
     data() {
@@ -20,7 +21,7 @@ export default {
     },
     methods: {
         loadRegs() {
-            axios.get('/registros')
+            return axios.get('/registros')
                 .then(res => {
                     this.listData = res.data
 
@@ -36,7 +37,9 @@ export default {
                         return (registro.created_at)
                     }))
 
-                }).catch("Erro")
+                }).catch(() => {
+                    toast.error('Não foi possível carregar os dados para exportação.', { theme: 'colored' })
+                })
         },
         exportData() {
             excelParser().exportDataFromJSON(this.listData, null, null);
