@@ -2,6 +2,20 @@
 
 Atualizado em 26/10/2026. As prioridades do item 16 do AGENTS.md são critérios de ordenação; não significam aprovação automática de arquitetura, autenticação, contratos ou schema. O ponto de continuidade, ambiente local e próximo lote estão em [RETOMADA.md](RETOMADA.md).
 
+### Estado mais recente — interface, temas e checkpoint de continuidade
+
+Concluídas as revisões visuais de registros, profissionais, cadastro, página inicial e login, seguidas de alternância de tema persistida, dropdown da conta e modais padronizados. Última validação: **130 testes**, build development e **78 grupos Chrome com API simulada** aprovados. Contratos, autorização e envio de avaliações desativado preservados. Ver [REVISAO_PAGINAS_GESTAO.md](REVISAO_PAGINAS_GESTAO.md). O usuário solicitou guardar a continuidade e enviar este conjunto ao GitHub; próximos trabalhos continuam sujeitos ao escopo/autorização próprios.
+
+Próxima etapa proposta: planejar revisão/conciliação dos oito registros legados, sem associação automática nem nova migration. A execução do plano dependerá de aprovação. O estado dos serviços locais deve ser conferido na retomada; eles foram reabertos após o lote SQL.
+
+### Lote anterior — vínculo por ID e migration validados no MySQL isolado
+
+Modelo aprovado: histórico acessível somente ao demandante atual do profissional e administradores, preservando o autor original. Implementados `colab_id`, consulta por associação atual antes da paginação, escrita por ID/compatibilidade de nome único, 409 para ambiguidade e seleção Vue por IDs. Sem vínculo, legados permanecem administrativos. A submissão segue desativada.
+
+O lote inicial teve 123 testes e build development aprovados. Após nova autorização, backup/restauração de oito tabelas/43 registros passaram; a 12ª migration e 15 grupos de testes SQL passaram primeiro na cópia, incluindo FKs, collation e espera real de lock/transferência. Só depois a origem fictícia recebeu a migration, preservando contas, profissionais e oito avaliações históricas com vínculo nulo. Suíte ao final desse lote: **127 aprovados**, zero falhas/skips. A instância foi parada ao final, com dados persistidos, e posteriormente reaberta para uso local.
+
+Próximo lote: planejar revisão/conciliação dos registros legados e, se solicitado, fluxo administrativo de transferência. Não associar automaticamente pelo nome/e-mail do autor. Outros ambientes, submissão e produção permanecem separados. [Modelo, compatibilidade, evidências e reversão](PLANO_VINCULOS.md).
+
 ## Primeiro lote aprovado
 
 | Tarefa | Estado | Critério de aceitação |

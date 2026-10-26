@@ -1,12 +1,13 @@
 <template>
-    <div class="flex flex-col min-w-0 w-full p-4 bg-zinc-200 rounded-md">
+    <div class="evaluation-criterion mp-card">
+        <div class="evaluation-criterion-heading"><span aria-hidden="true">03</span><h3>Disponibilidade</h3></div>
         <div class="star-title">
             <p>Como você avalia a disponibilidade do Posto de
                 Serviço no horário de serviço?</p>
         </div>
         <div>
-            <star-rating v-model:rating="postData.nota_dispon" :increment="0.5" active-border-color="#1a00ab"
-                active-color="#1a00ab" :star-size="25"
+            <star-rating v-model:rating="postData.nota_dispon" :increment="0.5" active-border-color="var(--mp-accent, #1d4ed8)"
+                active-color="var(--mp-accent, #1d4ed8)" :star-size="25"
                 @click="showSubModal = postData.nota_dispon <= 3" />
             <div class="my-3 flex flex-col">
                 <label for="obs_dispon">Observações:</label>

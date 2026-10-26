@@ -33,6 +33,9 @@ function loadApplication(identity = { id: 1, name: 'Usuário fictício', email: 
 
     function load(file) {
         if (file === path.join(frontend, 'src/stores/authStore.js')) return { useAuthStore: () => auth }
+        if (file === path.join(frontend, 'src/stores/colabStore.js')) return { useColabStore: () => ({ chkColabs: [] }) }
+        if (file === path.join(frontend, 'src/composables/useTheme.js')) return { useTheme: () => ({ isDark: Vue.ref(false), toggleTheme() {} }) }
+        if (file.endsWith('.css')) return {}
         if (pages.has(file)) return { __esModule: true, default: pages.get(file) }
         if (cache.has(file)) return cache.get(file).exports
         if (/\.(png|svg)$/.test(file)) return file

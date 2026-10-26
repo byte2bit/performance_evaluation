@@ -21,7 +21,7 @@ function page(name, axios, identity = user) {
     vm.runInNewContext(descriptor.script.content.replace(/^import .*$/gm, '')
         .replace('export default ', 'module.exports = '), {
         module, axios, toast, dados: identity, Vue3EasyDataTable: {},
-        Excel: {}, ConfirmDeleteModal: {}, exportFromJSON: {}, excelParser: () => ({})
+        ManagementPage: {}, Excel: {}, ConfirmDeleteModal: {}, exportFromJSON: {}, excelParser: () => ({})
     }, { filename, timeout: 1000 })
     const options = module.exports
     const instance = { ...options.data() }
@@ -87,14 +87,14 @@ for (const [name, selectedId, fields, endpoint] of [
     }
 }
 
-test('Registros: successful load preserves filtering and date presentation', async () => {
+test('Registros: authorized history from previous authors remains visible with date presentation', async () => {
     const rows = [
         { id: 1, demandante: user.email, created_at: '2026-10-25T12:00:00.000Z' },
         { id: 2, demandante: 'another@example.invalid', created_at: '2026-10-24T12:00:00.000Z' }
     ]
     const { instance, notifications } = page('Registros', { async get() { return { data: rows } } })
     await instance.loadRegs()
-    assert.deepEqual(Array.from(instance.colabcUser, row => row.id), [1])
+    assert.deepEqual(Array.from(instance.colabcUser, row => row.id), [1, 2])
     assert.equal(instance.registros[0].created_at, '25/10/2026')
     assert.equal(notifications.length, 0)
 })
@@ -131,6 +131,7 @@ test('collaborator store: failed loading preserves the list and selection withou
         module,
         defineStore: (name, setup) => setup,
         ref: value => ({ value }),
+        computed: getter => ({ get value() { return getter() } }),
         axios: { async get() { throw new Error('synthetic private API detail') } },
         toast: { error(message) { notifications.push(message) } },
         console: { error() { assert.fail('Raw API errors must not be logged') } }
@@ -138,9 +139,9 @@ test('collaborator store: failed loading preserves the list and selection withou
     const store = module.exports()
     const rows = [{ id: 1, colab: 'Profissional fictício' }]
     store.colabs.value = rows
-    store.chkColabs.value = ['Profissional fictício']
+    store.chkColabs.value = [1]
     await store.loadColabs()
     assert.equal(store.colabs.value, rows)
-    assert.deepEqual(store.chkColabs.value, ['Profissional fictício'])
+    assert.deepEqual(store.chkColabs.value, [1])
     assert.deepEqual(notifications, ['Não foi possível carregar os profissionais.'])
 })

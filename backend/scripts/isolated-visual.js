@@ -124,7 +124,7 @@ async function review({ profile, startApplication }) {
             const dialogs = page.locator('#exampleModal, #delete-colab-modal, #delete-registro-modal')
             check('reviewer-' + url.slice(1) + '-no-confirmation-visible', await dialogs.count() === 0)
         }
-        await page.locator('input[type="text"]').first().fill('Nao existe ficticio')
+        await page.getByRole('searchbox', { name: 'Buscar registros' }).fill('Nao existe ficticio')
         await page.getByText('Não há dados disponíveis', { exact: true }).waitFor()
         check('records-empty-search-state', true)
         await capture('07-records-empty-filter')
@@ -156,6 +156,7 @@ async function review({ profile, startApplication }) {
         check('mobile-menu-expands', await menu.getAttribute('aria-expanded') === 'true' && await page.getByRole('link', { name: 'Registros', exact: true }).isVisible())
         await capture('11-mobile-menu')
         await menu.click()
+        await page.getByRole('button', { name: 'Minha conta', exact: true }).click()
         await page.getByRole('button', { name: 'Sair', exact: true }).click()
         await page.waitForURL('**/login')
         check('logout-unmounts-private-header', await page.getByRole('button', { name: 'Sair', exact: true }).count() === 0)
@@ -167,9 +168,10 @@ async function review({ profile, startApplication }) {
         await capture('12-admin-home-desktop')
         await page.emulateMedia({ colorScheme: 'dark' })
         await capture('13-admin-home-dark')
-        const contrast = await page.locator('.demandante').first().evaluate(el => {
+        await page.getByRole('button', { name: 'Minha conta', exact: true }).click()
+        const contrast = await page.locator('.account-email').evaluate(el => {
             const foreground = getComputedStyle(el).color
-            const background = getComputedStyle(el.closest('header').firstElementChild).backgroundColor
+            const background = getComputedStyle(el.closest('.account-identity')).backgroundColor
             const luminance = color => color.match(/[\d.]+/g).slice(0, 3).map(Number).map(value => {
                 const channel = value / 255
                 return channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4
@@ -178,6 +180,7 @@ async function review({ profile, startApplication }) {
             return { foreground, background, ratio: Number(((values[1] + 0.05) / (values[0] + 0.05)).toFixed(2)) }
         })
         check('dark-identity-contrast', contrast.ratio >= 4.5, contrast)
+        await page.keyboard.press('Escape')
         await page.emulateMedia({ colorScheme: 'light' })
         await goto('/inserir')
         await capture('14-admin-insert-desktop')
@@ -186,8 +189,8 @@ async function review({ profile, startApplication }) {
             return [...new Set(ids.filter((id, index) => ids.indexOf(id) !== index))]
         })
         check('insert-unique-control-ids', duplicateIds.length === 0, { duplicateIds })
-        await page.getByText('Matrícula:', { exact: true }).click()
-        check('registration-label-focus', await page.getByLabel('Matrícula:', { exact: true }).evaluate(el => el === document.activeElement))
+        await page.getByText('Matrícula', { exact: true }).click()
+        check('registration-label-focus', await page.getByLabel('Matrícula', { exact: true }).evaluate(el => el === document.activeElement))
         await page.setViewportSize({ width: 390, height: 844 })
         await capture('14-admin-insert-mobile')
         await page.setViewportSize({ width: 1366, height: 900 })
@@ -259,6 +262,7 @@ async function review({ profile, startApplication }) {
         check('professionals-simulated-service-error', true)
         await capture('19-professionals-service-error')
         simulated = ''
+        await page.getByRole('button', { name: 'Minha conta', exact: true }).click()
         await page.getByRole('button', { name: 'Sair', exact: true }).click()
         await page.waitForURL('**/login')
         check('no-unexpected-page-errors', report.unexpectedPageErrors === 0)

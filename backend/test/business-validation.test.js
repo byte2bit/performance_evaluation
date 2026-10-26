@@ -96,7 +96,7 @@ test('invalid HTTP payloads fail before business queries or writes, while author
     const list = await reviewer.request('GET', '/registros2')
     assert.equal(list.status, 200)
     assert.deepEqual(list.json().map(row => row.colab), ['Profissional A'])
-    for (let index = 0; index < 50; index++) app.state.tables.registros.push({ id: index + 100, colab: 'Profissional A', demandante: email })
+    for (let index = 0; index < 50; index++) app.state.tables.registros.push({ id: index + 100, colab_id: 1, colab: 'Profissional A', demandante: email })
     const first = (await reviewer.request('GET', '/registros2')).json()
     const second = (await reviewer.request('GET', '/registros2?page=2')).json()
     const last = (await reviewer.request('GET', '/registros2?page=3')).json()

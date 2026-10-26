@@ -7,7 +7,7 @@ Sistema web para avaliação de profissionais, consulta de avaliações e gestã
 | Área | Funcionalidades implementadas |
 | --- | --- |
 | Acesso | Login por e-mail e senha, logout, recuperação da sessão ao navegar e troca de senha autenticada. |
-| Perfis | Administradores consultam todos os dados e executam operações administrativas; avaliadores acessam colaboradores e avaliações vinculados ao e-mail da própria conta. A autorização é aplicada pela API. |
+| Perfis | Administradores consultam todos os dados; o demandante atual consulta o histórico dos seus profissionais, inclusive avaliações anteriores. O anterior perde acesso, preservando a autoria. A autorização é aplicada pela API. |
 | Colaboradores | Cadastro administrativo, listagem com pesquisa e ordenação, seleção para avaliação e exclusão administrativa com confirmação. |
 | Avaliação | Formulário com qualidade, prazo, disponibilidade e responsabilidade; notas em incrementos de 0,5, observações, critérios e cálculo de média, nível e desconto. **A submissão pela interface permanece desativada.** |
 | Registros | Consulta de avaliações, pesquisa, ordenação e exclusão administrativa com confirmação. A API também oferece uma listagem paginada. |
@@ -20,7 +20,9 @@ Sistema web para avaliação de profissionais, consulta de avaliações e gestã
 
 Autenticação por Passport Local, sessões persistentes, autorização, proteção CSRF, limitação de requisições, expiração e revogação estão implementadas. Senhas usam Argon2id; cookies de sessão são HttpOnly, com regras específicas para HTTPS em produção.
 
-As 11 migrations e os fluxos de autenticação/dados foram validados em **MySQL 8.0.44 isolado, com contas fictícias**. Backup criptografado e restauração em schema separado também foram exercitados nesse ambiente. Isso não comprova configuração ou ativação em produção.
+As **12 migrations** e os fluxos de autenticação/dados foram validados em **MySQL 8.0.44 isolado, com contas fictícias**. Backup criptografado e restauração em schema separado também foram exercitados nesse ambiente. Isso não comprova configuração ou ativação em produção.
+
+**A 12ª migration foi aplicada e validada somente no perfil MySQL isolado documentado.** As oito avaliações legadas foram preservadas sem vínculo e ficam restritas a administradores até conciliação revisada. Não há associação automática por nome. Outros ambientes exigem preparação e autorização próprias. [Modelo, compatibilidade e evidências](docs/PLANO_VINCULOS.md).
 
 Continuam pendentes a persistência dos arrays de critérios e a ativação da submissão, recuperação de senha por e-mail, tratamento dos vínculos legados por nome/e-mail, purga de dados expirados e recuperação em outro host. URLs, proxy e HTTPS de produção ainda precisam ser definidos. O estado das dependências e dos alertas está em [DEPENDENCIAS_SEGURANCA.md](docs/DEPENDENCIAS_SEGURANCA.md).
 
@@ -43,6 +45,8 @@ AGENTS.md      Regras de manutenção e segurança do repositório
 Consign carrega autenticação, middlewares, handlers e rotas nessa ordem. `backend/index.js` inicia a API diretamente; `backend/api.js` é o wrapper Vhost e delega o hostname configurado à mesma aplicação. O Vhost não representa sistemas independentes. Consulte os [detalhes do backend](backend/README.md) e o [mapa de arquitetura](docs/AI_CONTEXT.md).
 
 ## Desenvolvimento local
+
+O perfil documentado já possui a 12ª migration. A instância foi encerrada ao final dos testes, voltando ao estado parado anterior. Os comandos abaixo iniciam o ambiente existente; não aplicam migrations em outros alvos. Avaliadores podem receber histórico vazio enquanto os registros legados não forem conciliados.
 
 O ambiente registrado usa **Node.js 24.12.0**, npm 11.6.2, PowerShell 7 e MySQL 8.0.44 isolado. As dependências de frontend e backend têm manifestos e lockfiles separados. A instalação precisa preservar esses lockfiles; Argon2 possui componente nativo.
 
@@ -87,6 +91,7 @@ Para validar o ciclo de processos do PM2 sem iniciar a aplicação ou acessar ba
 - [Plano de evolução](docs/PLANO_EVOLUCAO.md)
 - [Autenticação e configuração](docs/PLANO_AUTENTICACAO.md)
 - [Contrato de validação e paginação](docs/PLANO_VALIDACAO_API.md)
+- [Vínculos por ID e histórico do demandante atual](docs/PLANO_VINCULOS.md)
 - [Ambiente MySQL isolado](docs/AMBIENTE_ISOLADO.md)
 - [Backup e restauração](docs/BACKUP_RESTAURACAO.md)
 - [Revisão visual](docs/REVISAO_VISUAL.md)

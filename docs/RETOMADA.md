@@ -1,11 +1,14 @@
 # Ponto de retomada
 
-Atualizado em **26/10/2026** após a retomada, atualização dos READMEs e implementação dos dois lotes locais aprovados de Nodemailer/PM2. O usuário solicitou enviar as alterações ao GitHub. Este registro acompanha o código e as evidências; não autoriza deploy ou mudanças em produção.
+Checkpoint consolidado em **26/10/2026**, reunindo os vínculos por ID, a aplicação autorizada da **12ª migration no MySQL isolado**, a renovação visual das páginas, os temas e o menu da conta. O usuário solicitou guardar a continuidade e autorizou commit/push deste conjunto para `origin/master`; o commit anterior era `e0848ec`. Consultar `git log -1` e as referências remotas para identificar o commit deste checkpoint e confirmar o envio. Essa autorização não abrange deploy, outros bancos, backfill, produção ou futuros commits/push sem nova solicitação.
 
 ## Estado entregue
 
+- Cabeçalho com botão claro/escuro (preferência `evaluation-theme` no navegador) e dropdown **Minha conta** para nome/e-mail/troca de senha/saída. Modais padronizados nos dois temas, mantendo contratos e foco do Flowbite. **130/130 testes**, build e **30 grupos novos Chrome**, mais regressões de 16/32 grupos, aprovados com API simulada. [Detalhes](REVISAO_PAGINAS_GESTAO.md#extensão-tema-manual-menu-da-conta-e-modais). Sem alteração no modelo de autenticação ou ativação de envio.
+- Página inicial e login também receberam o estilo das páginas de gestão: seleção e resultados em painéis, critérios organizados e acesso com a marca. **127/127 testes**, build development e **16 grupos Chrome** com API simulada passaram, incluindo login, seleção, estrelas, critérios e resumo. Autenticação e submissão desativada preservadas. [Detalhes e reprodução](REVISAO_PAGINAS_GESTAO.md#extensão-página-inicial-e-login).
+- Aparência de `/registros`, `/colabs` e `/inserir` renovada: painéis, busca, tabelas responsivas e cadastro por seções, com tema escuro. **127/127 testes**, build e **32 grupos de verificações Chrome** com API inteiramente simulada passaram; ver [REVISAO_PAGINAS_GESTAO.md](REVISAO_PAGINAS_GESTAO.md). O ambiente local foi iniciado depois do lote SQL, a pedido do usuário; verificar os serviços antes de iniciá-los novamente.
 - Passport Local, sessões persistentes MySQL, autorização administrativa/por avaliador, CSRF, limitação, expiração/revogação, troca de senha, CLI e interface de login implementados.
-- Cadeia completa de 11 migrations validada somente em MySQL 8.0.44 isolado, com as duas correções aprovadas e contas fictícias.
+- **12 migrations aplicadas e validadas somente em MySQL 8.0.44 isolado**, primeiro na cópia recuperada e depois na origem fictícia. Backup/restauração confirmaram oito tabelas/43 registros antes da alteração. Contas, profissionais e oito avaliações históricas foram preservados; os oito vínculos antigos continuam nulos.
 - Backup criptografado e restauração em schema separado aprovados no lote anterior. Recuperação em outro host ainda pendente.
 - Cinco problemas visuais corrigidos e revalidados; submissão da avaliação permanece desativada.
 - Contrato de validação/paginação aprovado e implementado: notas 1–5 em passos de 0,5, consistência de média/nível/desconto, textos até 255 caracteres, IDs válidos, page=1/limit=25 e teto 100 em `/registros2`; entrada inválida retorna 400.
@@ -14,18 +17,27 @@ Atualizado em **26/10/2026** após a retomada, atualização dos READMEs e imple
 - Audit online do **backend: zero entradas, código 0**, após os dois lotes. O audit **frontend zero** é o resultado do lote anterior; não foi repetido.
 - Runner PM2 fictício opt-in passou **7/7**, com pipes exclusivos no Windows, ambiente sanitizado, rede bloqueada e daemon encerrado. Métricas WMI foram negadas e não estão validadas. Nenhum daemon pessoal/operacional foi usado.
 - O usuário ajustou `backend/api.js` para o hostname de exemplo `api.mysite.com` e removeu comentários inativos; alteração preservada, com teste e documentação alinhados.
+- Decisão atual aprovada: somente demandante atual e administradores consultam o histórico do profissional. O autor é preservado; o demandante anterior perde acesso, salvo se for administrador. Decisão inicial de manter acesso por autoria foi substituída.
+- `registros.colab_id` usa a identidade do profissional; leitura não faz fallback por nome/autor. Legados sem vínculo ficam administrativos até conciliação. POST por nome único continua compatível; ambiguidade/conflito nome-ID retorna 409. Vue seleciona IDs e não refiltra o histórico pelo autor.
+- Não há novo endpoint/tela para editar demandante, script de backfill, associação automática ou submissão de avaliações ativada. Sua edição no título de `AGENTS.md` foi preservada.
 
-Validações do lote local: **113 testes aprovados**, zero falhas/skips, audit backend zero e ciclo PM2 7/7. Evidências em [DEPENDENCIAS_SEGURANCA.md](DEPENDENCIAS_SEGURANCA.md#atualizacao-principal-local-nodemailer-e-pm2). Integração SQL isolada, **48/48 verificações no Chrome** e build de desenvolvimento aprovados continuam como evidências do lote anterior, concluídas na noite de 25/10 em São Paulo (UTC dos relatórios já indica 26/10). Não foram repetidas sem mudanças nessas áreas ou nova dúvida concreta.
+Última validação de código: **130 testes aprovados**, zero falhas/skips, build development e **78 grupos no Chrome com API simulada** (30 cabeçalho/modais + 16 inicial/login + 32 gestão). As verificações foram executadas no último lote de implementação; este checkpoint de documentação/envio não repete banco, migrations, instalações ou audits. Os screenshots e builds temporários não entram no Git.
+
+Evidências SQL anteriores: backup/restauração e 15 grupos reais de vínculos passaram, incluindo FKs, collation, autoria e transferência concorrente com espera de lock observada. Modelo/evidências em [PLANO_VINCULOS.md](PLANO_VINCULOS.md). Audit zero, ciclo PM2 7/7 e 48/48 da revisão antiga de autenticação também são resultados históricos, distintos dos 78 grupos simulados atuais. O MySQL foi parado ao final da aplicação SQL e depois reiniciado para uso da aplicação; não confundir o estado histórico com o atual.
+
+No checkpoint, o frontend respondeu **200 em `http://localhost:5173`** e a API respondeu **401 em `http://localhost:8001/session`** sem sessão, como esperado. Esses serviços foram mantidos; não iniciar duplicatas. O estado do MySQL não foi consultado novamente nesta etapa. Verificar os serviços na retomada, pois podem encerrar com o terminal/reinício do computador.
 
 ## Como retomar
 
-Ler `../AGENTS.md`, [AI_CONTEXT.md](AI_CONTEXT.md), [PLANO_EVOLUCAO.md](PLANO_EVOLUCAO.md), [DEPENDENCIAS_SEGURANCA.md](DEPENDENCIAS_SEGURANCA.md) e [PLANO_VALIDACAO_API.md](PLANO_VALIDACAO_API.md). Conferir primeiro `git status`, branch e diferenças remotas; preservar qualquer trabalho posterior a este registro.
+Ler `../AGENTS.md`, [AI_CONTEXT.md](AI_CONTEXT.md), [PLANO_EVOLUCAO.md](PLANO_EVOLUCAO.md), [PLANO_VINCULOS.md](PLANO_VINCULOS.md), [REVISAO_PAGINAS_GESTAO.md](REVISAO_PAGINAS_GESTAO.md), [DEPENDENCIAS_SEGURANCA.md](DEPENDENCIAS_SEGURANCA.md) e [PLANO_VALIDACAO_API.md](PLANO_VALIDACAO_API.md). Conferir primeiro `git status`, branch e diferenças remotas; preservar qualquer trabalho posterior a este registro.
 
-Próximo lote sugerido: **investigar vínculos legados por nome/e-mail com fixtures e preparar proposta**, preservando dados reais, schema e contratos. Qualquer correção estrutural exige plano e aprovação próprios. Os saltos locais de Nodemailer/PM2 estão concluídos; não repetir instalação/audit/testes sem mudança ou dúvida concreta. Não executar `npm audit fix --force` nem reiniciar daemon de produção.
+Próximo lote: **planejar revisão e conciliação dos oito vínculos legados**, preservando autoria e sem associação automática por nome/e-mail. `ValidateLinks` concluiu a transição 11→12 e recusa outro baseline; não repeti-lo no schema já atualizado. O runner genérico `Validate` altera fixtures e não é consulta somente leitura. Aplicação em outros alvos exige autorização própria. Não repetir instalações/audits/testes sem mudança ou dúvida concreta.
 
 Depois: desenhar persistência dos arrays de critérios e submissão antes de ativá-la, planejar recuperação em outro host/proteção das chaves, purga e recuperação de senha. URLs, HTTPS e proxy de produção não estão definidos; rotação das credenciais SMTP antigas depende do responsável operacional. Cluster, startup/resurrect, métricas WMI e SMTP real não foram validados pelos lotes locais.
 
 ## Reiniciar o ambiente local, se necessário
+
+O perfil abaixo já recebeu a 12ª migration. Iniciar MySQL e API somente se os serviços estiverem parados; a aplicação foi reaberta após a validação SQL. Histórico vazio para avaliadores é esperado enquanto os oito registros legados não forem conciliados; administradores continuam vendo esses registros. Esses comandos não migram outros ambientes.
 
 Na raiz do projeto, em PowerShell 7, com o mesmo usuário Windows que criou o cofre:
 
@@ -59,4 +71,4 @@ O runner `node backend/scripts/isolated-pm2.js` também é opt-in: cria perfil t
 
 ## Pedido para a próxima conversa
 
-> Continuar conforme AGENTS.md e docs/RETOMADA.md. Conferir o Git e investigar vínculos legados por nome/e-mail usando fixtures para preparar uma proposta, sem alterar schema/dados reais ou ativar submissão. Nodemailer/PM2 já foram atualizados e validados localmente; consultar as evidências antes de repetir trabalho.
+> Continuar conforme AGENTS.md e docs/RETOMADA.md. Estão concluídos os vínculos por ID e a 12ª migration no MySQL isolado, além das páginas renovadas, temas claro/escuro, menu da conta e modais. Último lote: 130 testes, build e 78 grupos Chrome simulados aprovados; validação SQL anterior preservada. Conferir Git/GitHub e serviços antes de iniciar qualquer processo. Próxima etapa: planejar revisão/conciliação dos oito registros legados sem vínculo, preservando autoria e aguardando aprovação para implementá-la. Não repetir a migration, acessar produção, associar legados automaticamente ou ativar submissão. Banco, backups e cofre DPAPI ficam fora do Git e não são recuperados pelo clone.

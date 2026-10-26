@@ -88,7 +88,7 @@ test('old session and collaborator responses cannot restore data after logout or
     await Promise.all([pendingSession, pendingColabs])
     assert.equal(state.auth.user.id, identity.id)
     assert.equal(state.colabs.colabs.length, 0)
-    state.colabs.chkColabs = ['Profissional fictício']
+    state.colabs.chkColabs = [1]
     state.unauthorized()
     assert.equal(state.auth.user, null)
     assert.equal(state.colabs.chkColabs.length, 0)
@@ -214,6 +214,7 @@ async function page(t, name, auth) {
             require(name) {
                 if (name === 'vue') return Vue
                 if (name === 'vue-router') return { useRouter: () => ({ async replace(value) { navigations.push(value) } }), useRoute: () => ({ query: {} }) }
+                if (name.endsWith('.css')) return {}
                 assert.equal(name, '@/stores/authStore.js')
                 return { useAuthStore: () => auth }
             }

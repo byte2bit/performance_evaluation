@@ -6,13 +6,15 @@ API Express do [Sistema de Avaliação de Desempenho](../README.md), com Knex/My
 
 - Login, consulta da sessão, logout e troca de senha autenticada.
 - Cadastro e consulta de colaboradores, consulta e gravação de avaliações e exclusões administrativas.
-- Avaliadores limitados aos profissionais/registros associados ao e-mail canônico de sua conta; administradores consultam todos.
+- Avaliadores consultam profissionais atualmente atribuídos ao e-mail canônico de sua conta e todo o histórico ligado aos IDs desses profissionais; administradores consultam todos. Autoria anterior não concede acesso.
 - Identidade da avaliação derivada da sessão e validação do profissional em transação.
 - Validação de notas, média, nível, desconto, textos, IDs e paginação.
 - Envio administrativo de templates HTML individuais ou em grupo por Nodemailer, com conteúdo dinâmico escapado e configuração externa.
 - CLI de contas, migrations Knex e ferramentas para validação e recuperação em MySQL isolado.
 
-A autenticação e a cadeia de 11 migrations foram validadas em MySQL 8.0.44 isolado com dados fictícios. Produção depende de configuração, schema e provisionamento próprios. A submissão da avaliação no frontend continua desativada, embora os endpoints de gravação existam.
+A autenticação e a cadeia de 12 migrations foram validadas em MySQL 8.0.44 isolado com dados fictícios. Produção depende de configuração, schema e provisionamento próprios. A submissão da avaliação no frontend continua desativada, embora os endpoints de gravação existam.
+
+O vínculo por `registros.colab_id` tem a **12ª migration aplicada no perfil isolado** após backup/restauração e testes reais em cópia. FKs, collation, transferência de acesso e concorrência passaram; as oito avaliações anteriores permaneceram nulas, sem associação automática. A conciliação desses registros e a aplicação em outros ambientes exigem etapas próprias. [Plano e evidências](../docs/PLANO_VINCULOS.md).
 
 ## Endpoints
 
@@ -36,6 +38,8 @@ A autenticação e a cadeia de 11 migrations foram validadas em MySQL 8.0.44 iso
 | `POST /mail` e `POST /mail2` | Enviar mensagem de avaliação | Administrador, com CSRF e limitação |
 
 `/registros2` devolve uma lista JSON com `page=1`, `limit=25` e teto de 100 itens por página; `/registros` mantém a lista completa no escopo autorizado. Notas aceitas: 1 a 5 em passos de 0,5, com média/nível/desconto consistentes. Entradas inválidas retornam 400; detalhes e payload fictício em [PLANO_VALIDACAO_API.md](../docs/PLANO_VALIDACAO_API.md).
+
+Avaliações incluem `colab_id`; `demandante` preserva o autor original. Para novas gravações, enviar o ID e nome do profissional. Clientes antigos podem enviar somente nome quando há um único correspondente autorizado; ambiguidade ou conflito nome/ID retorna 409, sem gravação. ID inexistente/fora de escopo retorna 403, sem fallback por nome. Leituras de registros sem vínculo são administrativas até conciliação. A consulta do responsável atual ocorre na mesma instrução SQL, antes da paginação.
 
 ## Autenticação e segurança
 

@@ -1,4 +1,4 @@
-# AGENTS.md — Sistema Vue 3 + Express + MySQL
+# AGENTS.md — Sistema de Avaliação de Desempenho
 
 ## 1. Contexto confirmado
 
@@ -10,7 +10,7 @@ Este é um **único sistema full stack já existente**, desenvolvido manualmente
 
 **Banco de dados:** MySQL.
 
-**Estado da autenticação:** login por Passport Local e sessões está **implementado e validado em MySQL 8.0.44 isolado, com contas fictícias**. As 11 migrations passaram nesse alvo autorizado; segredos locais estão fora do repositório. Configuração e ativação de produção permanecem pendentes. A presença do Passport nas dependências não comprova que outro ambiente esteja habilitado.
+**Estado da autenticação:** login por Passport Local e sessões está **implementado e validado em MySQL 8.0.44 isolado, com contas fictícias**. As 12 migrations passaram nesse alvo autorizado, incluindo vínculo por ID e histórico do demandante atual; oito avaliações legadas permanecem sem vínculo até conciliação revisada. Segredos locais estão fora do repositório. Configuração e ativação de produção permanecem pendentes. A presença do Passport nas dependências não comprova que outro ambiente esteja habilitado.
 
 **Vhost:** é utilizado dentro de um único sistema. Descubra sua finalidade, os hosts atendidos e suas dependências pelo código. **Não presuma** que exista uma arquitetura multi-tenant, SSO ou múltiplos sistemas independentes.
 

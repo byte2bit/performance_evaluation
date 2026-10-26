@@ -1,0 +1,140 @@
+{
+  "success": true,
+  "profileId": "0f8785e640294ebbbd5490d74b01e59a",
+  "mysqlVersion": "8.0.44",
+  "backupId": "2cf943c9fdd6",
+  "sourceDatabase": "evaluation_isolated_0f8785e64029_v2",
+  "validationDatabase": "evaluation_isolated_0f8785e64029_v2_restore_2cf943c9fdd6",
+  "backup": {
+    "success": true,
+    "sourceDatabase": "evaluation_isolated_0f8785e64029_v2",
+    "restoredDatabase": "evaluation_isolated_0f8785e64029_v2_restore_2cf943c9fdd6",
+    "encryptedArtifact": "backup-2cf943c9fdd6.evalbackup",
+    "encryption": "AES-256-GCM; separate key in DPAPI vault",
+    "tablesCompared": 8,
+    "rowsCompared": 43,
+    "ddlAndContentsMatch": true,
+    "sourceUnchanged": true,
+    "recoveredAdminAndEvaluatorLogin": true,
+    "elapsedMs": 1449,
+    "completedUtc": "2026-10-26T16:03:15.011Z"
+  },
+  "copyMigration": {
+    "applied": "20261026000100_link_registros_to_colab_id.js",
+    "migrationCount": 12,
+    "elapsedMs": 515
+  },
+  "sourceMigration": {
+    "applied": "20261026000100_link_registros_to_colab_id.js",
+    "migrationCount": 12,
+    "elapsedMs": 280
+  },
+  "copyMetadata": {
+    "nullableUnsignedId": true,
+    "indexed": true,
+    "foreignKeyRestrictive": true,
+    "collations": [
+      {
+        "tableName": "colab",
+        "columnName": "colab",
+        "collation": "utf8mb4_0900_ai_ci"
+      },
+      {
+        "tableName": "colab",
+        "columnName": "demandante",
+        "collation": "utf8mb4_0900_ai_ci"
+      },
+      {
+        "tableName": "registros",
+        "columnName": "colab",
+        "collation": "utf8mb4_0900_ai_ci"
+      },
+      {
+        "tableName": "registros",
+        "columnName": "demandante",
+        "collation": "utf8mb4_0900_ai_ci"
+      }
+    ]
+  },
+  "sourceMetadata": {
+    "nullableUnsignedId": true,
+    "indexed": true,
+    "foreignKeyRestrictive": true,
+    "collations": [
+      {
+        "tableName": "colab",
+        "columnName": "colab",
+        "collation": "utf8mb4_0900_ai_ci"
+      },
+      {
+        "tableName": "colab",
+        "columnName": "demandante",
+        "collation": "utf8mb4_0900_ai_ci"
+      },
+      {
+        "tableName": "registros",
+        "columnName": "colab",
+        "collation": "utf8mb4_0900_ai_ci"
+      },
+      {
+        "tableName": "registros",
+        "columnName": "demandante",
+        "collation": "utf8mb4_0900_ai_ci"
+      }
+    ]
+  },
+  "authenticationRegression": {
+    "sqlAuthorizationAndTransactions": true,
+    "apiInputValidation": {
+      "invalidPayloadsReturn400": true,
+      "invalidRouteIdsReturn400": true,
+      "noBusinessRowsChangedByInvalidInputs": true,
+      "paginationBounded": true,
+      "unicode255RoundTrip": true,
+      "unicodeProbeRolledBack": true
+    },
+    "sessionSurvivesApplicationRestart": true,
+    "sharedConcurrentRateLimit": {
+      "allowed": 10,
+      "blocked": 5,
+      "runtimes": 2
+    },
+    "passwordChangeLogoutAndRevocation": true,
+    "sessionExpiry": {
+      "databaseTTL": true,
+      "inactivity": true,
+      "absoluteDuration": true
+    },
+    "adminLoginAndVisibility": true,
+    "applicationAccountCannotCreateTables": true,
+    "fictionalAccounts": [
+      "admin@example.invalid",
+      "reviewer@example.invalid"
+    ],
+    "externalSecretsConfigured": true
+  },
+  "checks": {
+    "namesakesAndIdSelection": true,
+    "rejectedWritesDoNotInsert": true,
+    "assignmentTransfersHistory": true,
+    "previousSessionLosesAccess": true,
+    "administratorAuthorshipVisible": true,
+    "authorsAndTimestampsPreserved": true,
+    "legacyHistoryAdminOnly": true,
+    "filteringBeforePagination": true,
+    "foreignKeyRejectsMissingParent": true,
+    "referencedProfessionalDeletionRestricted": true,
+    "exactCanonicalAssignment": true,
+    "accentCollationAmbiguityRejected": true,
+    "legacyUniqueNameResolvesId": true,
+    "concurrentTransferWaitObserved": true,
+    "staleConcurrentWriterRejected": true
+  },
+  "existingBusinessRowsPreserved": true,
+  "existingEvaluationRows": 8,
+  "existingLinksRemainNull": true,
+  "automaticBackfill": false,
+  "testsWriteOnlyRecoveryCopy": true,
+  "smtpDelivery": false,
+  "completedUtc": "2026-10-26T16:03:46.264Z"
+}

@@ -396,13 +396,22 @@ async function validateAuthentication(profile, report) {
 async function main() {
     const profile = loadProfile()
     const action = process.argv[2]
-    assert.ok(['ready', 'validate', 'recoverytest', 'visualreview', 'stop', 'serve'].includes(action))
+    assert.ok(['ready', 'validate', 'validatelinks', 'recoverytest', 'visualreview', 'stop', 'serve'].includes(action))
     phase = 'server-identity'
     const root = await rootConnection(profile, action === 'ready')
     try {
         const version = await verifyServer(root, profile)
         if (action === 'ready') { console.log(JSON.stringify({ ready: true, version })); return }
         if (action === 'stop') { await root.query('SHUTDOWN'); console.log(JSON.stringify({ stopped: true })); return }
+        if (action === 'validatelinks') {
+            const report = await require('./isolated-record-links').apply({
+                profile, root, verifyServer, database, startApplication, browser, validateAuthentication,
+                progress(stage) { phase = 'links-' + stage; console.log(JSON.stringify({ phase })) }
+            })
+            fs.writeFileSync(path.join(profile.directory, 'links-validation-report-' + report.backupId + '.json'), JSON.stringify(report, null, 2))
+            console.log(JSON.stringify(report))
+            return
+        }
         if (action === 'visualreview') {
             phase = 'isolated-visual-review'
             const [marker] = await root.query('SELECT profile_id FROM ??.isolation_marker', [profile.database])
@@ -441,7 +450,9 @@ async function main() {
 }
 
 if (require.main === module) main().catch(error => {
+    const checkLocation = error.stack?.match(/isolated-record-links\.js:(\d+):\d+/)?.[1]
     console.error(JSON.stringify({ success: false, phase, code: error.code || 'ISOLATED_VALIDATION_FAILED',
+        ...(checkLocation ? { checkLocation: 'isolated-record-links.js:' + checkLocation, checkOperator: error.operator } : {}),
         ...(typeof error.expected === 'number' && typeof error.actual === 'number' ? { expectedStatus: error.expected, actualStatus: error.actual } : {}) }))
     process.exitCode = 1
 }).finally(async () => {

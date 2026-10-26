@@ -67,7 +67,7 @@ test('CSRF and exact Origin are required, including login and logout', async t =
     assert.equal((await replay.request('GET', '/registros')).status, 401)
 })
 
-test('evaluators receive only their own records and professionals through both list paths and IDs', async t => {
+test('evaluators receive records and professionals in their current assignment through both list paths and IDs', async t => {
     const app = await harness(t); const client = app.client(); await client.login()
     for (const url of ['/registros?admin=true&demandante=other@example.invalid', '/registros2?page=1&limit=25', '/colab']) {
         const result = await client.request('GET', url)
@@ -91,6 +91,7 @@ test('record writes use session identity, ignore protected fields and reject pro
         assert.equal(own.status, 204)
         const saved = app.state.tables.registros.at(-1)
         assert.equal(saved.demandante, email)
+        assert.equal(saved.colab_id, 1)
         assert.notEqual(saved.id, 999)
         assert.equal(saved.admin, undefined)
         assert.equal(saved.created_at, undefined)

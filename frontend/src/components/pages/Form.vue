@@ -23,7 +23,7 @@ import { useColabStore } from '@/stores/colabStore'
 const colabStore = useColabStore()
 
 //colabs selecionados, vindo do store
-const { chkColabs } = storeToRefs(colabStore)
+const { chkColabs, selectedColabs } = storeToRefs(colabStore)
 
 // console.log('Colaboradores selecionados:', chkColabs)
 
@@ -135,7 +135,7 @@ const submitState = reactive({
 function validatePostData() {
     const errors = []
 
-    if (!chkColabs.value || chkColabs.value.length === 0) {
+    if (selectedColabs.value.length === 0) {
         errors.push('Selecione pelo menos um colaborador')
     }
 
@@ -208,11 +208,11 @@ function reset() {
 </script>
 
 <template>
-    <div class="row p-4">
+    <div class="evaluation-workspace">
 
-        <main class="main px-4">
-            <div class="flex flex-col" id="inf-importante">
-                <h4>Informações importantes:</h4>
+        <section aria-label="Formulário de avaliação">
+            <div class="evaluation-notice" id="inf-importante">
+                <h2>Informações importantes</h2>
 
                 <p>A avaliação resultante influenciará a avaliação geral do desempenho do POSTO DE SERVIÇO, podendo
                     afetar a medição total devido à baixa qualidade, performance, produtividade, atrasos ou falhas nos
@@ -220,12 +220,12 @@ function reset() {
                     prestados. Baixo desempenho pode resultará em desconto na medição mensal como penalização pelos
                     serviços insatisfatórios, conforme avaliação das áreas clientes.</p>
             </div>
-            <form class="form vl-parent" @submit.prevent="">
+            <form class="form vl-parent evaluation-form" @submit.prevent="">
                 <!-- <form class="form vl-parent" @submit.prevent="save"> -->
 
                 <loading v-model:active="isLoading" :can-cancel="true" :is-full-page="fullPage" />
 
-                <div class="flex flex-col gap-3 md:flex-row md:justify-evenly md:mt-2 bg-gray-300 rounded-md p-3">
+                <div class="evaluation-results" role="group" aria-label="Resultado calculado">
                     <div class="inputs">
                         <label for="media">Avaliação Média:</label>
                         <input type="text" id="media" :value="avaliacao" disabled />
@@ -241,7 +241,12 @@ function reset() {
                 </div>
 
                 <!-- Perguntas com estrelas -->
-                <div class="grid grid-cols-1 gap-4 mt-4 pb-4 sm:grid-cols-2 xl:grid-cols-4">
+                <div class="evaluation-criteria-heading">
+                    <span class="mp-eyebrow">02 · Avaliação</span>
+                    <h2>Critérios de avaliação</h2>
+                    <p>Atribua as notas e registre suas observações.</p>
+                </div>
+                <div class="evaluation-criteria-grid">
 
                     <Qualidade :postData="postData" v-model:iQualidade="iQualidade" :optQualidade="optQualidade" />
 
@@ -253,18 +258,18 @@ function reset() {
                 </div>
                 <!-- Final Perguntas com estrelas -->
 
-                <div class="border-top mt-auto pb-3 flex flex-wrap gap-3 justify-between items-center">
+                <div class="evaluation-actions">
 
                     <!-- Modal toggle -->
                     <button @click="showReview = true" aria-haspopup="dialog"
                         aria-controls="default-modal" :aria-expanded="showReview"
-                        class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center "
+                        class="mp-button mp-button-secondary"
                         type="button">
                         Resumo
                     </button>
 
                     <button id="submit" type="submit"
-                        class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                        class="mp-button mp-button-primary">
                         Submeter Avaliação
                     </button>
                 </div>
@@ -278,8 +283,13 @@ function reset() {
                                 <h2 class="mb-4 font-bold">Colaborador(es) selecionado(s): </h2>
 
                                 <div class="flex flex-col flex-wrap md:max-h-150 md:max-w-230 overflow-auto me-12">
-                                    <ul class="text-sm" v-for="(colabs, index) in chkColabs" :key="index">
-                                        <li class="me-4">{{ index + 1 + ' - ' + colabs }}</li>
+                                    <ul class="text-sm" v-for="(colab, index) in selectedColabs" :key="colab.id">
+                                        <li class="me-4">
+                                            {{ index + 1 + ' - ' + colab.colab }}
+                                            <span v-if="colabStore.selectionDetails(colab)">
+                                                ({{ colabStore.selectionDetails(colab) }})
+                                            </span>
+                                        </li>
                                     </ul>
                                 </div>
                             </div>
@@ -300,7 +310,7 @@ function reset() {
                 </ChecksModal>
 
             </form>
-        </main>
+        </section>
     </div>
 </template>
 
@@ -325,7 +335,7 @@ h5 {
 }
 
 .form {
-    min-height: calc(100vh - 260px);
+    min-width: 0;
 }
 
 

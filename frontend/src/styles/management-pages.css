@@ -1,0 +1,110 @@
+/* Shared palette and controls; each page opts in through .management-page. */
+.management-page {
+    flex: 1;
+    width: 100%;
+    padding: 28px clamp(16px, 3vw, 48px) 56px;
+    background: var(--mp-bg);
+    color: var(--mp-text);
+}
+.management-page .mp-content { max-width: 1440px; margin: 0 auto; min-width: 0; }
+.management-page .mp-content-narrow { max-width: 1040px; }
+.management-page .mp-breadcrumb { display: flex; flex-wrap: wrap; gap: 10px; color: var(--mp-muted); font-size: 13px; margin-bottom: 28px; }
+.management-page .mp-breadcrumb a:hover { color: var(--mp-accent); text-decoration: underline; }
+.management-page .mp-heading { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 26px; }
+.management-page .mp-eyebrow { display: block; font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--mp-accent); margin-bottom: 8px; }
+.management-page h1 { font-size: clamp(25px, 3vw, 32px); font-weight: 700; letter-spacing: -.035em; line-height: 1.2; margin: 0; }
+.management-page .mp-heading p { color: var(--mp-muted); font-size: 14px; line-height: 1.6; margin: 10px 0 0; max-width: 660px; }
+.management-page .mp-heading-actions { flex-shrink: 0; }
+.management-page .mp-card { background: var(--mp-surface); border: 1px solid var(--mp-line); border-radius: 16px; box-shadow: 0 3px 12px #152a4c05; overflow: hidden; }
+.management-page .mp-toolbar { padding: 22px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 18px; border-bottom: 1px solid var(--mp-line); }
+.management-page .mp-search { flex: 1; max-width: 520px; min-width: min(100%, 260px); }
+.management-page .mp-search label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+.management-page .mp-search-control { position: relative; }
+.management-page .mp-search-control svg { position: absolute; left: 13px; top: 13px; width: 19px; height: 19px; color: var(--mp-muted); pointer-events: none; }
+.management-page .mp-search input { padding-left: 42px; }
+.management-page .mp-search p { font-size: 12px; color: var(--mp-muted); line-height: 1.5; margin: 8px 0 0; }
+.management-page .mp-count { color: var(--mp-muted); background: var(--mp-muted-bg); border: 1px solid var(--mp-line); border-radius: 999px; padding: 7px 12px; font-size: 12px; white-space: nowrap; }
+.management-page .mp-count strong { color: var(--mp-text); }
+.management-page .mp-input { display: block; width: 100%; min-width: 0; min-height: 46px; padding: 10px 13px; border: 1px solid var(--mp-line); border-radius: 8px; background: var(--mp-surface); color: var(--mp-text); font-size: 14px; line-height: 1.5; box-shadow: 0 1px 2px #152a4c04; }
+.management-page .mp-input::placeholder { color: var(--mp-muted); opacity: .8; }
+.management-page .mp-input:focus { outline: 3px solid #3b82f630; outline-offset: 1px; border-color: #3b82f6; }
+.management-page .mp-button { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 44px; padding: 10px 18px; border: 1px solid transparent; border-radius: 9px; font-size: 14px; font-weight: 600; line-height: 1.4; cursor: pointer; text-decoration: none; transition: background-color .15s; }
+.management-page .mp-button svg { width: 18px; height: 18px; }
+.management-page .mp-button-primary { color: white; background: #1d4ed8; box-shadow: 0 2px 4px #1d4ed81a; }
+.management-page .mp-button-primary:hover { background: #1e40af; }
+.management-page .mp-button-secondary { color: var(--mp-text); background: var(--mp-surface); border-color: var(--mp-line); }
+.management-page .mp-button-secondary:hover { background: var(--mp-muted-bg); }
+.management-page :is(a, button):focus-visible { outline: 3px solid #60a5fa; outline-offset: 3px; }
+.management-page .mp-table-note { margin: 0; padding: 12px 24px; color: var(--mp-muted); background: var(--mp-muted-bg); border-top: 1px solid var(--mp-line); font-size: 12px; line-height: 1.5; }
+.management-page .mp-person { font-weight: 600; color: var(--mp-text); }
+.management-page .mp-delete { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px; color: #dc2626; cursor: pointer; }
+.management-page .mp-delete:hover { background: #fee2e2; }
+.management-page .mp-delete svg { width: 18px; height: 18px; }
+.management-page .mp-data-table {
+    --easy-table-border: none;
+    --easy-table-row-border: 1px solid var(--mp-line);
+    --easy-table-header-font-size: 12px;
+    --easy-table-header-height: 48px;
+    --easy-table-header-font-color: var(--mp-muted);
+    --easy-table-header-background-color: var(--mp-muted-bg);
+    --easy-table-header-item-padding: 12px 16px;
+    --easy-table-body-row-height: 62px;
+    --easy-table-body-row-font-size: 13px;
+    --easy-table-body-row-font-color: var(--mp-text);
+    --easy-table-body-row-background-color: var(--mp-surface);
+    --easy-table-body-even-row-font-color: var(--mp-text);
+    --easy-table-body-even-row-background-color: var(--mp-muted-bg);
+    --easy-table-body-row-hover-font-color: var(--mp-text);
+    --easy-table-body-row-hover-background-color: var(--mp-hover);
+    --easy-table-body-item-padding: 12px 16px;
+    --easy-table-footer-background-color: var(--mp-surface);
+    --easy-table-footer-font-color: var(--mp-muted);
+    --easy-table-footer-font-size: 12px;
+    --easy-table-footer-height: 64px;
+    --easy-table-footer-padding: 12px 20px;
+    --easy-table-message-font-color: var(--mp-muted);
+    --easy-table-message-padding: 48px 20px;
+    --easy-table-scrollbar-track-color: var(--mp-muted-bg);
+    --easy-table-scrollbar-color: var(--mp-muted-bg);
+    --easy-table-scrollbar-thumb-color: #94a3b8;
+    --easy-table-scrollbar-corner-color: var(--mp-surface);
+    --easy-table-buttons-pagination-border: 1px solid var(--mp-line);
+}
+.management-page .mp-data-table .vue3-easy-data-table__main { overscroll-behavior-x: contain; }
+.management-page .mp-data-table th { white-space: nowrap; }
+.management-page .mp-data-table table { min-width: 1100px; }
+.management-page .mp-records-table table { min-width: 2600px; }
+.management-page .mp-data-table td { max-width: 280px; overflow-wrap: anywhere; }
+.management-page .mp-data-table .vue3-easy-data-table__footer { flex-wrap: wrap; gap: 12px; height: auto; min-height: 64px; }
+.management-page .mp-data-table .pagination__rows-per-page { margin: 0; }
+.management-page .mp-data-table .buttons-pagination { flex-shrink: 0; }
+.management-page .mp-form-section { border: 0; padding: 28px; min-width: 0; }
+.management-page .mp-form-section + .mp-form-section { border-top: 1px solid var(--mp-line); }
+.management-page .mp-section-heading { display: flex; align-items: flex-start; gap: 13px; margin-bottom: 22px; }
+.management-page .mp-section-number { display: grid; place-items: center; width: 32px; height: 32px; flex-shrink: 0; border-radius: 9px; color: var(--mp-accent); background: var(--mp-hover); font-size: 12px; font-weight: 700; }
+.management-page .mp-section-heading h2 { font-size: 16px; font-weight: 700; margin: 0; line-height: 1.4; }
+.management-page .mp-section-heading p { color: var(--mp-muted); font-size: 13px; margin: 4px 0 0; line-height: 1.5; }
+.management-page .mp-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.management-page .mp-field-wide { grid-column: 1 / -1; }
+.management-page .mp-field label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+.management-page .mp-field p { color: var(--mp-muted); font-size: 12px; line-height: 1.5; margin: 7px 0 0; }
+.management-page .mp-form-actions { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 22px 28px; border-top: 1px solid var(--mp-line); background: var(--mp-muted-bg); }
+@media (max-width: 640px) {
+    .management-page { padding-top: 20px; }
+    .management-page .mp-breadcrumb { margin-bottom: 22px; }
+    .management-page .mp-heading { align-items: stretch; flex-direction: column; gap: 18px; }
+    .management-page .mp-heading-actions .mp-button { width: 100%; }
+    .management-page .mp-toolbar { padding: 18px; align-items: flex-start; }
+    .management-page .mp-search { max-width: none; width: 100%; flex-basis: 100%; }
+    .management-page .mp-fields { grid-template-columns: minmax(0, 1fr); }
+    .management-page .mp-form-section { padding: 22px 18px; }
+    .management-page .mp-form-actions { padding: 18px; }
+    .management-page .mp-table-note { padding: 12px 18px; }
+    .management-page .mp-data-table .vue3-easy-data-table__footer { display: grid; grid-template-columns: 1fr auto auto 1fr; gap: 12px; }
+    .management-page .mp-data-table .pagination__rows-per-page { grid-column: 1 / -1; justify-content: center; }
+    .management-page .mp-data-table .pagination__items-index { justify-self: end; }
+    .management-page .mp-data-table .next-page__click-button { justify-self: start; }
+    .management-page .mp-data-table .pagination__items-index { margin: 0; }
+}
+.dark .management-page .mp-delete { color: #fca5a5; }
+.dark .management-page .mp-delete:hover { background: #612c35; }

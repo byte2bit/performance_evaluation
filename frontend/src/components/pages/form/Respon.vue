@@ -1,13 +1,14 @@
 <template>
 
-    <div class="flex flex-col min-w-0 w-full p-4 bg-zinc-200 rounded-md">
+    <div class="evaluation-criterion mp-card">
+        <div class="evaluation-criterion-heading"><span aria-hidden="true">04</span><h3>Responsabilidade</h3></div>
         <div class="star-title">
             <p>Com relação a responsabilidade de profissionais atendendo
                 ao posto de serviço, qual seu nível de satisfação?</p>
         </div>
         <div>
-            <star-rating v-model:rating="postData.nota_respon" :increment="0.5" active-border-color="#1a00ab"
-                active-color="#1a00ab" :star-size="25" />
+            <star-rating v-model:rating="postData.nota_respon" :increment="0.5" active-border-color="var(--mp-accent, #1d4ed8)"
+                active-color="var(--mp-accent, #1d4ed8)" :star-size="25" />
 
             <div class="my-3 flex flex-col">
                 <label for="obs_respon">Observações:</label>

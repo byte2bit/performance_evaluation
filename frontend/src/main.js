@@ -4,6 +4,9 @@ import App from './App.vue'
 import router from '@/router/index.js'
 import { createPinia } from 'pinia'
 import { sanitizePlugin } from "v-sanitize-directive"
+import { initializeTheme } from '@/composables/useTheme.js'
+
+initializeTheme(window)
 
 createApp(App)
     .use(createPinia())

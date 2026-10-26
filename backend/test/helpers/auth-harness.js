@@ -22,7 +22,7 @@ function database() {
                 { id: 5, name: 'Conta excluída', email: 'deleted@example.invalid', admin: 1, active: 1, deletedAt: 'synthetic-date', session_version: 0, password: 'hash:' + password }
             ],
             colab: [{ id: 1, colab: 'Profissional A', demandante: email }, { id: 2, colab: 'Profissional B', demandante: 'other@example.invalid' }],
-            registros: [{ id: 1, colab: 'Profissional A', demandante: email }, { id: 2, colab: 'Profissional B', demandante: 'other@example.invalid' }]
+            registros: [{ id: 1, colab_id: 1, colab: 'Profissional A', demandante: email }, { id: 2, colab_id: 2, colab: 'Profissional B', demandante: 'other@example.invalid' }]
         }
     }
     function db(table) {
@@ -48,6 +48,10 @@ function database() {
                 return this
             },
             whereNull(key) { predicates.push(row => row[key] == null); return this },
+            whereIn(key, subquery) {
+                predicates.push(row => row[key] != null && subquery.fixtureRows().some(candidate => candidate.id === row[key]))
+                return this
+            },
             whereRaw(sql, bindings) {
                 assert.equal(sql, 'BINARY ?? = ?'); assert.equal(bindings[0], 'demandante')
                 predicates.push(row => row.demandante === bindings[1]); return this
@@ -55,6 +59,7 @@ function database() {
             orderBy() { return this }, forUpdate() { return this }, forShare() { return this },
             limit(value) { limit = value; return this }, offset(value) { offset = value; return this },
             first() { first = true; return Promise.resolve(result()) },
+            fixtureRows() { return result() },
             then(resolve, reject) { return Promise.resolve(result()).then(resolve, reject) },
             async insert(value) {
                 const row = { id: state.tables[table].length + 1, ...value }

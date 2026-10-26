@@ -25,7 +25,7 @@ export default {
                 .then(res => {
                     this.listData = res.data
 
-                    this.colabcUser = this.listData.filter(registro => registro.demandante === dados.email)
+                    this.colabcUser = this.listData
 
                     var data = this.listData.map((registro => {
                         let a = registro.created_at.split("T")[0]
@@ -54,12 +54,10 @@ export default {
 <template>
     <div v-if="admin" id="exportar">
 
-        <button class="btn btn-primary btn-sm" @click="exportData">Exportar XLS</button>
+        <button type="button" class="mp-button mp-button-secondary" @click="exportData">Exportar XLS</button>
         
     </div>
 </template>
-<style lang="scss" scoped>  
-button{
-    width: 100px;
-}
+<style scoped>
+button { min-height: 44px; padding: 10px 18px; border: 1px solid #cbd5e1; border-radius: 9px; font-size: 14px; font-weight: 600; cursor: pointer; }
 </style>

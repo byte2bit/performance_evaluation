@@ -181,7 +181,7 @@ test('professional registration sends its payload to /colab using the shared cli
     const calls = []
     const component = evaluate(file, code, {
         axios: { post(url, data) { calls.push({ url, data }); return Promise.resolve() } },
-        toast: {}
+        toast: {}, ManagementPage: {}
     })
     const payload = { colab: 'synthetic', matricula: 'TEST' }
     let reset = false

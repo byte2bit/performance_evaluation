@@ -9,22 +9,65 @@ test('selection, select all and store replacement stay synchronized with the lis
     first.checked = true
     first.dispatch('change')
     await flush()
-    assert.deepEqual(Array.from(form.store.chkColabs), ['Profissional A'])
+    assert.deepEqual(Array.from(form.store.chkColabs), [1])
     assert.equal(form.element('select-all-colabs').indeterminate, true)
     form.element('select-all-colabs').dispatch('change')
     await flush()
-    assert.deepEqual(Array.from(form.store.chkColabs), ['Profissional A', 'Profissional B'])
+    assert.deepEqual(Array.from(form.store.chkColabs), [1, 2])
     assert.equal(form.element('checkbox-2').checked, true)
     assert.equal(form.element('select-all-colabs').checked, true)
-    form.store.chkColabs = ['Profissional B']
+    form.store.chkColabs = [2]
     await flush()
     assert.equal(form.element('checkbox-1').checked, false)
     assert.equal(form.element('checkbox-2').checked, true)
-    assert.deepEqual(Array.from(form.component('Form').setupState.chkColabs), ['Profissional B'])
+    assert.deepEqual(Array.from(form.component('Form').setupState.chkColabs), [2])
     form.store.clearSelection()
     await flush()
     assert.equal(form.element('checkbox-2').checked, false)
     assert.equal(form.element('select-all-colabs').indeterminate, false)
+})
+
+test('namesakes remain individually selectable by ID and keep both identities in the review', async t => {
+    const form = await mountForm(t)
+    form.store.colabs = [
+        { id: 10, colab: 'Homônimo fictício', matricula: 'FICT-10' },
+        { id: 11, colab: 'Homônimo fictício', matricula: 'FICT-11' }
+    ]
+    await flush()
+    const first = form.element('checkbox-10')
+    first.checked = true; first.dispatch('change')
+    await flush()
+    assert.equal(first.checked, true)
+    assert.equal(form.element('checkbox-11').checked, false)
+    assert.deepEqual(Array.from(form.store.chkColabs), [10])
+    assert.match(form.store.selectionDetails(form.store.selectedColabs[0]), /Cadastro: 10/)
+    form.element('select-all-colabs').dispatch('change')
+    await flush()
+    assert.deepEqual(Array.from(form.store.chkColabs), [10, 11])
+    assert.deepEqual(Array.from(form.component('Form').setupState.selectedColabs, row => row.id), [10, 11])
+    const text = walk(form.root).map(node => node.text).join(' ')
+    assert.match(text, /FICT-10/)
+    assert.match(text, /FICT-11/)
+    // Registration numbers are not unique in the legacy schema either.
+    form.store.colabs[1].matricula = 'FICT-10'
+    await flush()
+    assert.notEqual(form.store.selectionDetails(form.store.colabs[0]), form.store.selectionDetails(form.store.colabs[1]))
+    form.element('checkbox-11').dispatch('change')
+    await flush()
+    assert.deepEqual(Array.from(form.store.chkColabs), [10])
+})
+
+test('a refreshed professional list removes transferred selections instead of leaving stale identities selected', async t => {
+    const form = await mountForm(t)
+    form.store.colabs = [{ id: 99, colab: 'Profissional transferido' }]
+    form.store.toggleColab(99)
+    assert.equal(form.component('Form').setupState.validatePostData().length, 0)
+    // The harness API returns only its original IDs 1/2 on refresh.
+    await form.store.loadColabs()
+    await flush()
+    assert.deepEqual(Array.from(form.store.chkColabs), [])
+    assert.equal(form.store.selectedColabs.length, 0)
+    assert.equal(form.component('Form').setupState.validatePostData().length, 1)
 })
 
 for (const [name, starIndex, modalId, itemId, itemKey] of [
@@ -121,7 +164,7 @@ test('switching modals keeps only one backdrop and reset clears the shared selec
 
 test('leaving and reopening Home cleans modal instances and preserves the store selection', async t => {
     const form = await mountForm(t)
-    form.store.toggleColab('Profissional A')
+    form.store.toggleColab(1)
     form.stars()[0].emit('update:rating', 2)
     await flush()
     const ids = walk(form.document.body).map(node => node.id).filter(Boolean)

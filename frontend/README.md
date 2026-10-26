@@ -17,7 +17,9 @@ Interface Vue 3 do [sistema de avaliação](../README.md), com Vite, Vue Router,
 
 O formulário calcula média, nível e desconto e permite notas em passos de 0,5. Qualidade e disponibilidade incluem critérios associados. **A submissão da avaliação permanece desativada**: seu formato persistente e a ativação do envio precisam de etapa própria. A API já possui endpoints de gravação, com regras descritas em [PLANO_VALIDACAO_API.md](../docs/PLANO_VALIDACAO_API.md).
 
-Administradores consultam todos os dados; avaliadores recebem somente colaboradores/registros vinculados ao e-mail da conta. As guardas Vue controlam a navegação; a autorização efetiva é feita pelo backend.
+Administradores consultam todos os dados; o demandante atual recebe o histórico completo dos profissionais atualmente atribuídos à sua conta, inclusive avaliações de outros autores. O anterior perde acesso após a transferência. A coluna **Avaliador original** preserva a autoria; ela não filtra a lista. As guardas Vue controlam a navegação; a autorização efetiva é feita pelo backend.
+
+A seleção e o resumo usam IDs para distinguir homônimos, com matrícula ou identificador do cadastro quando necessário. O backend correspondente tem a 12ª migration validada no MySQL isolado; registros legados sem vínculo são administrativos até conciliação. Outros ambientes não foram habilitados. [Plano e limitações](../docs/PLANO_VINCULOS.md).
 
 ## Sessão e interface
 
@@ -27,6 +29,9 @@ Administradores consultam todos os dados; avaliadores recebem somente colaborado
 - Layout responsivo, tema escuro e mensagens de erro de carregamento/operação.
 - Modais Flowbite com sincronização de foco e limpeza; confirmação de exclusão compartilhada com Cancelar, Escape e retorno do foco.
 - Listas são atualizadas após confirmação da exclusão pela API.
+- Registros e profissionais compartilham painéis, busca identificada, contador e tabelas com rolagem horizontal; o cadastro está organizado em identificação, atuação e responsáveis. Layouts adaptados ao celular e ao tema escuro. [Validação visual e reprodução](../docs/REVISAO_PAGINAS_GESTAO.md).
+- Página inicial e login seguem a mesma paleta e controles: seleção em painel, resultados/critério em cartões e acesso com a marca existente. Mantidos autenticação, cálculos, seleção por ID e envio de avaliações desativado. [Extensão da revisão](../docs/REVISAO_PAGINAS_GESTAO.md#extensão-página-inicial-e-login).
+- Botão de tema claro/escuro no cabeçalho, com preferência visual salva no navegador e sistema como padrão inicial. Dropdown **Minha conta** reúne nome, e-mail, troca de senha e saída, com suporte a teclado. Modais de critérios, resumo e exclusão seguem a mesma paleta e mantêm foco/Escape. [Revisão do cabeçalho e modais](../docs/REVISAO_PAGINAS_GESTAO.md#extensão-tema-manual-menu-da-conta-e-modais).
 
 Login e sessões foram validados em MySQL 8.0.44 isolado com contas fictícias. Isso não significa que produção esteja configurada. Não há cadastro público, senha padrão ou recuperação de senha por e-mail implementada.
 

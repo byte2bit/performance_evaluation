@@ -67,4 +67,12 @@ Exemplo fictício de avaliação válida, após login/CSRF, para `/registros` ou
 }
 ```
 
-`demandante`, IDs e timestamps não são campos graváveis da avaliação; identidade vem da sessão. Observações obrigatórias podem estar vazias. Critérios são strings opcionais, mas obrigatórias e não vazias para qualidade/disponibilidade <=3; arrays aguardam desenho de persistência próprio. Clientes com dados incompletos/tipos inválidos precisam se adequar ao retorno 400; não houve mudança de schema nem migração de dados legados.
+`demandante`, ID da avaliação e timestamps não são campos graváveis da avaliação; identidade vem da sessão. Observações obrigatórias podem estar vazias. Critérios são strings opcionais, mas obrigatórias e não vazias para qualidade/disponibilidade <=3; arrays aguardam desenho de persistência próprio. Clientes com dados incompletos/tipos inválidos precisam se adequar ao retorno 400. Não houve mudança de schema nem migração de dados legados no lote original de validação; a extensão posterior abaixo escreve uma migration sem executá-la.
+
+## Extensão aprovada — vínculo por ID e demandante atual
+
+`colab_id` passa a ser um seletor opcional validado como INT UNSIGNED positivo, preservando `colab` obrigatório. Com ID, o backend busca somente esse profissional no escopo atual; ID inválido retorna 400, inexistente/fora do escopo retorna 403 e nome divergente retorna 409. Nunca há fallback por nome quando o ID foi fornecido. Somente nome continua aceito quando existe exatamente um correspondente autorizado; mais de um retorna 409, sem gravação. O ID selecionado e o nome do cadastro são persistidos, com autoria da sessão.
+
+As respostas de avaliação incluem `colab_id`. Listas/paginação e consulta individual usam a atribuição atual em `colab`, sem filtro por e-mail do autor; o demandante anterior perde acesso e recebe 404 por ID. Registros sem vínculo são administrativos até conciliação. `/colab` e `/colab/:id` incluem a matrícula já existente. Submissão da UI continua desativada.
+
+O lote inicial teve **123 testes aprovados**, build development e DDL compilado sem conexão SQL. Após nova autorização, a 12ª migration foi aplicada em MySQL isolado e a validação real passou para transferência de acesso, FKs, collation e concorrência, preservando as oito avaliações legadas sem vínculo. Suíte atual: **127 testes aprovados**. Conciliação, limites e reversão em [PLANO_VINCULOS.md](PLANO_VINCULOS.md).

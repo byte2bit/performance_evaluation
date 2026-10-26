@@ -6,7 +6,7 @@ module.exports = app => {
     const getColab = async (req, res) => {
         try {
             const rows = await scope(app.db('colab')
-                .select('id', 'colab', 'ppu', 'servico', 'funcao', 'liderancas', 'gerencia', 'demandante'), req.user)
+                .select('id', 'colab', 'matricula', 'ppu', 'servico', 'funcao', 'liderancas', 'gerencia', 'demandante'), req.user)
                 .orderBy('colab')
             return res.json(rows)
         } catch { return res.status(500).send('Não foi possível carregar os profissionais.') }
@@ -16,7 +16,7 @@ module.exports = app => {
         if (professionalId === null) return res.status(400).send('Identificador inválido.')
         try {
             const row = await scope(app.db('colab')
-                .select('id', 'colab', 'ppu', 'servico', 'funcao', 'liderancas', 'gerencia', 'demandante'), req.user)
+                .select('id', 'colab', 'matricula', 'ppu', 'servico', 'funcao', 'liderancas', 'gerencia', 'demandante'), req.user)
                 .where({ id: professionalId }).first()
             return row ? res.json(row) : res.status(404).send('Profissional não encontrado.')
         } catch { return res.status(500).send('Não foi possível carregar o profissional.') }

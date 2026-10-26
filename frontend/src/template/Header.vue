@@ -1,17 +1,36 @@
 <template>
     <header>
-        <div class="header-layout bg-white border-gray-200 dark:bg-gray-900">
-            <img src="@/assets/logo-horizontal branco.png" class="h-8 w-auto rounded bg-gray-900 p-1" alt="Núcleo Logo" />
-            <a href="#" class="min-w-0 lg:text-center">
-                <span class="text-base sm:text-xl font-semibold dark:text-white">Núcleo
-                    Avaliação de Nível de Serviço</span>
-            </a>
-            <div class="identity min-w-0 text-gray-800 dark:text-gray-100 lg:me-6 lg:text-right">
-                <p class="mb-1 demandante">Nome: {{ auth.user?.name }}</p>
-                <p class="demandante">E-mail: {{ auth.user?.email }}</p>
-                <router-link to="/senha" class="text-blue-700 dark:text-blue-300 underline me-3">Alterar senha</router-link>
-                <button type="button" @click="signout" :disabled="auth.busy" class="text-blue-700 dark:text-blue-300 underline">Sair</button>
-                <p v-if="auth.error" role="alert" class="text-red-700 dark:text-red-300">{{ auth.error }}</p>
+        <div class="header-layout">
+            <img src="@/assets/logo-horizontal branco.png" class="header-logo" alt="Núcleo Logo" />
+            <router-link to="/" class="header-title">Núcleo Avaliação de Nível de Serviço</router-link>
+            <div class="header-actions">
+                <button type="button" class="header-icon-button" @click="toggleTheme" :aria-pressed="isDark"
+                    :aria-label="isDark ? 'Ativar tema claro' : 'Ativar tema escuro'"
+                    :title="isDark ? 'Ativar tema claro' : 'Ativar tema escuro'">
+                    <svg v-if="isDark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path stroke-linecap="round" d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg>
+                    <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path stroke-linejoin="round" d="M20.5 14.2A9 9 0 0 1 9.8 3.5a9 9 0 1 0 10.7 10.7Z"/></svg>
+                </button>
+                <div ref="accountRoot" class="account-menu" @keydown.esc="onAccountEscape">
+                    <button ref="accountButton" id="account-button" type="button" class="account-button"
+                        :aria-expanded="accountOpen" aria-controls="account-dropdown" @click="accountOpen = !accountOpen"
+                        @keydown.down.prevent="openAccountWithFocus">
+                        <span class="account-avatar" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="8" r="3.5"/><path stroke-linecap="round" d="M5 21v-2a7 7 0 0 1 14 0v2"/></svg></span>
+                        <span>Minha conta</span>
+                        <svg class="account-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></svg>
+                    </button>
+                    <section v-if="accountOpen" id="account-dropdown" class="account-dropdown" aria-labelledby="account-button">
+                        <div class="account-identity">
+                            <span class="account-label">Conta conectada</span>
+                            <p class="account-name">{{ auth.user?.name }}</p>
+                            <p class="account-email">{{ auth.user?.email }}</p>
+                        </div>
+                        <div class="account-options">
+                            <router-link to="/senha" @click="accountOpen = false">Alterar senha</router-link>
+                            <button type="button" @click="signout" :disabled="auth.busy">{{ auth.busy ? 'Saindo…' : 'Sair' }}</button>
+                        </div>
+                        <p v-if="auth.error" role="alert" class="account-error">{{ auth.error }}</p>
+                    </section>
+                </div>
             </div>
         </div>
         <nav class="bg-gray-600 text-white">
@@ -71,63 +90,88 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, nextTick, watch, onMounted, onBeforeUnmount } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore.js'
+import { useTheme } from '@/composables/useTheme.js'
 const auth = useAuthStore()
 const router = useRouter()
+const route = useRoute()
+const { isDark, toggleTheme } = useTheme()
 const menuOpen = ref(false)
+const accountOpen = ref(false)
+const accountRoot = ref(null)
+const accountButton = ref(null)
+let ownerDocument = null
+
+function closeAccount(restoreFocus = false) {
+    if (!accountOpen.value) return
+    accountOpen.value = false
+    if (restoreFocus) accountButton.value?.focus()
+}
+function onAccountEscape(event) {
+    if (!accountOpen.value) return
+    event.preventDefault()
+    event.stopPropagation()
+    closeAccount(true)
+}
+async function openAccountWithFocus() {
+    accountOpen.value = true
+    await nextTick()
+    accountRoot.value?.querySelector('a')?.focus()
+}
+function outsideAccount(event) {
+    if (!accountRoot.value?.contains(event.target)) closeAccount()
+}
+onMounted(() => {
+    ownerDocument = accountRoot.value?.ownerDocument
+    ownerDocument?.addEventListener('pointerdown', outsideAccount)
+    ownerDocument?.addEventListener('focusin', outsideAccount)
+})
+onBeforeUnmount(() => {
+    ownerDocument?.removeEventListener('pointerdown', outsideAccount)
+    ownerDocument?.removeEventListener('focusin', outsideAccount)
+})
+watch(() => route.fullPath, () => { accountOpen.value = false; menuOpen.value = false })
 async function signout() {
     if (await auth.signout()) await router.replace({ name: 'Login' })
 }
 </script>
 
-<style lang="scss" scoped>
-
-.header-layout {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    gap: 0.75rem;
-    align-items: center;
-    padding: 0.5rem;
-}
-
-.identity {
-    overflow-wrap: anywhere;
-}
-
+<style scoped>
+.header-layout { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 24px; padding: 16px clamp(16px, 3vw, 48px); background: var(--mp-surface); color: var(--mp-text); border-bottom: 1px solid var(--mp-line); }
+.header-logo { width: 116px; height: auto; border-radius: 6px; background: #18263c; padding: 5px; }
+.header-title { font-size: 18px; font-weight: 600; line-height: 1.5; text-align: center; }
+.header-actions { display: flex; align-items: center; gap: 12px; }
+.header-icon-button, .account-button { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; border: 1px solid var(--mp-line); border-radius: 10px; color: var(--mp-text); background: var(--mp-surface); cursor: pointer; }
+.header-icon-button { width: 44px; }
+.header-icon-button svg, .account-avatar svg { width: 20px; height: 20px; }
+.header-icon-button:hover, .account-button:hover { background: var(--mp-hover); }
+.account-menu { position: relative; }
+.account-button { gap: 9px; padding: 6px 10px; font-size: 13px; font-weight: 600; }
+.account-avatar { display: inline-flex; align-items: center; justify-content: center; color: var(--mp-accent); }
+.account-chevron { width: 16px; height: 16px; }
+.account-dropdown { position: absolute; right: 0; top: calc(100% + 10px); z-index: 40; width: 280px; max-width: calc(100vw - 32px); background: var(--mp-surface); border: 1px solid var(--mp-line); border-radius: 14px; box-shadow: 0 12px 40px #02061726; overflow: hidden; }
+.account-identity { padding: 20px; background: var(--mp-muted-bg); border-bottom: 1px solid var(--mp-line); overflow-wrap: anywhere; }
+.account-label { font-size: 10px; color: var(--mp-accent); text-transform: uppercase; letter-spacing: .1em; font-weight: 700; }
+.account-name { font-size: 14px; font-weight: 700; line-height: 1.5; margin: 8px 0 4px; }
+.account-email { font-size: 12px; color: var(--mp-muted); line-height: 1.6; margin: 0; }
+.account-options { padding: 8px; }
+.account-options a, .account-options button { display: block; text-align: left; width: 100%; padding: 12px; border-radius: 8px; font-size: 13px; color: var(--mp-text); cursor: pointer; }
+.account-options a:hover, .account-options button:hover { background: var(--mp-hover); }
+.account-options button:disabled { opacity: .6; cursor: wait; }
+.account-error { font-size: 12px; line-height: 1.6; color: #b91c1c; padding: 0 20px 16px; margin: 0; }
+.dark .account-error { color: #fca5a5; }
+.header-layout :is(a, button):focus-visible { outline: 3px solid #60a5fa; outline-offset: 3px; }
 @media (max-width: 767px) {
-    .header-layout {
-        grid-template-columns: auto minmax(0, 1fr);
-    }
-    .identity {
-        grid-column: 1 / -1;
-    }
+    .header-layout { grid-template-columns: minmax(0, 1fr) auto; gap: 14px; }
+    .header-title { grid-row: 2; grid-column: 1 / -1; font-size: 15px; text-align: left; }
+    .header-actions { gap: 8px; }
+    .account-button { gap: 7px; }
 }
-
-header {
-
-    p {
-        margin-bottom: 4px;
-        font-size: 0.7rem;
-    }
-}
-
-#logo img {
-    max-width: 120px;
-}
-
-@media(max-width: 768px) {
-    #logo {
-        text-align: center;
-        margin-bottom: 25px;
-    }
-
-    .head div {
-        margin-bottom: 15px;
-    }
-}
-.demandante {
-    font-size: 0.6rem;
+@media (max-width: 359px) {
+    .header-logo { width: 96px; }
+    .account-chevron { display: none; }
+    .account-button { font-size: 12px; padding-inline: 8px; }
 }
 </style>

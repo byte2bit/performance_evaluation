@@ -2,6 +2,8 @@
 
 Validado em 25/10/2026, com autorização para criar instância separada, aplicar migrations corretivas somente nela e provisionar contas fictícias. Nenhuma configuração, credencial ou dado de produção foi alterado. Nenhum e-mail foi enviado.
 
+**Estado posterior em 26/10/2026:** após nova autorização, a **12ª migration foi aplicada e validada neste perfil isolado**, primeiro em cópia recuperada e depois no schema original. As oito avaliações anteriores foram preservadas com vínculo nulo; continuam administrativas até conciliação. A instância estava parada antes da tarefa e foi novamente encerrada ao final; API local não ficou em execução. Outros ambientes não foram alterados. [Modelo e evidências](PLANO_VINCULOS.md).
+
 ## Ambiente preparado
 
 | Item | Valor |
@@ -79,3 +81,17 @@ O runner `Validate` foi executado novamente após os ajustes aprovados de depend
 Uma avaliação fictícia com texto de 255 caracteres Unicode foi gravada/lida dentro de transação e revertida com rollback, preservando linhas existentes. Isso valida o charset do alvo isolado, sem certificar produção. Nenhuma migration foi criada ou aplicada neste lote. Suíte atual: **108 testes aprovados**; Chrome **48/48** e novo build aprovados. Versões e evidências em [DEPENDENCIAS_SEGURANCA.md](DEPENDENCIAS_SEGURANCA.md). O teste de backup/restauração acima continua sendo evidência do lote anterior; não foi repetido nesta etapa.
 
 Continuam pendentes: recuperação em outro host/volume real, dados legados e duplicidade dos nomes referenciados, políticas de retenção e configuração de produção. O índice não único conserva o contrato atual; não resolve a fragilidade do vínculo por nome. A aprovação deste ambiente não autoriza aplicar migrations em outro banco, alterar `.env` de produção ou publicar.
+
+## Aplicação da 12ª migration e validação do demandante atual
+
+`ValidateLinks` é um runner específico para a transição **11 → 12 migrations**, a partir de relatório de recuperação explícito do próprio perfil. Recusa baseline diferente ou qualquer migration pendente além da aprovada. Não é comando para repetir no schema já atualizado.
+
+Na execução autorizada foram usados `RecoveryTest` e depois:
+
+```powershell
+./backend/scripts/isolated-mysql.ps1 -Action ValidateLinks -ProfileDirectory $perfilAvaliacao -RecoveryReportName 'recovery-report-2cf943c9fdd6.json'
+```
+
+O runner verifica identidade/markers, ausência de conexões selecionando origem/cópia, backup e igualdade dos dados de negócio. Aplica somente a migration de vínculo na cópia, valida autenticação/HTTP, FKs, homônimos, collation e espera real de lock. Só então migra a origem e compara novamente contas, profissionais e avaliações, sem backfill. DDL/grants limitam-se aos schemas fictícios identificados.
+
+Resultado final: 12 migrations, tipo/índice/FK corretos em ambos os schemas, 15 grupos de verificações SQL aprovados, oito avaliações originais preservadas e todos os vínculos históricos ainda nulos. Fonte: [relatório sanitizado](evidencias/vinculos-demandante-atual/mysql-validation-report.json). Relatórios/backup/cópias de tentativas anteriores permanecem no diretório protegido, sem limpeza automática. Suíte padrão atual: **127 aprovados**, zero falhas/skips; nenhum novo build/Chrome foi necessário após a etapa anterior.

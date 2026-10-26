@@ -1,6 +1,6 @@
 # Proposta do segundo lote: autenticação e autorização
 
-Data: 25/10/2026. **Estado atual: login, sessões, autorização, UI e CLI implementados; cadeia completa de 11 migrations e duas contas fictícias validadas em MySQL 8.0.44 isolado. Suíte atual com 108 testes aprovados e 48/48 verificações no Chrome após as correções de dependências/validação. Produção permanece pendente.** As seções de proposta preservam o modelo aprovado; a seção 16 registra a execução e a configuração. Recuperação/convites seguem para etapa posterior.
+Data inicial: 25/10/2026; continuidade em 26/10/2026. **Estado atual: login, sessões, autorização, UI e CLI implementados; 12 migrations validadas em MySQL 8.0.44 isolado, com contas fictícias e histórico autorizado pelo demandante atual. Suíte atual com 127 testes aprovados. As 48/48 verificações no Chrome são evidência anterior, sem nova revisão visual deste lote. Produção permanece pendente.** As seções de proposta preservam o modelo aprovado; a seção 16 registra a execução e a configuração. Recuperação/convites seguem para etapa posterior.
 
 ## 1. Decisões confirmadas pelo usuário
 
@@ -37,7 +37,7 @@ A proposta é uma escolha para este sistema único, sem reescrever Vue/Express, 
 | Formulário e resumo | Negado | Permitido | Permitido |
 | `GET /colab` e `GET /colab/:id` | Negado | Somente profissionais associados ao seu e-mail em `demandante` | Todos |
 | `POST /colab`, `DELETE /colab/:id` | Negado | Negado | Permitido |
-| `GET /registros`, `GET /registros2`, `GET /registros/:id` | Negado | Somente avaliações com seu e-mail em `demandante` | Todas |
+| `GET /registros`, `GET /registros2`, `GET /registros/:id` | Negado | Histórico vinculado aos IDs dos profissionais de que é demandante atual; autoria não concede acesso | Todas, inclusive legados sem vínculo |
 | `POST /registros`, `POST /registros2` | Negado | Apenas no próprio escopo e para profissional autorizado | Permitido no escopo validado |
 | `DELETE /registros/:id` | Negado | Negado | Permitido |
 | Exportação XLS pela interface existente | Negado | Negado | Permitido, preservando o comportamento atual |
@@ -49,6 +49,7 @@ Os detalhes de profissionais, exportação e envio acima são propostas conserva
 Regras de autorização:
 
 - Aplicar filtros na consulta Knex **antes** de obter dados, incluindo consultas por ID, paginação e caminhos alternativos da mesma funcionalidade.
+- A mudança de visibilidade foi aprovada posteriormente: o demandante anterior perde acesso, salvo se for administrador. `registros.demandante` preserva o autor e `colab.demandante` controla o escopo atual por `registros.colab_id`. A 12ª migration e a regressão de autenticação foram validadas em MySQL isolado após nova autorização; ver [PLANO_VINCULOS.md](PLANO_VINCULOS.md). Legados sem vínculo continuam administrativos até conciliação.
 - Não aceitar `admin`, identidade ou escopo enviados pelo cliente. Em gravações de avaliação, o `demandante` vem do usuário autenticado, inclusive para administradores que estejam avaliando.
 - Para avaliadores, validar que o profissional solicitado pertence ao seu escopo; não escolher a identidade pelo nome de colaborador ou pelo referrer.
 - Não interpretar listas ou trechos de e-mail como equivalência de identidade. Usar correspondência exata com um e-mail canônico validado; a convenção de normalização deve ser igual no cadastro e na consulta. Registros antigos sem correspondência permanecem invisíveis ao avaliador até reconciliação aprovada.

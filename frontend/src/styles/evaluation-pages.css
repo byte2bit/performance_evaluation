@@ -1,0 +1,85 @@
+/* Home and login reuse the palette, fields and buttons of the management pages. */
+.home-page .mp-heading { padding-top: 12px; margin-bottom: 28px; }
+.home-page .evaluation-selection-heading { padding: 22px; border-bottom: 1px solid var(--mp-line); }
+.home-page .evaluation-selection-heading h2 { font-size: 18px; font-weight: 700; margin: 0; }
+.home-page .evaluation-selection-heading p { font-size: 13px; line-height: 1.5; color: var(--mp-muted); margin: 6px 0 0; }
+.home-page .evaluation-professionals { padding: 8px 14px 14px; }
+.home-page .evaluation-select-all, .home-page .line-colabs { display: flex; align-items: flex-start; gap: 10px; padding: 13px 8px; border-radius: 8px; }
+.home-page .evaluation-select-all { border-bottom: 1px solid var(--mp-line); border-radius: 0; margin-bottom: 4px; }
+.home-page .line-colabs:hover { background: var(--mp-muted-bg); }
+.home-page .line-colabs:has(input:checked) { background: var(--mp-hover); }
+.home-page .evaluation-professionals label { color: var(--mp-text); font-size: 13px; font-weight: 500; line-height: 1.5; overflow-wrap: anywhere; cursor: pointer; flex: 1; }
+.home-page .evaluation-select-all label { font-weight: 700; }
+.home-page .evaluation-professional-name span { color: var(--mp-muted); margin-top: 4px; }
+.home-page .evaluation-checkbox { width: 17px; height: 17px; flex-shrink: 0; margin: 2px 0 0; accent-color: #1d4ed8; border-color: var(--mp-line); border-radius: 4px; cursor: pointer; }
+.home-page .evaluation-checkbox:focus-visible { outline: 3px solid #60a5fa; outline-offset: 3px; }
+.home-page .evaluation-workspace { min-width: 0; }
+.home-page .evaluation-notice { padding: 18px 20px; background: var(--mp-hover); border: 1px solid var(--mp-line); border-left: 3px solid var(--mp-accent); border-radius: 12px; margin-bottom: 20px; }
+.home-page .evaluation-notice h2 { font-size: 13px; font-weight: 700; margin: 0 0 6px; }
+.home-page .evaluation-notice p { color: var(--mp-muted); font-size: 13px; line-height: 1.6; margin: 0; }
+.home-page .evaluation-results { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.home-page .evaluation-results .inputs { background: var(--mp-surface); border: 1px solid var(--mp-line); border-radius: 12px; padding: 18px 12px; justify-content: space-between; gap: 8px; }
+.home-page .evaluation-results label { font-size: 12px; text-align: center; line-height: 1.5; color: var(--mp-muted); font-weight: 500; }
+.home-page .evaluation-results input { color: var(--mp-accent); -webkit-text-fill-color: var(--mp-accent); opacity: 1; background: transparent; font-size: 28px; line-height: 1.2; font-weight: 700; padding: 0; }
+.home-page .evaluation-criteria-heading { margin: 28px 0 18px; }
+.home-page .evaluation-criteria-heading h2 { font-size: 20px; font-weight: 700; letter-spacing: -.02em; }
+.home-page .evaluation-criteria-heading p { font-size: 13px; color: var(--mp-muted); margin: 6px 0 0; line-height: 1.5; }
+.home-page .evaluation-criteria-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.home-page .evaluation-criterion { display: flex; flex-direction: column; min-width: 0; padding: 22px; }
+.home-page .evaluation-criterion-heading { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.home-page .evaluation-criterion-heading span { background: var(--mp-hover); color: var(--mp-accent); border-radius: 7px; padding: 5px 8px; font-size: 11px; font-weight: 700; }
+.home-page .evaluation-criterion h3 { font-size: 16px; font-weight: 700; }
+.home-page .star-title { min-height: 66px; }
+.home-page .star-title p { font-size: 13px; line-height: 1.6; color: var(--mp-muted); margin: 0 0 14px; }
+.home-page .evaluation-criterion > .star-title + div { margin-top: auto; }
+.home-page .evaluation-criterion label { font-size: 12px; font-weight: 600; margin: 4px 0 8px; }
+.home-page .evaluation-criterion textarea { display: block; padding: 10px 12px; border: 1px solid var(--mp-line); border-radius: 8px; background: var(--mp-surface); color: var(--mp-text); font-size: 13px; line-height: 1.6; min-height: 92px; resize: vertical; }
+.home-page .evaluation-criterion textarea:focus { outline: 3px solid #3b82f630; outline-offset: 1px; border-color: #3b82f6; }
+.home-page .vue-star-rating-rating-text { color: var(--mp-text); font-size: 15px; }
+.home-page .evaluation-actions { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; border-top: 1px solid var(--mp-line); padding-top: 22px; margin-top: 24px; }
+.management-page.login-page { display: flex; align-items: center; justify-content: center; padding: 48px 24px; }
+.login-page .login-layout { display: grid; grid-template-columns: .95fr 1.05fr; width: 100%; max-width: 1020px; }
+.login-page .login-intro { position: relative; display: flex; flex-direction: column; justify-content: space-between; gap: 48px; padding: 44px 38px; background: linear-gradient(145deg, #1e40af, #1d4ed8 60%, #2563eb); color: #fff; }
+.login-page .login-brand { display: block; width: 180px; height: 50px; background: url('../assets/logo-horizontal branco.png') left center / contain no-repeat; }
+.login-page .login-overline { display: block; color: #dbeafe; font-size: 11px; text-transform: uppercase; letter-spacing: .12em; font-weight: 700; margin-bottom: 16px; }
+.login-page .login-intro h2 { font-size: 32px; line-height: 1.2; letter-spacing: -.035em; font-weight: 700; max-width: 340px; }
+.login-page .login-intro p { font-size: 14px; line-height: 1.75; color: #dbeafe; margin: 18px 0 0; }
+.login-page .login-criteria { display: flex; flex-wrap: wrap; gap: 8px; padding: 0; margin: 0; list-style: none; }
+.login-page .login-criteria li { border: 1px solid #ffffff40; border-radius: 999px; padding: 6px 11px; font-size: 12px; color: #eff6ff; }
+.login-page .login-form-panel { padding: 58px 44px 38px; align-self: center; min-width: 0; }
+.login-page .login-description { font-size: 14px; line-height: 1.65; color: var(--mp-muted); margin: 12px 0 30px; }
+.login-page .mp-field { margin-bottom: 20px; }
+.login-page .login-submit { width: 100%; margin-top: 6px; }
+.login-page :disabled { opacity: .6; cursor: wait; }
+.login-page .login-message { font-size: 13px; line-height: 1.6; padding: 12px 14px; border-radius: 8px; margin: 0 0 20px; }
+.login-page .login-message-error { color: #991b1b; background: #fef2f2; border: 1px solid #fecaca; }
+.login-page .login-message-success { color: #166534; background: #f0fdf4; border: 1px solid #bbf7d0; }
+.login-page .login-footnote { font-size: 12px; text-align: center; color: var(--mp-muted); margin: 30px 0 0; line-height: 1.5; }
+@media (max-width: 1023px) {
+    .home-page .evaluation-professionals { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; }
+    .home-page .evaluation-select-all { grid-column: 1 / -1; }
+}
+@media (max-width: 767px) {
+    .management-page.login-page { padding: 24px 16px; align-items: flex-start; }
+    .login-page .login-layout { grid-template-columns: minmax(0, 1fr); max-width: 480px; }
+    .login-page .login-intro { padding: 24px; gap: 22px; }
+    .login-page .login-brand { width: 140px; height: 38px; }
+    .login-page .login-intro h2 { font-size: 24px; }
+    .login-page .login-intro p, .login-page .login-criteria { display: none; }
+    .login-page .login-overline { margin-bottom: 10px; }
+    .login-page .login-form-panel { padding: 30px 24px; }
+    .login-page h1 { font-size: 25px; }
+}
+@media (max-width: 639px) {
+    .home-page .evaluation-criteria-grid, .home-page .evaluation-professionals { grid-template-columns: minmax(0, 1fr); }
+    .home-page .evaluation-results { gap: 8px; }
+    .home-page .evaluation-results .inputs { padding: 14px 6px; }
+    .home-page .evaluation-results label { font-size: 11px; }
+    .home-page .evaluation-results input { font-size: 25px; }
+    .home-page .evaluation-criterion { padding: 20px; }
+    .home-page .star-title { min-height: 0; }
+    .home-page .evaluation-actions .mp-button { flex: 1; }
+}
+.dark .login-page .login-intro { background: linear-gradient(145deg, #172f77, #1e40af); }
+.dark .login-page .login-message-error { color: #fecaca; background: #451f2c; border-color: #7f3542; }
+.dark .login-page .login-message-success { color: #bbf7d0; background: #163c30; border-color: #27604a; }

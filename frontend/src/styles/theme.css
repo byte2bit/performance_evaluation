@@ -1,0 +1,23 @@
+:root {
+    color-scheme: light;
+    --mp-bg: #f5f7fb;
+    --mp-surface: #fff;
+    --mp-muted-bg: #f8fafc;
+    --mp-text: #18263c;
+    --mp-muted: #58687e;
+    --mp-line: #dce3ed;
+    --mp-accent: #1d4ed8;
+    --mp-hover: #eef4ff;
+}
+:root.dark {
+    color-scheme: dark;
+    --mp-bg: #111827;
+    --mp-surface: #1f2937;
+    --mp-muted-bg: #192333;
+    --mp-text: #f1f5f9;
+    --mp-muted: #b0bed0;
+    --mp-line: #37465b;
+    --mp-accent: #93b4ff;
+    --mp-hover: #263b60;
+}
+body { background: var(--mp-bg); color: var(--mp-text); }

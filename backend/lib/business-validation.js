@@ -48,6 +48,11 @@ function professional(body) {
 function evaluation(body) {
     if (!object(body) || !text(body.colab, { required: true })) return null
     const result = { colab: body.colab }
+    if (has(body, 'colab_id')) {
+        const professionalId = id(body.colab_id)
+        if (professionalId === null) return null
+        result.colab_id = professionalId
+    }
     const notes = []
     for (const criterion of ['qualidade', 'prazo', 'dispon', 'respon']) {
         const note = decimal(body['nota_' + criterion])

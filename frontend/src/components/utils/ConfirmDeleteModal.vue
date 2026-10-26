@@ -18,15 +18,16 @@ function confirm() {
 <template>
     <teleport to="body">
         <div :id="id" ref="modalElement" tabindex="-1" aria-hidden="true" :aria-labelledby="`${id}-title`"
-            class="fixed inset-0 z-50 hidden w-full overflow-y-auto p-4">
-            <div class="relative w-full max-w-md rounded-lg bg-white p-6 shadow-sm">
-                <h2 :id="`${id}-title`" class="mb-4 text-xl font-semibold text-gray-900">Remover</h2>
-                <div class="mb-6 break-words text-gray-800"><slot /></div>
-                <div class="flex justify-end gap-3">
-                    <button type="button" @click="visible = false"
-                        class="rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm text-gray-900 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200">Cancelar</button>
-                    <button type="button" @click="confirm"
-                        class="rounded-lg bg-blue-700 px-5 py-2.5 text-sm text-white hover:bg-blue-800 focus:ring-4 focus:ring-blue-300">Sim</button>
+            class="app-modal fixed inset-0 z-50 hidden w-full overflow-y-auto">
+            <div class="app-modal-panel app-modal-small">
+                <header class="app-modal-header">
+                    <span class="app-modal-eyebrow">Confirmação</span>
+                    <h2 :id="`${id}-title`">Remover</h2>
+                </header>
+                <div class="app-modal-body"><slot /></div>
+                <div class="app-modal-footer">
+                    <button type="button" @click="visible = false" class="app-modal-button">Cancelar</button>
+                    <button type="button" @click="confirm" class="app-modal-button app-modal-danger">Sim</button>
                 </div>
             </div>
         </div>

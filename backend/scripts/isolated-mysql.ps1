@@ -1,9 +1,10 @@
 param(
-    [ValidateSet('Initialize', 'Start', 'NewSchema', 'Validate', 'RecoveryTest', 'VisualReview', 'Stop', 'Serve', 'Info')]
+    [ValidateSet('Initialize', 'Start', 'NewSchema', 'Validate', 'ValidateLinks', 'RecoveryTest', 'VisualReview', 'Stop', 'Serve', 'Info')]
     [string]$Action = 'Info',
     [string]$ProfileDirectory,
     [string]$MySqlBinary = 'C:/Program Files/MySQL/MySQL Server 8.0/bin/mysqld.exe',
-    [string]$VisualToolDirectory
+    [string]$VisualToolDirectory,
+    [string]$RecoveryReportName
 )
 
 $ErrorActionPreference = 'Stop'
@@ -48,6 +49,7 @@ function Invoke-IsolatedNode([string]$verb, [string]$directory) {
         TRUST_PROXY = $null
         EVAL_ISOLATED_RECOVERY_KEY = $(if ($verb -eq 'recoverytest') { $secrets.recovery } else { $null })
         EVAL_VISUAL_TOOL_DIRECTORY = $(if ($verb -eq 'visualreview') { $VisualToolDirectory } else { $null })
+        EVAL_ISOLATED_LINKS_RECOVERY_REPORT = $(if ($verb -eq 'validatelinks') { $RecoveryReportName } else { $null })
     }
     $previous = @{}
     try {

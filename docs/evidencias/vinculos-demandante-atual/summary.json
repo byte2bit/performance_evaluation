@@ -1,0 +1,92 @@
+{
+  "date": "2026-10-26",
+  "baselineCommit": "e0848ec",
+  "authorization": "Local implementation, then explicitly authorized backup/recovery and migration application on the documented isolated MySQL profile",
+  "accessPolicy": {
+    "currentOwner": "All linked evaluations, including previous and administrator authors",
+    "previousOwner": "No access unless administrator",
+    "administrator": "All records including unreconciled history",
+    "authorSnapshot": "Preserved; does not grant access"
+  },
+  "schema": {
+    "migration": "20261026000100_link_registros_to_colab_id.js",
+    "column": "registros.colab_id INT UNSIGNED NULL",
+    "references": "colab.id",
+    "onDelete": "RESTRICT",
+    "onUpdate": "RESTRICT",
+    "newMigrationExecuted": true,
+    "automaticBackfill": false,
+    "previouslyValidatedMigrationCount": 11,
+    "oldTextForeignKeyPreserved": true,
+    "appliedOnlyTo": "Verified isolated MySQL 8.0.44 source schema and its recovery copies",
+    "appliedMigrationCount": 12,
+    "existingEvaluationsPreserved": 8,
+    "existingLinksRemainNull": true
+  },
+  "contracts": {
+    "legacyUniqueName": "204 with resolved professional ID",
+    "ambiguousName": "409 without writes",
+    "invalidId": "400",
+    "unauthorizedOrMissingId": "403 with no name fallback",
+    "nameIdConflict": "409",
+    "unreconciledHistory": "Administrator-only; 404 for evaluators by ID",
+    "author": "registros.demandante",
+    "currentAssignment": "colab.demandante"
+  },
+  "tests": {
+    "command": "node --test backend/test/*.test.js frontend/test/*.test.js",
+    "passed": 127,
+    "failed": 0,
+    "skipped": 0,
+    "baselinePassed": 113,
+    "addedBackendTests": 12,
+    "addedFrontendTests": 2,
+    "sqlScopeCompiledWithoutConnection": true,
+    "migrationDdlCompiledWithoutConnection": true
+  },
+  "build": {
+    "mode": "development",
+    "passed": true,
+    "output": "%TEMP%/evaluation-links-build-38dc54a787f34912826250ad222a5fe9",
+    "frontendDistPreserved": true,
+    "note": "Passed during local implementation; UI unchanged in SQL integration step, no new build"
+  },
+  "notPerformed": [
+    "Legacy data reconciliation or backfill",
+    "Production access or migration",
+    "Real email delivery",
+    "New dependency installation or audit",
+    "New Chrome visual review",
+    "Commit, push or deploy"
+  ],
+  "limitations": [
+    "Eight existing evaluations remain admin-only until reviewed reconciliation",
+    "No new administrative reassignment endpoint or screen",
+    "Evaluation submission remains disabled",
+    "Other MySQL versions, production workloads and topology not validated"
+  ],
+  "completedUtc": "2026-10-26T16:03:46.264Z",
+  "sqlIntegration": {
+    "report": "mysql-validation-report.json",
+    "passed": true,
+    "checkGroups": 15,
+    "copyBeforeSource": true,
+    "sourceBusinessDataPreserved": true,
+    "automaticBackfill": false,
+    "backupTablesCompared": 8,
+    "backupRowsCompared": 43,
+    "backupArtifact": "backup-2cf943c9fdd6.evalbackup",
+    "sourceDatabase": "evaluation_isolated_0f8785e64029_v2",
+    "validationDatabase": "evaluation_isolated_0f8785e64029_v2_restore_2cf943c9fdd6",
+    "sourceMigrationElapsedMs": 280,
+    "realLockWaitObserved": true,
+    "previousOwnerConcurrentWriteStatus": 403,
+    "temporaryCredentialFilesRemaining": 0,
+    "isolatedInstanceStoppedAfterValidation": true,
+    "productionAccess": false
+  },
+  "localImplementationEvidence": {
+    "initialTestsPassed": 123,
+    "migrationInitiallyOnlyWritten": true
+  }
+}

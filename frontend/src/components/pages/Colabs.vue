@@ -1,39 +1,39 @@
 <template>
-    <div class="tb">
-        <div class="d-flex justify-content-between align-items-center">
-            <h2 class="my-5">Lista de profissionais: </h2>
-            <router-link to="/" class="h5">Voltar</router-link>
+  <ManagementPage title="Lista de profissionais" description="Consulte os profissionais, suas áreas de atuação e os responsáveis.">
+    <template #actions><router-link v-if="identity.admin" to="/inserir" class="mp-button mp-button-primary"><span aria-hidden="true">+</span> Inserir profissional</router-link></template>
+    <section class="mp-card" aria-label="Lista de profissionais">
+      <div class="mp-toolbar">
+        <div class="mp-search">
+          <label for="busca-colabs">Buscar profissionais</label>
+          <div class="mp-search-control"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/></svg>
+            <input id="busca-colabs" class="mp-input" type="search" v-model="searchValue"
+              placeholder="Nome, serviço, função ou demandante…" aria-describedby="ajuda-colabs" />
+          </div>
+          <p id="ajuda-colabs">A busca considera todos os campos da tabela.</p>
         </div>
-
-        <div class="bg-dark bg-opacity-10 p-2 rounded ps-3">    
-            <span class="me-2"><b>Procurar: </b> </span>
-            <input class="w-25" type="text" v-model="searchValue">
-        </div>
-
-        <EasyDataTable class="my-4" show-index id="tabela" :headers="visibleHeaders" :items="colabs"
-            v-model:items-selected="itemsSelected" rowsPerPageMessage="linhas por página:"
-            rowsOfPageSeparatorMessage="de" emptyMessage="Não há dados disponíveis" :buttons-pagination=true
-            :search-value="searchValue" alternating>
-
-            <!--v-model:items-selected="itemsSelected"-->
-
-            <template #item-operation="colab">
-                <div v-if="identity.admin" class="operation-wrapper">
-                    <button type="button" :aria-label="`Remover profissional ${colab.colab}`"
-                        aria-haspopup="dialog" aria-controls="delete-colab-modal" @click="modal(colab)">
-                        <img src="../../assets/delete.png" class="operation-icon" alt="" />
-                    </button>
-                </div>
-            </template>
-        </EasyDataTable>
-
-        <ConfirmDeleteModal v-if="identity.admin" id="delete-colab-modal" v-model="showDelete" @confirm="deleteItem">
-            Remover profissional: <b>{{ colab }}</b> ?
-        </ConfirmDeleteModal>
-    </div>
+        <span class="mp-count">Total: <strong>{{ colabs.length }}</strong></span>
+      </div>
+      <EasyDataTable class="mp-data-table" theme-color="#1d4ed8" show-index id="tabela" :headers="visibleHeaders" :items="colabs"
+        v-model:items-selected="itemsSelected" rowsPerPageMessage="linhas por página:" rowsOfPageSeparatorMessage="de"
+        emptyMessage="Não há dados disponíveis" :buttons-pagination="true" :search-value="searchValue" alternating>
+        <template #item-colab="item"><span class="mp-person">{{ item.colab }}</span></template>
+        <template #item-operation="colab">
+          <button v-if="identity.admin" type="button" class="mp-delete" :aria-label="`Remover profissional ${colab.colab}`"
+            aria-haspopup="dialog" aria-controls="delete-colab-modal" @click="modal(colab)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v5m4-5v5"/></svg>
+          </button>
+        </template>
+      </EasyDataTable>
+      <p class="mp-table-note">Deslize a tabela para consultar todos os dados dos profissionais.</p>
+    </section>
+    <ConfirmDeleteModal v-if="identity.admin" id="delete-colab-modal" v-model="showDelete" @confirm="deleteItem">
+      Remover profissional: <b>{{ colab }}</b> ?
+    </ConfirmDeleteModal>
+  </ManagementPage>
 </template>
 
 <script>
+import ManagementPage from "@/components/utils/ManagementPage.vue";
 import axios from '@/plugins/axios.js'
 import ConfirmDeleteModal from '@/components/utils/ConfirmDeleteModal.vue'
 import Vue3EasyDataTable from 'vue3-easy-data-table'
@@ -48,7 +48,6 @@ export default {
         return {
             identity: dados,
             headers: [
-                { text: "Remover", value: "operation" },
                 { text: "Profissional", value: "colab", sortable: true, width: 200 },
                 { text: "PPU", value: "ppu", sortable: true },
                 { text: "Serviço", value: "servico", sortable: true },
@@ -56,6 +55,7 @@ export default {
                 { text: "Lideranças", value: "liderancas", sortable: true },
                 { text: "Gerência", value: "gerencia", sortable: true },
                 { text: "Demandante", value: "demandante", sortable: true },
+                { text: "Remover", value: "operation" },
 
             ],
             items: [],
@@ -68,6 +68,7 @@ export default {
         }
     },
     components: {
+        ManagementPage,
         'EasyDataTable': Vue3EasyDataTable,
         ConfirmDeleteModal,
         toast
@@ -118,11 +119,3 @@ export default {
     }
 }
 </script>
-
-
-<style lang="scss" scoped>
-.operation-wrapper .operation-icon {
-    width: 20px;
-    cursor: pointer;
-}
-</style>

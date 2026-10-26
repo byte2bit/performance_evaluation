@@ -1,7 +1,10 @@
 @import "tailwindcss";
 @import "flowbite/src/themes/default";
+@import "./styles/theme.css";
+@import "./styles/dialogs.css";
 @plugin "flowbite/plugin";
 @source "../node_modules/flowbite";
+@custom-variant dark (&:where(.dark, .dark *));
 
 html, body, #app {
   min-height: 100vh;
