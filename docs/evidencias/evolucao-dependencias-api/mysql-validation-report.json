@@ -1,0 +1,52 @@
+{
+  "profileId": "0f8785e640294ebbbd5490d74b01e59a",
+  "database": "evaluation_isolated_0f8785e64029_v2",
+  "mysqlVersion": "8.0.44",
+  "isolatedServerVerified": true,
+  "loopbackOnly": true,
+  "historicalSchema": {
+    "success": false,
+    "database": "evaluation_isolated_0f8785e64029_v2_legacy_c59ee4",
+    "migration": "20240622215930_create_table_registros.js",
+    "code": "ER_FK_NO_INDEX_PARENT",
+    "errno": 1822
+  },
+  "authenticationMigrations": {
+    "success": true,
+    "persistedColumns": 14
+  },
+  "completeMigrationChain": {
+    "success": true,
+    "migrationCount": 11,
+    "businessSchemaAdaptedByFixture": false
+  },
+  "sqlAuthorizationAndTransactions": true,
+  "apiInputValidation": {
+    "invalidPayloadsReturn400": true,
+    "invalidRouteIdsReturn400": true,
+    "noBusinessRowsChangedByInvalidInputs": true,
+    "paginationBounded": true,
+    "unicode255RoundTrip": true,
+    "unicodeProbeRolledBack": true
+  },
+  "sessionSurvivesApplicationRestart": true,
+  "sharedConcurrentRateLimit": {
+    "allowed": 10,
+    "blocked": 5,
+    "runtimes": 2
+  },
+  "passwordChangeLogoutAndRevocation": true,
+  "sessionExpiry": {
+    "databaseTTL": true,
+    "inactivity": true,
+    "absoluteDuration": true
+  },
+  "adminLoginAndVisibility": true,
+  "applicationAccountCannotCreateTables": true,
+  "fictionalAccounts": [
+    "admin@example.invalid",
+    "reviewer@example.invalid"
+  ],
+  "externalSecretsConfigured": true,
+  "completedUtc": "2026-10-26T02:49:47.389Z"
+}

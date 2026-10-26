@@ -10,7 +10,7 @@ Este é um **único sistema full stack já existente**, desenvolvido manualmente
 
 **Banco de dados:** MySQL.
 
-**Estado da autenticação:** o sistema ainda **não possui login implementado**. A presença do Passport nas dependências não significa que a autenticação esteja funcionando.
+**Estado da autenticação:** login por Passport Local e sessões está **implementado e validado em MySQL 8.0.44 isolado, com contas fictícias**. As 11 migrations passaram nesse alvo autorizado; segredos locais estão fora do repositório. Configuração e ativação de produção permanecem pendentes. A presença do Passport nas dependências não comprova que outro ambiente esteja habilitado.
 
 **Vhost:** é utilizado dentro de um único sistema. Descubra sua finalidade, os hosts atendidos e suas dependências pelo código. **Não presuma** que exista uma arquitetura multi-tenant, SSO ou múltiplos sistemas independentes.
 
@@ -132,11 +132,11 @@ Não assuma que um determinado diretório, arquivo, proxy, esquema de usuário o
 - Nunca teste em banco de produção ou com dados pessoais reais.
 - Sempre que possível use usuário MySQL de desenvolvimento com privilégios mínimos.
 
-## 11. Passport — autenticação ainda não implementada
+## 11. Passport — autenticação validada em MySQL isolado
 
-**Situação confirmada:** não há login funcional. Não descreva Passport como autenticação ativa apenas porque está instalado.
+**Situação confirmada:** o modelo aprovado de Passport Local + sessões persistentes tem implementação, testes automatizados e integração validada em instância MySQL separada com dados fictícios. Ver `docs/AMBIENTE_ISOLADO.md`. Não declare login operacional em outros ambientes ou produção sem validar schema, configuração e provisionamento nesses alvos.
 
-Antes de implementar:
+Antes de implementar ou alterar o modelo de autenticação:
 
 1. Identifique configurações parciais do Passport, estratégias e dependências existentes.
 2. Descubra quais páginas, endpoints e operações devem ser públicos ou protegidos.

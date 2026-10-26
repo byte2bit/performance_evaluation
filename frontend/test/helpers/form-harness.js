@@ -25,10 +25,24 @@ export function walk(root) {
     return [root, ...root.children.flatMap(walk)]
 }
 
+class SyntheticDocument {}
+class SyntheticShadowRoot {}
+
+export function installDocumentGlobals(document) {
+    const previous = Object.fromEntries(['document', 'Document', 'ShadowRoot'].map(name => [name, globalThis[name]]))
+    Object.assign(globalThis, { document, Document: SyntheticDocument, ShadowRoot: SyntheticShadowRoot })
+    return () => {
+        for (const [name, value] of Object.entries(previous)) {
+            if (value === undefined) delete globalThis[name]
+            else globalThis[name] = value
+        }
+    }
+}
+
 // Minimal in-memory DOM for Vue's native form directives, Teleport and the
 // installed Flowbite Modal. No browser, database or external service is used.
-function memoryDocument() {
-    const document = { activeElement: null }
+export function memoryDocument() {
+    const document = Object.assign(new SyntheticDocument(), { activeElement: null })
     function remove(node) {
         if (!node.parent) return
         const children = node.parent.children
@@ -74,6 +88,7 @@ function memoryDocument() {
             remove() { remove(this) },
             contains(child) { return walk(this).includes(child) },
             focus() { document.activeElement = this },
+            getRootNode() { return document },
             get isConnected() { return this === document.body || Boolean(this.parent?.isConnected) },
             getClientRects() {
                 let current = this
@@ -124,8 +139,7 @@ function memoryDocument() {
 
 export async function mountForm(t) {
     const { document, renderer, create } = memoryDocument()
-    const previousDocument = globalThis.document
-    globalThis.document = document
+    const restoreDocument = installDocumentGlobals(document)
     const requests = []
     const api = {
         async get(url) {
@@ -192,7 +206,7 @@ export async function mountForm(t) {
     app.mount(root)
     t.after(() => {
         app.unmount()
-        globalThis.document = previousDocument
+        restoreDocument()
         assert.equal(Object.keys(modalInstances.getInstances('Modal')).length, 0)
         assert.equal(document.body.classList.contains('overflow-hidden'), false)
         assert.equal(document.body.listeners.get('keydown')?.size || 0, 0)

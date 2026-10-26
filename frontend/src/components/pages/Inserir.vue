@@ -64,8 +64,8 @@ export default {
                     <input type="text" class="form-control" id="profissional" v-model="postData.colab" />
                 </div>
                 <div class="col-sm-12 col-md-2">
-                    <label for="profissional" class="form-label">Matrícula:</label><br>
-                    <input type="text" class="form-control" id="profissional" v-model="postData.matricula" />
+                    <label for="matricula" class="form-label">Matrícula:</label><br>
+                    <input type="text" class="form-control" id="matricula" v-model="postData.matricula" />
                 </div>
                 <div class="col-sm-12 col-md-2">
                     <label for="ppu" class="form-label">Item de PPU:</label><br>

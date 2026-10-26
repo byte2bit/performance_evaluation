@@ -1,19 +1,8 @@
 const assert = require('node:assert/strict')
-const fs = require('node:fs')
-const path = require('node:path')
 const test = require('node:test')
-const vm = require('node:vm')
 
 function controller(db) {
-    const module = { exports: {} }
-    vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../api/registros.js'), 'utf8'), {
-        module,
-        require(name) {
-            assert.equal(name, 'bcrypt-nodejs')
-            return {}
-        }
-    }, { timeout: 1000 })
-    return module.exports({ db })
+    return require('../api/registros')({ db })
 }
 
 function response() {
@@ -39,10 +28,10 @@ test('GET /registros2 returns its list once, keeps pagination and does not count
     let queries = 0
     const api = controller(table => { queries++; assert.equal(table, 'registros'); return query })
     const res = response()
-    await api.getReg({ query: { page: '2', limit: '25' } }, res)
+    await api.getReg({ user: { admin: true }, query: { page: '2', limit: '25' } }, res)
     assert.deepEqual(res.replies, [{ status: 200, body: rows }])
     assert.equal(queries, 1)
-    assert.deepEqual(calls, [['orderBy', 'created_at', 'desc'], ['limit', '25'], ['offset', 25]])
+    assert.deepEqual(calls, [['orderBy', 'created_at', 'desc'], ['orderBy', 'id', 'desc'], ['limit', 25], ['offset', 25]])
 })
 
 test('GET /registros2 returns one sanitized 500 for rejected and synchronous database failures', async () => {
@@ -58,7 +47,7 @@ test('GET /registros2 returns one sanitized 500 for rejected and synchronous dat
             return query
         })
         const res = response()
-        await api.getReg({ query: { page: '1', limit: '25' } }, res)
+        await api.getReg({ user: { admin: true }, query: { page: '1', limit: '25' } }, res)
         assert.deepEqual(res.replies, [{ status: 500, body: 'Não foi possível carregar os registros.' }])
     }
 })

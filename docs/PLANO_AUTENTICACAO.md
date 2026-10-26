@@ -1,6 +1,6 @@
 # Proposta do segundo lote: autenticação e autorização
 
-Data: 25/10/2026. **Estado: modelo aprovado; cinco dependências instaladas; correção adicional das dependências citadas autorizada e concluída. Login, sessões, autorização, CLI e migrations ainda não implementados.** O pedido atual de correção e envio ao GitHub consolida o trabalho já feito; a implementação do modelo de autenticação continua como pendência aprovada. Ver triagem em `AUDITORIA.md`.
+Data: 25/10/2026. **Estado atual: login, sessões, autorização, UI e CLI implementados; cadeia completa de 11 migrations e duas contas fictícias validadas em MySQL 8.0.44 isolado. Suíte atual com 108 testes aprovados e 48/48 verificações no Chrome após as correções de dependências/validação. Produção permanece pendente.** As seções de proposta preservam o modelo aprovado; a seção 16 registra a execução e a configuração. Recuperação/convites seguem para etapa posterior.
 
 ## 1. Decisões confirmadas pelo usuário
 
@@ -222,4 +222,63 @@ Aprovados pelo usuário: Passport Local + sessão persistente MySQL, matriz deta
 
 Executado: instalação das cinco dependências, teste Argon2id, triagem inicial e correção adicional autorizada das dependências citadas. Express permanece na linha 4; body-parser 1.20.9, proxy-addr 2.0.8 e basic-ftp 6.2.3 não aparecem no audit posterior. Os 57 testes passaram; ainda restam 18 entradas de outros pacotes (10 altas, 8 moderadas). Ainda não executado: implementação de autenticação/autorização, UI de login, CLI e criação de arquivos de migration. O modelo continua aprovado, sem necessidade de nova aprovação; o tratamento dos demais pacotes e sua aplicabilidade devem ser acompanhados na auditoria.
 
+Esse parágrafo registra a situação anterior à retomada: o primeiro passo de autenticação foi posteriormente implementado, conforme seção 16. Os alertas restantes não foram reavaliados por uma nova instalação/audit neste lote.
+
 As URLs de produção podem continuar indefinidas durante a implementação/testes locais; sua definição será requisito de ativação, sem assumir domínio, proxy ou arquitetura adicionais.
+
+## 16. Implementação concluída e configuração
+
+Implementados: `/signin`, `/session`, `/signout`, `/csrf-token`, `/change-password`; Passport Local por instância, sessão persistente MySQL, verificação de atividade/perfil/versão no banco a cada requisição, expiração por inatividade e prazo absoluto, Argon2id, CSRF, limitadores compartilhados e matriz de autorização. A estratégia JWT anterior deixou de ser registrada; dependências legadas não foram removidas.
+
+As duas APIs de avaliação reutilizam `lib/records.js` para aplicar a mesma autorização. Campos graváveis são explícitos; `demandante` vem da sessão; a autorização do profissional é verificada com lock compartilhado em transação. No cadastro de profissional, o e-mail do demandante é validado e normalizado. Na continuidade aprovada em [PLANO_VALIDACAO_API.md](PLANO_VALIDACAO_API.md), `/registros2` recebeu padrões page=1/limit=25 e teto 100, e ambos os handlers receberam validação de notas, consistência e comprimentos. Entradas inválidas retornam 400; listas e filtros de autorização foram preservados.
+
+Frontend: login e troca de senha acessíveis, estado de envio/erro, guardas, cabeçalho com identidade real, logout, CSRF automático em mutações e Axios credenciado. Não há replay automático de escrita. O mapeamento pessoal fixo foi removido; respostas antigas de sessão/lista não repõem dados após troca de usuário. A seleção/resumo e a submissão desativada da avaliação foram preservados.
+
+### Variáveis externas do processo backend
+
+| Variável | Regra atual |
+| --- | --- |
+| `SESSION_SECRET` | Obrigatória inclusive em desenvolvimento; segredo de sessão externo com pelo menos 32 bytes; gerar a partir de 32 bytes criptograficamente aleatórios ou mais |
+| `AUTH_RATE_LIMIT_SECRET` | Obrigatória, distinta da anterior; mesmo mínimo, usada em HMAC para chaves de IP/e-mail |
+| `FRONTEND_ORIGIN` | Padrão local `http://localhost:5173`; origem exata, sem caminho/credenciais/trailing slash. Fora do ambiente local exige `NODE_ENV=production` e HTTPS |
+| `NODE_ENV` | Usar `production` explicitamente fora do desenvolvimento local; produção exige origem HTTPS e recusa requisições sem HTTPS reconhecido |
+| `SESSION_SAME_SITE` | `lax` em desenvolvimento; `lax`, `strict` ou `none` explícito em produção, após avaliar a topologia; `none` não é permitido no modo local HTTP |
+| `TRUST_PROXY` | Ausente significa confiança desabilitada. Lista separada por vírgulas de IPs/CIDRs explícitos; não aceita `true`, contagem de hops ou prefixo zero. Definir somente após confirmar o proxy real |
+
+Nenhum desses valores passa a ser carregado automaticamente do arquivo CommonJS `backend/.env`. O acesso MySQL existente continua por esse arquivo; os novos segredos vêm de `process.env`. Não colocar valores reais neste documento, em comandos com senha como argumento ou no repositório. Nenhum arquivo de ambiente foi alterado pela implementação.
+
+### Migrations e contas
+
+Arquivos criados no primeiro passo, posteriormente aplicados somente no MySQL isolado autorizado:
+
+- `backend/migrations/20261025000100_add_auth_state_to_users2.js`: `active=false` e `session_version=0`; não ativa contas antigas.
+- `backend/migrations/20261025000200_create_sessions.js`: SID, JSON de sessão e expiração indexada.
+- `backend/migrations/20261025000300_create_auth_rate_limits.js`: chaves HMAC, contagem e expiração.
+
+Aplicação isolada concluída conforme [AMBIENTE_ISOLADO.md](AMBIENTE_ISOLADO.md), incluindo duas correções aprovadas de índice/coluna e cadeia completa de 11 migrations. Para outros ambientes, ainda é necessário conferir schema/versão/JSON/índices, validar backup/restauração e obter autorização específica. O servidor não cria tabelas automaticamente; configuração obrigatória ausente impede inicialização, e store não disponível resulta em 503. O runner isolado ignora o bootstrap e o arquivo de credenciais da aplicação.
+
+A CLI `backend/scripts/accounts.js` oferece `create-admin`, `create-evaluator`, `activate`, `disable`, `promote`, `demote`. Exige terminal interativo, arquivo de conexão explícito e confirmação do banco/ação; senhas são digitadas sem eco e confirmadas. Não há seed, conta padrão, senha em argumentos ou cadastro público. A ativação de conta antiga exige senha nova; desativação/perfil/reativação incrementam a versão; a CLI preserva pelo menos um administrador ativo.
+
+Formato da chamada manual, somente depois de confirmar ambiente e autorizar alterações:
+
+```powershell
+node backend/scripts/accounts.js create-admin --config C:/config-local/isolated-db.cjs
+```
+
+O arquivo escolhido pelo operador deve exportar `{ client: 'mysql', connection: { ... } }` com conexão confiável e específica do alvo. A CLI não importa o bootstrap da aplicação, `.env`, seeds ou migrations. Ela não foi executada contra banco real nesta etapa.
+
+### Testes executados e pendências
+
+`node --test backend/test/*.test.js frontend/test/*.test.js`: **100 aprovados**. Cobrem sucesso/falha de login, isolamento, campos protegidos, administração, revogação, expiração, CSRF, HTTPS/proxy, indisponibilidade, HMAC/limitação, terminal sem eco, carregamento pelo Consign real, DDL compilado, estado Vue, navegação, formulários e guardas do runner isolado. Essa suíte usa mocks de banco; MemoryStore existe somente na fixture de teste. A validação SQL opt-in foi executada separadamente em MySQL 8.0.44 e confirmou migrations, transações, persistência, expiração, revogação e limitação concorrente; ver guia do ambiente.
+
+Build de desenvolvimento aprovado em pasta temporária, preservando `frontend/dist`; o bundle do lote de autenticação não contém os e-mails do antigo mapeamento. Os cinco achados da revisão visual foram posteriormente corrigidos com autorização e validados no Chrome, conforme `REVISAO_VISUAL.md`. Segredos locais de autenticação e duas contas fictícias estão provisionados fora do repositório, com DPAPI/ACL. As bibliotecas persistentes estão configuradas sem limpeza automática de expirados; definir retenção/purga como etapa operacional própria, sem executar exclusões por esta implementação.
+
+Recuperação/convites por e-mail, UI de gestão de contas, definição da infraestrutura e ativação da submissão de avaliações continuam fora deste primeiro passo. A rotação de credenciais SMTP antigas permanece pendente. Na continuidade autorizada, os 18 alertas do backend caíram para seis; o frontend ficou sem entradas no audit online final. O backend ainda requer análise das atualizações principais de Nodemailer e PM2, conforme [DEPENDENCIAS_SEGURANCA.md](DEPENDENCIAS_SEGURANCA.md).
+
+### Continuidade: teste de recuperação
+
+Backup criptografado do schema fictício e restauração em outro schema novo passaram, incluindo comparação de DDL/conteúdo e login/logout dos dois perfis na cópia. A origem foi preservada. Suíte daquele lote: 102 testes aprovados; novo build local aprovado após as correções de interface. Procedimento e limitações de DPAPI/recuperação em outro host em [BACKUP_RESTAURACAO.md](BACKUP_RESTAURACAO.md). Os cinco achados visuais foram corrigidos com autorização: **48/48 verificações no Chrome**, 27 capturas, exclusões somente simuladas e contratos de autenticação preservados; ver [REVISAO_VISUAL.md](REVISAO_VISUAL.md).
+
+### Continuidade atual: dependências e entradas da API
+
+Regras de [PLANO_VALIDACAO_API.md](PLANO_VALIDACAO_API.md) aprovadas pelo usuário e implementadas; consultas online npm dos dois projetos também autorizadas. A suíte passou em **108/108**, a integração MySQL isolada confirmou as novas rejeições/limites/Unicode e os fluxos de sessão, e **48/48 verificações visuais** e build passaram após atualizar Vue/Axios/Vite. O harness DOM foi ajustado para as APIs usadas pelo Vue atualizado; os contratos de autenticação permaneceram. Não houve nova migration, envio SMTP ou alteração de produção neste lote. Detalhes e seis alertas restantes do backend em [DEPENDENCIAS_SEGURANCA.md](DEPENDENCIAS_SEGURANCA.md).

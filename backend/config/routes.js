@@ -1,49 +1,32 @@
-// const admin = require('./admin')
-
 module.exports = app => {
-/*     app.post('/signup', app.api.user.save)
-    app.post('/signin', app.api.auth.signin)
-    app.post('/validateToken', app.api.auth.validateToken) */
-    
-        app.route('/registros')
-            .get(app.api.user.getReg)
-            .post(app.api.user.saveReg)
-        // .get(app.api.user.get)
-    
-        app.route('/registros2')
-            .get(app.api.registros.getReg)
-            .post(app.api.registros.saveReg)
-        // .get(app.api.user.get)
-    
+    const auth = app.config.passport
+    app.get('/csrf-token', auth.limit('csrf'), app.api.auth.csrfToken)
+    app.post('/signin', auth.csrf, auth.limit('signin'), app.api.auth.signin)
+    app.get('/session', auth.requireUser, app.api.auth.session)
+    app.post('/signout', auth.requireUser, auth.csrf, app.api.auth.signout)
+    app.post('/change-password', auth.requireUser, auth.csrf, auth.limit('password'), app.api.auth.changePassword)
+
+    app.route('/registros')
+        .all(auth.requireUser)
+        .get(app.api.user.getReg)
+        .post(auth.csrf, app.api.user.saveReg)
+    app.route('/registros2')
+        .all(auth.requireUser)
+        .get(app.api.registros.getReg)
+        .post(auth.csrf, app.api.registros.saveReg)
     app.route('/registros/:id')
-        // .all(app.config.passport.authenticate())
+        .all(auth.requireUser)
         .get(app.api.user.getRegById)
-        .delete(app.api.user.removeReg)
-    // .put(app.api.user.save)
-
-
+        .delete(auth.requireAdmin, auth.csrf, app.api.user.removeReg)
     app.route('/colab')
-        // .all(app.config.passport.authenticate())
+        .all(auth.requireUser)
         .get(app.api.user.getColab)
-        // .delete(app.api.user.remove)
-
-    app.route('/colab')
-        .post(app.api.user.newColab)
-    // .get(app.api.user.get)
-
-
+        .post(auth.requireAdmin, auth.csrf, app.api.user.newColab)
     app.route('/colab/:id')
-        // .all(app.config.passport.authenticate())
+        .all(auth.requireUser)
         .get(app.api.user.getColabById)
-        .delete(app.api.user.removeColab)
-    // .put(app.api.user.save)
-
-    //DISPARA EMAIL
-    app.route('/mail')
-        .post(app.api.mail.mail)
-
-    app.route('/mail2')
-        .post(app.api.mail2.mail)
-
-
+        .delete(auth.requireAdmin, auth.csrf, app.api.user.removeColab)
+    app.post('/mail', auth.requireUser, auth.requireAdmin, auth.csrf, auth.limit('mail'), app.api.mail.mail)
+    app.post('/mail2', auth.requireUser, auth.requireAdmin, auth.csrf, auth.limit('mail'), app.api.mail2.mail)
+    app.use(auth.errorHandler)
 }

@@ -1,6 +1,6 @@
 # Plano de evolução
 
-Atualizado em 25/10/2026. As prioridades do item 16 do AGENTS.md são critérios de ordenação; não significam aprovação automática de arquitetura, autenticação, contratos ou schema.
+Atualizado em 26/10/2026. As prioridades do item 16 do AGENTS.md são critérios de ordenação; não significam aprovação automática de arquitetura, autenticação, contratos ou schema. O ponto de continuidade, ambiente local e próximo lote estão em [RETOMADA.md](RETOMADA.md).
 
 ## Primeiro lote aprovado
 
@@ -16,7 +16,31 @@ Atualizado em 25/10/2026. As prioridades do item 16 do AGENTS.md são critérios
 
 O lote não instala dependências, não ativa submissão, não protege rotas e não altera schema, configuração de produção ou histórico Git. A rotação das credenciais antigas continua a cargo do responsável operacional.
 
-## Próximas etapas propostas, sem implementação autorizada
+## Continuidade e próximos passos
+
+### Lote atual concluído — dependências e validação da API
+
+Após autorização para os audits online e aprovação explícita das regras de [PLANO_VALIDACAO_API.md](PLANO_VALIDACAO_API.md), foram atualizadas dependências dentro das linhas principais existentes e implementadas validação de profissionais/avaliações, consistência de notas/média/nível/desconto, limites de texto/IDs e paginação de `/registros2` (page=1, limit=25, teto 100). Preservados os nomes, sucessos, autorização e schema; entradas inválidas retornam 400.
+
+Evidência atual: **108 testes aprovados**, integração real em MySQL isolado, **48/48 verificações no Chrome** e build aprovados. Audit frontend: **14 → 0** entradas; backend: **18 → 6**, sendo 1 alta e 5 moderadas. As seis entradas pertencem a Nodemailer e à cadeia PM2/OpenCensus/uuid. Impactos de atualização principal precisam de análise própria, sem modificar daemon/SMTP de produção. [Relatório e evidências](DEPENDENCIAS_SEGURANCA.md).
+
+Próximas tarefas: preparar propostas de atualização principal de Nodemailer/PM2 com testes de consumidores; investigar vínculos e dados legados usando apenas fixtures; desenhar persistência dos critérios e submissão antes de ativá-la. Recuperação em outro host, proteção externa das chaves, purga, recuperação de senha e infraestrutura de produção continuam pendentes. Os registros abaixo preservam os resultados históricos de cada lote.
+
+### Retomada aprovada: primeiro passo de autenticação implementado
+
+Concluídos em código: Passport Local/sessão persistente MySQL, CSRF, expiração/revogação, troca de senha, limitação, autorização de todas as rotas existentes, login no Vue e CLI de contas. Três migrations aditivas foram escritas, sem execução. Foram preservados a ordem do Consign, nomes das rotas existentes e a submissão desativada da avaliação; filtros de autorização agora ocorrem antes das consultas.
+
+Validação: 95 testes aprovados (52 backend, 43 frontend) e build de desenvolvimento aprovado em pasta temporária. A verificação do bundle não encontrou os e-mails do antigo mapeamento fixo. Nenhum MySQL/SMTP real foi acessado e nenhuma conta real foi criada/alterada. Configuração e próximos passos operacionais estão na seção 16 de `PLANO_AUTENTICACAO.md`.
+
+Etapa seguinte concluída com autorização específica: instância MySQL 8.0.44 separada, segredos externos DPAPI/ACL, duas contas fictícias e 11 migrations aplicadas no alvo isolado. As correções aprovadas preservam migrations históricas e acrescentam índice em `colab.colab` e coluna `registros.liderancas`. Integração real passou para autorização, transações, persistência após reiniciar a aplicação, expiração, revogação e concorrência dos limitadores. A própria instância foi reiniciada e revalidada. Suíte padrão: 100 testes aprovados. Guia: [AMBIENTE_ISOLADO.md](AMBIENTE_ISOLADO.md).
+
+Continuidade autorizada: backup/restauração isolados concluídos, com arquivo criptografado, destino novo, comparação de 8 tabelas/36 registros e login dos dois perfis na cópia. Origem preservada; guia em [BACKUP_RESTAURACAO.md](BACKUP_RESTAURACAO.md). A revisão visual original encontrou cinco problemas (19 de 30 verificações aprovadas), posteriormente corrigidos com autorização do usuário. Resultado atual: **48/48 verificações visuais**, 27 capturas, **102 testes automatizados** e novo build de desenvolvimento aprovados. Evidências antes/depois em [REVISAO_VISUAL.md](REVISAO_VISUAL.md).
+
+Lote visual concluído: responsividade do formulário/cabeçalho, confirmação de exclusão nas duas listagens com teclado/Cancelar/Escape/foco, contraste no escuro e ID de matrícula corrigidos; rodapé no fluxo do conteúdo para não sobrepor campos. Contratos, Options API e envio desativado preservados. Sucesso/falha de exclusão foram simulados na interface, sem remover dados SQL.
+
+Demais prioridades: validar dados/vínculos legados por nome/e-mail, planejar recuperação em outro host e proteção das chaves, recuperação de senha/convites, purga de expirados, rotação SMTP e triagem dos outros pacotes. A implantação exige origens/HTTPS/proxy definidos e aprovação operacional própria.
+
+As subseções de preparação e interrupção abaixo registram o histórico dos lotes; não indicam que o modelo ainda dependa de aprovação ou que a implementação esteja ausente.
 
 ### Segundo lote aprovado: início da execução e interrupção por risco
 
@@ -44,9 +68,9 @@ Aceitação: proposta revisável com matriz de acesso, impactos, arquivos, contr
 
 ### 2. Integridade dos dados MySQL
 
-1. Aprovar regras de validação e campos graváveis para colaboradores e avaliações, mantendo nomes existentes.
-2. Definir paginação válida e limites de `/registros2` sem alterar silenciosamente seu contrato.
-3. Comparar migrations com schema de uma cópia isolada e fictícia: FK por nome, índices, coluna `liderancas`, tamanhos e nulabilidade.
+1. Concluído: regras de validação e campos graváveis aprovados e implementados para colaboradores e avaliações, mantendo nomes existentes.
+2. Concluído: paginação de `/registros2` aprovada, implementada e testada com padrões 1/25 e teto 100.
+3. Concluído no alvo isolado: cadeia de migrations, índice da FK por nome, coluna `liderancas`, tamanhos e nulabilidade. Investigar ainda duplicidade de nomes e dados legados, sem usar dados reais nos testes.
 4. Propor migrations somente se necessárias, com backup, reversão e autorização específica antes de executar.
 
 Aceitação: payloads inválidos não gravam dados; sucesso válido compatível; erros genéricos; nenhuma consulta de teste contra produção.

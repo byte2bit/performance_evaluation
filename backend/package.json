@@ -21,9 +21,9 @@
     "express-session": "1.19.0",
     "jwt-simple": "*",
     "knex": "^3.1.0",
-    "moment": "*",
+    "moment": "2.31.0",
     "mysql": "*",
-    "mysql2": "^3.12.0",
+    "mysql2": "3.24.6",
     "nodemailer": "^6.9.14",
     "passport": "*",
     "passport-jwt": "*",
@@ -34,6 +34,16 @@
   },
   "overrides": {
     "proxy-addr": "2.0.8",
+    "brace-expansion@1.x": "1.1.21",
+    "follow-redirects@1.x": "1.16.2",
+    "jws@3.x": "3.2.3",
+    "lodash@4.x": "4.18.1",
+    "minimatch@3.x": "3.1.4",
+    "picomatch@2.x": "2.3.2",
+    "systeminformation@5.x": "5.33.16",
+    "ws@7.x": "7.5.11",
+    "socks@2.x": "2.8.10",
+    "ip-address@10.x": "10.7.5",
     "get-uri@6.0.3": {
       "basic-ftp": "6.2.3"
     }

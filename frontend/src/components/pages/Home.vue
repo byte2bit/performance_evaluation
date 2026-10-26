@@ -26,11 +26,27 @@ import Form from './Form.vue';
 }
 
 #checks {
-    height: calc(100vh - 170px);
+    max-height: calc(100vh - 170px);
     overflow: auto;
 }
 
 aside {
-    height: calc(100vh - 110px);
+    min-height: calc(100vh - 150px);
+}
+
+article {
+    min-width: 0;
+}
+
+@media (max-width: 1023px) {
+    .home {
+        grid-template-columns: minmax(0, 1fr);
+    }
+    aside {
+        min-height: 0;
+    }
+    #checks {
+        max-height: 14rem;
+    }
 }
 </style>

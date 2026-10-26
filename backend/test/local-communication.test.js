@@ -96,7 +96,15 @@ function corsRequest(origin, method = 'OPTIONS', frontendOrigin) {
         require,
         process: { env: { FRONTEND_ORIGIN: frontendOrigin } }
     })
-    configure({ use(handler) { handlers.push(handler) } })
+    const noop = (req, res, next) => next()
+    configure({
+        config: { passport: {
+            config: { origin: frontendOrigin || 'http://localhost:5173', trustProxy: [] },
+            noStore: noop, httpsOnly: noop, ready: noop, sessionMiddleware: noop, lifecycle: noop,
+            passport: { initialize: () => noop, session: () => noop }
+        } },
+        use(handler) { handlers.push(handler) }
+    })
     const headers = new Map()
     const response = {
         setHeader(name, value) { headers.set(name.toLowerCase(), value) },
@@ -106,16 +114,16 @@ function corsRequest(origin, method = 'OPTIONS', frontendOrigin) {
     const request = { method, headers: { 'access-control-request-method': 'GET' } }
     if (origin) request.headers.origin = origin
     let next = false
-    handlers[0](request, response, () => { next = true })
+    handlers[2](request, response, () => { next = true })
     return { headers, response, next }
 }
 
-test('CORS permits the local frontend preflight without credentials', () => {
+test('CORS permits the local frontend preflight with credentials for sessions', () => {
     const result = corsRequest('http://localhost:5173')
     assert.equal(result.response.statusCode, 204)
     assert.equal(result.response.ended, true)
     assert.equal(result.headers.get('access-control-allow-origin'), 'http://localhost:5173')
-    assert.equal(result.headers.get('access-control-allow-credentials'), undefined)
+    assert.equal(result.headers.get('access-control-allow-credentials'), 'true')
 })
 
 test('CORS does not authorize an unrelated origin', () => {
@@ -136,10 +144,12 @@ test('CORS supports an explicitly configured frontend origin', () => {
 
 function apiClient(baseURL) {
     const code = source('frontend/src/plugins/axios.js')
-        .replace(/^import axios from 'axios'\s*$/m, '')
+        .replace(/^import .*$/gm, '')
         .replace('import.meta.env.VITE_API_URL', 'configuredBaseURL')
+        .replace('export const ', 'const ')
         .replace('export default ', 'module.exports = ')
-    return evaluate('frontend/src/plugins/axios.js', code, { axios, configuredBaseURL: baseURL })
+    return evaluate('frontend/src/plugins/axios.js', code, { axios, configuredBaseURL: baseURL,
+        installAuthClient: () => ({ clearCsrf() {}, onUnauthorized() {} }) })
 }
 
 test('API client rejects missing configuration', () => {

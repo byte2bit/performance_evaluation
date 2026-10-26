@@ -1,121 +1,41 @@
-const bcrypt = require('bcrypt-nodejs')
+const { createRecords } = require('../lib/records')
+const { scope } = require('../lib/auth/identity')
+const validation = require('../lib/business-validation')
 
 module.exports = app => {
-/*     const { existsOrError, notExistsOrError, equalsOrError } = app.api.validation
-
-    const encryptPassword = password => {
-        const salt = bcrypt.genSaltSync(10)
-        return bcrypt.hashSync(password, salt)
-    } */
-
-/** TABELA REGISTROS ************************/
-
-   /*  const getReg = async (req, res) => {
-        const page = parseInt(req.query.page) || 1
-        const limit = 25
-        const offset = (page - 1) * limit
-
+    const getColab = async (req, res) => {
         try {
-            // const total = await app.db("registros").count("id as count").first()
-            const registros = await app.db("registros")
-                .select("id","colab", "avaliacao", "nivel", "desconto", "demandante", "liderancas", "nota_qualidade", "obs_qualidade", "nota_prazo", "obs_prazo", "nota_dispon", "obs_dispon", "nota_respon", "obs_respon", "created_at", "updated_at", "itensQualidade", "itensDispon")
-                .orderBy("created_at", "desc")
-                .limit(limit)
-                .offset(offset)
-
-            res.json({
-                data: registros,
-                total: total.count
-            })
-        } catch (err) {
-            res.status(500).send(err)
-        }
-    } */
-   
-    const getReg = (req, res) => {
-        app.db("registros")
-            .select("id", "colab", "avaliacao", "nivel", "desconto", "demandante", "liderancas", "nota_qualidade", "obs_qualidade", "nota_prazo", "obs_prazo", "nota_dispon", "obs_dispon", "nota_respon", "obs_respon", "created_at", "updated_at", "itensQualidade", "itensDispon")
-            .orderBy("created_at", "desc")
-            .then(registros => res.json(registros))
-            .catch(err => res.status(500).send(err))
-        }
-
-    const saveReg = (req, res) => { //async 
-        const user = { ...req.body }
-        app.db('registros')
-            .insert(user)
-            .then(_ => res.status(204).send())
-            .catch(err => res.status(500).send(err))
-        // }
+            const rows = await scope(app.db('colab')
+                .select('id', 'colab', 'ppu', 'servico', 'funcao', 'liderancas', 'gerencia', 'demandante'), req.user)
+                .orderBy('colab')
+            return res.json(rows)
+        } catch { return res.status(500).send('Não foi possível carregar os profissionais.') }
     }
-
-    const getRegById = (req, res) => {
-        app.db('registros')
-            .select("colab", "avaliacao", "nivel", "desconto", "demandante", "liderancas", "nota_qualidade", "obs_qualidade", "nota_prazo", "obs_prazo", "nota_dispon", "obs_dispon", "nota_respon", "obs_respon", "created_at", "updated_at", "itensQualidade", "itensDispon")
-            .where({ id: req.params.id })
-            // .whereNull('deletedAt')
-            .first()
-            .then(colabs => res.json(colabs))
-            .catch(err => res.status(500).send(err))
-    }
-
-    const removeReg = async (req, res) => {
+    const getColabById = async (req, res) => {
+        const professionalId = validation.id(req.params.id)
+        if (professionalId === null) return res.status(400).send('Identificador inválido.')
         try {
-            const rowsUpdate = await app.db('registros')
-                // .update({ deletedAt: new Date() })
-                .where({ id: req.params.id })
-                .del()
-            // existsOrError(rowsUpdate, 'Usuário não foi encontrado.')
-
-            res.status(204).send()
-        } catch (msg) {
-            res.status(400).send(msg)
-        }
+            const row = await scope(app.db('colab')
+                .select('id', 'colab', 'ppu', 'servico', 'funcao', 'liderancas', 'gerencia', 'demandante'), req.user)
+                .where({ id: professionalId }).first()
+            return row ? res.json(row) : res.status(404).send('Profissional não encontrado.')
+        } catch { return res.status(500).send('Não foi possível carregar o profissional.') }
     }
-
-
-    /** TABELA COLAB ************************/
-
-    const getColab = (req, res) => {
-        app.db('colab')
-            .select("id", "colab", "ppu", "servico", "funcao", "liderancas", "gerencia", "demandante")
-            .orderBy("colab")
-            // .whereNull('deletedAt')
-            .then(colabs => res.json(colabs))
-            .catch(err => res.status(500).send(err))
+    const newColab = async (req, res) => {
+        const professional = validation.professional(req.body)
+        if (!professional) return res.status(400).send('Dados de profissional inválidos.')
+        try {
+            await app.db('colab').insert(professional)
+            return res.status(204).send()
+        } catch { return res.status(500).send('Não foi possível registrar o profissional.') }
     }
-
-    const newColab = (req, res) => { //async 
-        const user = { ...req.body }
-        app.db('colab')
-            .insert(user)
-            .then(_ => res.status(204).send())
-            .catch(err => res.status(500).send(err))
-        // }
-    }
-
-    const getColabById = (req, res) => {
-        app.db('colab')
-            .select("id", "colab", "ppu", "servico", "funcao", "liderancas", "gerencia", "demandante")
-            .where({ id: req.params.id })
-            // .whereNull('deletedAt')
-            .first()
-            .then(colabs => res.json(colabs))
-            .catch(err => res.status(500).send(err))
-    }
-
     const removeColab = async (req, res) => {
+        const professionalId = validation.id(req.params.id)
+        if (professionalId === null) return res.status(400).send('Identificador inválido.')
         try {
-            const rowsUpdate = await app.db('colab')
-                .where({ id: req.params.id })
-                .del()
-            // existsOrError(rowsUpdate, 'Usuário não foi encontrado.')
-
-            res.status(204).send()
-        } catch (msg) {
-            res.status(400).send(msg)
-        }
+            await app.db('colab').where({ id: professionalId }).del()
+            return res.status(204).send()
+        } catch { return res.status(400).send('Não foi possível remover o profissional.') }
     }
-
-    return { saveReg, newColab, getColab, getReg, getColabById, getRegById, removeColab, removeReg }
+    return { ...createRecords(app.db), getColab, getColabById, newColab, removeColab }
 }

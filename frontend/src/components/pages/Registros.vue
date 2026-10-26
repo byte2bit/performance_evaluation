@@ -26,7 +26,7 @@
     <EasyDataTable
       show-index
       id="tabela"
-      :headers="headers"
+      :headers="visibleHeaders"
       :items="colabcUser"
       rowsPerPageMessage="linhas por página:"
       rowsOfPageSeparatorMessage="de"
@@ -38,68 +38,24 @@
       <!--v-model:items-selected="itemsSelected"-->
 
       <template #item-operation="registro">
-        <div class="operation-wrapper">
-          <img
-            src="../../assets/delete.png"
-            class="operation-icon"
-            data-bs-toggle="modal"
-            data-bs-target="#exampleModal"
-            @click="modal(registro)"
-          />
+        <div v-if="dados.admin" class="operation-wrapper">
+          <button type="button" :aria-label="`Remover registro de ${registro.colab}`"
+            aria-haspopup="dialog" aria-controls="delete-registro-modal" @click="modal(registro)">
+            <img src="../../assets/delete.png" class="operation-icon" alt="" />
+          </button>
         </div>
       </template>
     </EasyDataTable>
 
-    <!--***** Modal ********-->
-    <div
-      class="modal fade"
-      id="exampleModal"
-      tabindex="-1"
-      aria-labelledby="exampleModalLabel"
-      
-    >
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <img id="svg" src="../../assets/triangule.svg" alt="" />
-
-            <h1 class="modal-title fs-5" id="exampleModalLabel">Remover</h1>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div class="modal-body">
-            Remover registro de: <b>{{ registro }}</b> ?
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-primary"
-              data-bs-dismiss="modal"
-              @click="deleteItem(registro)"
-            >
-              Sim
-            </button>
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-bs-dismiss="modal"
-            >
-              Cancelar
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!--***** /Modal ********-->
+    <ConfirmDeleteModal v-if="dados.admin" id="delete-registro-modal" v-model="showDelete" @confirm="deleteItem">
+      Remover registro de: <b>{{ registro }}</b> ?
+    </ConfirmDeleteModal>
   </div>
 </template>
 
 <script>
 import axios from "@/plugins/axios.js";
+import ConfirmDeleteModal from "@/components/utils/ConfirmDeleteModal.vue";
 import Vue3EasyDataTable from "vue3-easy-data-table";
 import "vue3-easy-data-table/dist/style.css";
 
@@ -113,13 +69,14 @@ import Excel from "./Excel.vue";
 export default {
   data() {
     return {
-      dados: {},
+      dados,
       colabcUser: [],
       items: [],
       registros: [],
       registro: {},
       itemsSelected: [],
       regId: "",
+      showDelete: false,
       searchValue: "",
       headers: [
         { text: "Remover", value: "operation" },
@@ -145,9 +102,13 @@ export default {
   },
   components: {
     EasyDataTable: Vue3EasyDataTable,
+    ConfirmDeleteModal,
     toast,
     dados,
     Excel,
+  },
+  computed: {
+    visibleHeaders() { return this.dados.admin ? this.headers : this.headers.filter(header => header.value !== 'operation'); },
   },
   methods: {
     notify() {
@@ -193,6 +154,7 @@ export default {
       this.lReg = { ...registro };
       this.registro = this.lReg.colab;
       this.regId = this.lReg.id;
+      this.showDelete = true;
     },
     deleteItem() {
       // console.log("lReg: " + JSON.stringify(this.lReg))
@@ -218,12 +180,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-#svg {
-  width: 40px;
-  margin-right: 20px;
-  color: orange;
-}
-
 .operation-icon {
   width: 20px;
   cursor: pointer;

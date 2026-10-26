@@ -1,4 +1,6 @@
 import { createWebHistory, createRouter } from "vue-router"
+import { useAuthStore } from '@/stores/authStore.js'
+import { createAuthGuard } from './authGuard.js'
 
 
 // import Home from '@/components/pages/Home.vue'
@@ -21,6 +23,8 @@ const CheckAll = () => import(/* webpackChunkName: "checkall" */ '@/components/u
 
 
 const routes = [
+    { path: '/login', name: 'Login', component: () => import('@/components/pages/Login.vue'), meta: { public: true } },
+    { path: '/senha', name: 'Senha', component: () => import('@/components/pages/ChangePassword.vue') },
     {
         path: "/",
         name: "Form",
@@ -29,6 +33,7 @@ const routes = [
     {
         path: "/inserir",
         name: "Inserir",
+        meta: { admin: true },
         component: Inserir,
     },
     {
@@ -49,6 +54,7 @@ const routes = [
     {
         path: "/excel",
         name: "Excel",
+        meta: { admin: true },
         component: Excel,
     },
     {
@@ -62,5 +68,7 @@ const router = createRouter({
     history: createWebHistory(),
     routes,
 });
+
+router.beforeEach(createAuthGuard(() => useAuthStore()));
 
 export default router;

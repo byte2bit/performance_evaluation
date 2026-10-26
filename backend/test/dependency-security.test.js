@@ -15,6 +15,10 @@ test('JSON parsing survives malformed compressed input and retains normal parsin
         const zlib = require('node:zlib')
         const express = require('express')
         const app = express()
+        const noop = (req, res, next) => next()
+        app.config = { passport: { config: { origin: 'http://localhost:5173', trustProxy: [] },
+            noStore: noop, httpsOnly: noop, ready: noop, sessionMiddleware: noop, lifecycle: noop,
+            passport: { initialize: () => noop, session: () => noop } } }
         require('./config/middlewares')(app)
         app.post('/synthetic', (req, res) => res.json(req.body))
         app.use((err, req, res, next) => res.status(err.status || 500).end())

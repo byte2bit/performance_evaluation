@@ -21,7 +21,7 @@ function page(name, axios, identity = user) {
     vm.runInNewContext(descriptor.script.content.replace(/^import .*$/gm, '')
         .replace('export default ', 'module.exports = '), {
         module, axios, toast, dados: identity, Vue3EasyDataTable: {},
-        Excel: {}, exportFromJSON: {}, excelParser: () => ({})
+        Excel: {}, ConfirmDeleteModal: {}, exportFromJSON: {}, excelParser: () => ({})
     }, { filename, timeout: 1000 })
     const options = module.exports
     const instance = { ...options.data() }

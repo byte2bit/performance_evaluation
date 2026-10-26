@@ -1,6 +1,6 @@
 # Contexto técnico e continuidade
 
-Atualizado em 25/10/2026. Este documento descreve o código inspecionado; não comprova a configuração implantada nem o esquema atual do MySQL.
+Atualizado em 26/10/2026. Este documento descreve o código inspecionado; não comprova a configuração implantada nem o esquema do MySQL de produção. Para continuar em outra conversa, ler [RETOMADA.md](RETOMADA.md).
 
 ## Escopo e decisões aprovadas
 
@@ -16,7 +16,7 @@ Primeiro lote aprovado pelo usuário nesta sessão:
 
 Não foram aprovados neste lote: autenticação, sessões, mudanças de schema, migrations, ativação da submissão de avaliações, deploy ou publicação. Nenhuma dependência foi instalada ou atualizada.
 
-Na preparação do segundo lote, o usuário confirmou: tudo exige login; administradores gerenciam o sistema e avaliadores acessam somente suas próprias avaliações. URLs, proxy e HTTPS de produção ainda não estão definidos. O modelo de `PLANO_AUTENTICACAO.md` foi aprovado e suas cinco dependências foram instaladas. A implementação foi interrompida antes de alterar o código de autenticação, por alertas graves nas dependências preexistentes. O usuário autorizou corrigir as dependências citadas e enviar as alterações ao GitHub; as correções e os testes estão concluídos. Autenticação permanece aprovada para implementação, mas ainda não foi escrita. Ver acompanhamento em `AUDITORIA.md`.
+O segundo lote foi aprovado e implementado: Passport Local, sessões MySQL, autorização no Express, CSRF, limitação, troca de senha, login no Vue e CLI de contas. Na etapa posterior autorizada, a cadeia completa de 11 migrations passou em MySQL 8.0.44 separado, incluindo duas correções de schema aprovadas; duas contas fictícias foram provisionadas. URLs, proxy e HTTPS de produção ainda não estão definidos. As correções de dependências anteriores foram enviadas no commit `c06bb66`; autenticação e integração isolada são trabalho posterior no workspace.
 
 ## Estrutura, versões e execução
 
@@ -32,12 +32,12 @@ Versões conferidas nos lockfiles e nas instalações locais:
 | Dependência | Versão |
 | --- | --- |
 | Node local | 24.12.0; não há `engines` nos dois `package.json` |
-| Vue / Vue Router / Pinia | 3.5.14 / 4.5.1 / 3.0.2 |
-| Vite / Axios | 6.3.5 / 1.9.0 |
+| Vue / Vue Router / Pinia | 3.5.44 / 4.5.1 / 3.0.2 |
+| Vite / Axios | 6.4.4 / 1.20.0 |
 | Tailwind / integração Vite / Flowbite | 4.1.7 / 4.1.7 / 3.1.2 |
 | Express / Consign | 4.22.3 / 0.1.6 |
-| Knex / mysql / mysql2 | 3.1.0 / 2.18.1 / 3.12.0; `mysql2` instalado, mas não selecionado no `knexfile.js` |
-| Passport / passport-jwt | 0.7.0 / 4.0.1; autenticação não ativa nas rotas |
+| Knex / mysql / mysql2 | 3.1.0 / 2.18.1 / 3.24.6; `mysql2` usado pelo bootstrap isolado, mas não selecionado no `knexfile.js` |
+| Passport / passport-jwt | 0.7.0 / 4.0.1; estratégia Local ativa no código; JWT legado não registrado |
 | Nodemailer / Vhost | 6.9.14 / 3.0.2 |
 | CORS / body-parser | 2.8.5 / 1.20.9 |
 | Transitivas corrigidas | proxy-addr 2.0.8; basic-ftp 6.2.3, com override limitado a get-uri 6.0.3 |
@@ -60,15 +60,15 @@ O Vhost registra somente `api.nucleoengenharia.com.br` e delega a `index.js`. Ho
 
 `index.js` atribui `app.db` antes do Consign, nesta sequência:
 
-1. `config/passport.js` registra uma estratégia JWT e depende de `app.db` e da configuração local de segredo.
-2. `config/middlewares.js` registra CORS e parsing JSON.
+1. `config/passport.js` cria o runtime de autenticação Local sobre `app.db`, com configuração externa validada e store SQL sem criação automática de schema.
+2. `config/middlewares.js` registra no-store, exigência de HTTPS em produção, CORS credenciado, parsing JSON, prontidão do store, sessão, Passport e validação de expiração/revogação.
 3. `api/validation.js` declara funções, mas não as exporta atualmente.
-4. `api/` registra os handlers sob `app.api`.
-5. `config/routes.js` depende dos handlers carregados e registra as rotas.
+4. `api/` registra handlers sob `app.api`; `api/auth.js` expõe handlers do runtime já inicializado. Utilitários ficam em `lib/auth/` e `lib/records.js`, fora do autoload.
+5. `config/routes.js` registra rotas, autenticação/autorização/CSRF/limitação e por último tratamento genérico de erros.
 
 O helper SMTP está em `lib/` para não ser tratado pelo Consign como fábrica de módulo da API. Ele não abre conexão SMTP ao ser importado.
 
-CORS permite a origem exata de `FRONTEND_ORIGIN`, cujo padrão é `http://localhost:5173`, e requisições sem `Origin`. Não habilita credenciais. CORS não impede chamadas diretas à API e não substitui autorização.
+CORS permite a origem exata de `FRONTEND_ORIGIN`, cujo padrão local é `http://localhost:5173`, habilitando credenciais; preflight não exige login. Requisições sem `Origin` podem atravessar CORS, mas mutações exigem origem exata, JSON e token CSRF. CORS não substitui autorização. Cookie local: `evaluation.sid`, HttpOnly, SameSite=Lax; em produção, `__Host-evaluation.sid`, Secure, sem Domain, Path=/ e SameSite explícito.
 
 ## Contratos e funcionalidades observadas
 
@@ -86,11 +86,13 @@ CORS permite a origem exata de `FRONTEND_ORIGIN`, cujo padrão é `http://localh
 | `DELETE /colab/:id` | `user.removeColab`: exclusão física; sucesso 204 |
 | `POST /mail`, `POST /mail2` | Envio SMTP: 204 após aceitação pelo transporte; 503 sem configuração válida; 502 em falha de preparação/transporte/envio; mensagens de erro genéricas |
 
-As rotas de login estão comentadas e nenhuma rota ativa usa o middleware Passport. A estratégia e o código parcial de login consultam `colab`; as migrations declaram também uma tabela `users2`. Não se deve ativar esses trechos sem definir e aprovar o modelo real.
+As rotas da tabela acima agora exigem sessão. Avaliadores recebem somente registros/profissionais cujo `demandante` corresponde exatamente ao e-mail canônico da conta; administradores consultam todos. Cadastro/exclusão de profissionais, exclusão de registros e SMTP exigem administrador. Gravações de avaliação usam a identidade da sessão e validam o profissional em transação, sem aceitar identidade/ID/timestamps arbitrários do cliente. Erros desses handlers são genéricos. As regras aprovadas de tipos, comprimentos, notas, consistência e paginação foram implementadas em `lib/business-validation.js`; contrato em [PLANO_VALIDACAO_API.md](PLANO_VALIDACAO_API.md).
 
-Frontend em JavaScript com Composition API e Options API; existe também um composable `.ts` preexistente. Rotas: `/`, `/inserir`, `/registros`, `/colabs`, `/excel`, `/checkall`. Tailwind 4 integra-se pelo plugin Vite e CSS; modais do formulário usam Flowbite JS por composable, com limpeza e sincronização de foco. As telas de listagem ainda contêm marcação de modal de outro padrão, cuja interação em navegador não foi validada nesta etapa.
+Novos endpoints: `GET /csrf-token`, `POST /signin`, `GET /session`, `POST /signout` e `POST /change-password`. Login devolve somente ID/nome/e-mail/perfil, sem JWT; contas vêm de `users2`, não de `colab`. `signup` e `validateToken` seguem inativos. Sessões expiram em 30 minutos de inatividade ou 8 horas absolutas, com versão de revogação verificada a cada requisição. Configuração, contratos e CLI estão na seção 16 de `PLANO_AUTENTICACAO.md`.
 
-O formulário permite seleção, notas, justificativas e resumo, mas a submissão continua desativada. A identidade administrativa fixa e o filtro por demandante em `src/js/store.js`/componentes não constituem autenticação ou autorização.
+Frontend em JavaScript com Composition API e Options API; existe também um composable `.ts` preexistente. Rotas: `/`, `/inserir`, `/registros`, `/colabs`, `/excel`, `/checkall`. Tailwind 4 integra-se pelo plugin Vite e CSS; modais do formulário usam Flowbite JS por composable, com limpeza e sincronização de foco. As duas listagens usam `ConfirmDeleteModal.vue`, validado no Chrome com teclado, foco e cancelamento.
+
+O formulário permite seleção, notas, justificativas e resumo, mas a submissão continua desativada. A identidade fixa foi removida: `src/js/store.js` preserva exportações legadas com dados reativos recebidos da sessão. Novas telas `/login` e `/senha`; todas as rotas de negócio têm guarda, com restrição administrativa de `/inserir` e `/excel`. Tokens CSRF e identidade ficam somente em memória; logout/401/troca de conta limpam seleção e invalidam respostas antigas. A proteção efetiva está no Express, antes da leitura/escrita de dados.
 
 ## Configuração SMTP após o primeiro lote
 
@@ -127,3 +129,36 @@ Na execução inicial do segundo lote, os 53 testes foram executados novamente e
 Na correção adicional autorizada, Express foi fixado em 4.22.3 e body-parser em 1.20.9; os overrides fixam proxy-addr em 2.0.8 e basic-ftp em 6.2.3 para get-uri 6.0.3. Não há cópias antigas desses três pacotes no lockfile. Os 57 testes passaram (29 backend e 28 frontend), incluindo quatro regressões de dependências. O probe HTTP usa somente loopback em processo filho com dados fictícios; FTP, SMTP e MySQL não foram acessados. O audit posterior retornou código 1: 18 entradas restantes (10 altas, 8 moderadas, nenhuma crítica), sem entradas para Express, body-parser, proxy-addr ou basic-ftp. Isso não certifica ausência de vulnerabilidades; outras dependências ainda precisam de triagem.
 
 Próximas decisões e limitações detalhadas: `AUDITORIA.md`, `PLANO_EVOLUCAO.md` e `PLANO_AUTENTICACAO.md`.
+
+## Resultado do lote inicial de autenticação (histórico)
+
+- 95 testes aprovados: 52 backend e 43 frontend, incluindo os 57 anteriores com adaptações dos contratos de sessão aprovados.
+- Testes HTTP usam somente loopback efêmero, banco simulado e MemoryStore injetado exclusivamente na fixture. Runtime usa ConnectSessionKnexStore sobre `app.db`, sem fallback em memória.
+- Store e limitador desabilitam criação de schema e limpeza automática. Planejar purga de linhas expiradas como operação posterior aprovada; nenhuma tarefa desse tipo foi executada.
+- Três migrations novas: estado de conta em `users2`, `sessions` e `auth_rate_limits`. O teste compila DDL MySQL, sem executá-lo; não comprova locks, collation ou persistência reais.
+- Build de desenvolvimento aprovado em pasta temporária; verificação confirmou ausência dos e-mails pessoais do mapeamento antigo nos chunks JS. Não houve validação visual em navegador real nesta etapa.
+- Não houve novas instalações neste lote, uso de MySQL/SMTP reais, execução da CLI contra contas reais ou alteração dos arquivos de ambiente. Ativação requer schema isolado validado e configuração externa; não considerar produção habilitada.
+
+## Resultado atual: integração MySQL isolada
+
+- 100 testes automatizados aprovados (57 backend, 43 frontend), sem banco externo na suíte padrão. O runner opt-in `backend/scripts/isolated-mysql.ps1` foi executado separadamente contra MySQL 8.0.44 real, com diretório, porta, UUID e marcador de schema verificados antes das operações.
+- As 11 migrations passaram em schema novo sem adaptações de tabelas pelas fixtures. Correções aditivas aprovadas: índice não único em `colab.colab` antes da FK histórica e coluna nullable `registros.liderancas`. Migrations históricas preservadas; reversão automática das duas correções é recusada para proteger índices/valores preexistentes.
+- Login, autorização SQL, gravação transacional, expiração por TTL/inatividade/prazo absoluto, troca de senha, revogação, logout e persistência após reiniciar a aplicação passaram. Limitação compartilhada entre dois pools: 10 requisições permitidas e 5 bloqueadas em 15 concorrentes. Conta da aplicação teve DDL negado.
+- A instância MySQL isolada foi parada, iniciada e revalidada com sucesso. O serviço MySQL80 existente não foi alterado. Contas fictícias, segredos externos protegidos por DPAPI/ACL e comandos estão em [AMBIENTE_ISOLADO.md](AMBIENTE_ISOLADO.md).
+- Nenhum novo pacote instalado, arquivo de produção alterado ou e-mail enviado nesta etapa. Produção, retenção de expirados, validação visual e demais pendências da auditoria continuam separados.
+
+## Continuidade: recuperação isolada e revisão visual
+
+O usuário autorizou prosseguir com backup/restauração e revisão visual. `isolated-mysql.ps1 -Action RecoveryTest` chama `isolated-recovery.js`: dump consistente, AES-256-GCM com chave independente no cofre DPAPI, restauração em schema novo e comparação de DDL/conteúdo. Resultado: 8 tabelas e 36 registros coincidentes, origem preservada e autenticação dos dois perfis na cópia aprovada. Temporários de credenciais removidos; nenhum pacote instalado. Suíte atual: 102 aprovados; build local aprovado. Detalhes e limites em [BACKUP_RESTAURACAO.md](BACKUP_RESTAURACAO.md).
+
+A revisão visual original com Playwright temporário e Chrome confirmou cinco problemas (30 verificações: 19 aprovadas, 11 reprovadas). O usuário aprovou as correções, posteriormente concluídas: formulário/cabeçalho responsivos, `ConfirmDeleteModal.vue` compartilhado e administrativo nas duas listagens, contraste no escuro de 16,12:1, matrícula com ID/rótulo próprios e rodapé sem sobreposição. Options API, cálculos e contratos foram mantidos; submissão continua desativada.
+
+Validação do lote visual: **48/48 verificações visuais**, 27 capturas, **102 testes aprovados** e novo build de desenvolvimento aprovado. Quatro exclusões com 503/204 foram simuladas no navegador; nenhuma chegou à API e o banco manteve suas linhas. Evidências e comandos em [REVISAO_VISUAL.md](REVISAO_VISUAL.md). Não houve alteração de dependências, autenticação, schema ou produção naquele lote. Recuperação em outro host, proteção das chaves fora da máquina, retenção e demais pendências da auditoria permanecem separadas.
+
+## Continuidade atual — dependências e contratos aprovados da API
+
+As consultas online npm foram autorizadas para ambos os projetos. O frontend passou de 14 entradas (2 críticas) para zero; o backend passou de 18 para 6 (1 alta, 5 moderadas, nenhuma crítica). Atualizados mysql2, Moment 2.31.0, Axios, Vue e Vite dentro das linhas principais existentes, além de transitivas direcionadas. A tabela de versões acima reflete esta etapa. Nodemailer e a cadeia PM2/OpenCensus/uuid continuam em análise para atualização principal; não considerar o backend sem alertas.
+
+O usuário aprovou o contrato de [PLANO_VALIDACAO_API.md](PLANO_VALIDACAO_API.md). `lib/business-validation.js`, `lib/records.js` e `api/user.js` rejeitam entradas inválidas com 400, limitam textos a 255 caracteres Unicode, verificam notas/média/nível/desconto e IDs. `/registros2` usa page=1/limit=25, teto 100, com desempate por ID; `/registros` mantém lista completa. Nenhuma migration foi acrescentada ou aplicada neste lote.
+
+Resultado atual: **108 testes aprovados**, integração MySQL 8.0.44 isolada aprovada (incluindo entradas inválidas sem alterar linhas e sonda Unicode revertida), **48/48 verificações no Chrome** e build Vite 6.4.4 aprovados. Produção e SMTP real não foram acessados. Evidências, versões e riscos restantes em [DEPENDENCIAS_SEGURANCA.md](DEPENDENCIAS_SEGURANCA.md). Submissão da avaliação, persistência dos arrays de critérios, vínculos legados por nome/e-mail e demais pendências operacionais continuam para etapas próprias.

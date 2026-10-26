@@ -4,12 +4,9 @@
 @source "../node_modules/flowbite";
 
 html, body, #app {
-  height: 100%;
   min-height: 100vh;
   width: 100%;
-  min-width: 100vw;
   margin: 0;
-  overflow-x: hidden;
   
 }
 
@@ -63,12 +60,8 @@ h4{
 }
 
 @media(max-width: 768px) {
-  .star-title {
-      margin-top: 50px;
-  }
-
   .inputs {
-      margin-top: 20px;
+      margin-top: 0;
 
       input {
           width: 100%;

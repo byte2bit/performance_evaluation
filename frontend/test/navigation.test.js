@@ -15,12 +15,16 @@ const frontend = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'
 
 // Render the actual shell, links, Home and router in memory. Page contents
 // are replaced so navigation cannot load personal data or call any service.
-function loadApplication() {
+function loadApplication(identity = { id: 1, name: 'Usuário fictício', email: 'test@example.invalid', admin: true }, restoreError = false) {
+    const auth = Vue.reactive({ user: identity, busy: false, error: '',
+        async restore() { if (restoreError) throw new Error('Synthetic unavailable service'); return auth.user },
+        async signout() { auth.user = null; return true }
+    })
     const cache = new Map()
     const pages = new Map([
         ['src/components/pages/Form.vue', 'Form'],
         ['src/components/ListCheckboxes.vue', 'ListCheckboxes'],
-        ...['Inserir', 'Registros', 'Colabs', 'Excel'].map(name => [`src/components/pages/${name}.vue`, name]),
+        ...['Inserir', 'Registros', 'Colabs', 'Excel', 'Login', 'ChangePassword'].map(name => [`src/components/pages/${name}.vue`, name]),
         ['src/components/utils/CheckAll.vue', 'CheckAll']
     ].map(([file, name]) => [path.resolve(frontend, file), {
         name,
@@ -28,6 +32,7 @@ function loadApplication() {
     }]))
 
     function load(file) {
+        if (file === path.join(frontend, 'src/stores/authStore.js')) return { useAuthStore: () => auth }
         if (pages.has(file)) return { __esModule: true, default: pages.get(file) }
         if (cache.has(file)) return cache.get(file).exports
         if (/\.(png|svg)$/.test(file)) return file
@@ -61,6 +66,7 @@ function loadApplication() {
         return module.exports
     }
     return {
+        auth,
         App: load(path.join(frontend, 'src/App.vue')).default,
         router: load(path.join(frontend, 'src/router/index.js')).default
     }
@@ -106,8 +112,8 @@ function find(root, predicate) {
     return [...(predicate(root) ? [root] : []), ...root.children.flatMap(child => find(child, predicate))]
 }
 
-async function mount(t, location) {
-    const { App, router } = loadApplication()
+async function mount(t, location, identity, restoreError) {
+    const { App, router, auth } = loadApplication(identity, restoreError)
     const { renderer, root } = memoryRenderer()
     await router.push(location)
     await router.isReady()
@@ -116,7 +122,7 @@ async function mount(t, location) {
     app.mount(root)
     t.after(() => app.unmount())
     await Vue.nextTick()
-    return { root, router }
+    return { root, router, auth }
 }
 
 function assertPage(root, name) {
@@ -163,4 +169,42 @@ test('history back restores the initial form and collaborator list', async t => 
     await Vue.nextTick()
     assert.equal(router.currentRoute.value.fullPath, '/')
     assertPage(root, 'Form')
+})
+
+test('all existing pages redirect anonymous users to login before mounting private content', async t => {
+    const { root, router } = await mount(t, '/', null)
+    for (const location of ['/', '/registros', '/colabs', '/inserir', '/excel', '/checkall', '/senha']) {
+        await router.push(location)
+        await Vue.nextTick()
+        assert.equal(router.currentRoute.value.name, 'Login')
+        assertPage(root, 'Login')
+        assert.equal(find(root, target => target.tag === 'a' && target.props.href === '/registros').length, 0)
+    }
+})
+
+test('evaluators cannot navigate to administrator pages and do not see the insertion link', async t => {
+    const identity = { id: 2, name: 'Avaliador fictício', email: 'test@example.invalid', admin: false }
+    const { root, router } = await mount(t, '/', identity)
+    for (const location of ['/inserir', '/excel']) {
+        await router.push(location)
+        assert.equal(router.currentRoute.value.name, 'Form')
+    }
+    assert.equal(find(root, target => target.tag === 'a' && target.props.href === '/inserir').length, 0)
+})
+
+test('service failure prevents private navigation instead of granting access from cached identity', async t => {
+    const { root, router } = await mount(t, '/', undefined, true)
+    assert.equal(router.currentRoute.value.name, 'Login')
+    assert.equal(router.currentRoute.value.query.unavailable, '1')
+    assertPage(root, 'Login')
+})
+
+test('clearing identity unmounts private content and redirects to login', async t => {
+    const { root, router, auth } = await mount(t, '/')
+    auth.user = null
+    await Vue.nextTick()
+    await new Promise(resolve => setImmediate(resolve))
+    await Vue.nextTick()
+    assert.equal(router.currentRoute.value.name, 'Login')
+    assertPage(root, 'Login')
 })

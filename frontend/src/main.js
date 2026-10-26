@@ -6,7 +6,7 @@ import { createPinia } from 'pinia'
 import { sanitizePlugin } from "v-sanitize-directive"
 
 createApp(App)
+    .use(createPinia())
     .use(router)
     .use(sanitizePlugin)
-    .use(createPinia())
     .mount('#app')

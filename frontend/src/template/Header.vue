@@ -1,24 +1,25 @@
 <template>
     <header>
-        <div class="flex justify-between items-center p-2 bg-white border-gray-200 dark:bg-gray-900">
-            <img src="@/assets/logo-horizontal branco.png" class="h-6" alt="Núcleo Logo" />
-            <a href="#" class="flex items-center space-x-3 rtl:space-x-reverse">
-                <span class="self-center text-xl font-semibold whitespace-nowrap font-white dark:text-white">Núcleo
+        <div class="header-layout bg-white border-gray-200 dark:bg-gray-900">
+            <img src="@/assets/logo-horizontal branco.png" class="h-8 w-auto rounded bg-gray-900 p-1" alt="Núcleo Logo" />
+            <a href="#" class="min-w-0 lg:text-center">
+                <span class="text-base sm:text-xl font-semibold dark:text-white">Núcleo
                     Avaliação de Nível de Serviço</span>
             </a>
-            <div class="text-white me-6">
-                <p class="mb-1 demandante">Nome: Nome do Demandante</p>
-                <p class="demandante">Email: Email do Demandante</p>
-                <!-- <p class="mb-1"><b>Nome: </b>{{ dados.nome }}</p>
-                <p><b>Email: </b>{{ dados.email }}</p> -->
+            <div class="identity min-w-0 text-gray-800 dark:text-gray-100 lg:me-6 lg:text-right">
+                <p class="mb-1 demandante">Nome: {{ auth.user?.name }}</p>
+                <p class="demandante">E-mail: {{ auth.user?.email }}</p>
+                <router-link to="/senha" class="text-blue-700 dark:text-blue-300 underline me-3">Alterar senha</router-link>
+                <button type="button" @click="signout" :disabled="auth.busy" class="text-blue-700 dark:text-blue-300 underline">Sair</button>
+                <p v-if="auth.error" role="alert" class="text-red-700 dark:text-red-300">{{ auth.error }}</p>
             </div>
         </div>
         <nav class="bg-gray-600 text-white">
             <div class="flex flex-wrap items-center justify-between 2xl:mx-auto px-4 py-2">
 
-                <button data-collapse-toggle="navbar-default" type="button"
-                    class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
-                    aria-controls="navbar-default" aria-expanded="false">
+                <button @click="menuOpen = !menuOpen" type="button"
+                    class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-white rounded-lg md:hidden hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+                    aria-controls="navbar-default" :aria-expanded="menuOpen">
                     <span class="sr-only">Abrir menu principal</span>
                     <svg class="w-5 h-5"  xmlns="http://www.w3.org/2000/svg" fill="none"
                         viewBox="0 0 17 14">
@@ -27,7 +28,7 @@
                     </svg>
                 </button>
 
-                <div class="hidden w-full md:block md:w-auto" id="navbar-default">
+                <div :class="{ hidden: !menuOpen }" class="w-full md:block md:w-auto" id="navbar-default">
                     <ul
                         class="text-sm flex flex-col p-4 md:p-0 mt-4 border  text-white border-gray-100 rounded-lg md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0">
                         <li>
@@ -54,7 +55,7 @@
                                 Lista de profissionais
                             </router-link>
                         </li>
-                        <li>
+                        <li v-if="auth.user?.admin">
                             <router-link to="/inserir"
                                 class="block py-2 px-3 text-white rounded-sm  md:border-0 hover:text-yellow-200 md:p-0  ">
                                 Inserir profissional
@@ -70,12 +71,39 @@
 </template>
 
 <script setup>
-// import { dados } from '../../js/store.js'
-
-
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/authStore.js'
+const auth = useAuthStore()
+const router = useRouter()
+const menuOpen = ref(false)
+async function signout() {
+    if (await auth.signout()) await router.replace({ name: 'Login' })
+}
 </script>
 
 <style lang="scss" scoped>
+
+.header-layout {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 0.75rem;
+    align-items: center;
+    padding: 0.5rem;
+}
+
+.identity {
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 767px) {
+    .header-layout {
+        grid-template-columns: auto minmax(0, 1fr);
+    }
+    .identity {
+        grid-column: 1 / -1;
+    }
+}
 
 header {
 

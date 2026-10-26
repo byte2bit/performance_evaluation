@@ -1,6 +1,6 @@
 <template>
 
-    <div class="flex flex-col w-full md:w-1/4 p-4 bg-zinc-200 rounded-md">
+    <div class="flex flex-col min-w-0 w-full p-4 bg-zinc-200 rounded-md">
         <div class="star-title">
             <p>Com relação ao atendimento no prazo das solicitações
                 efetuadas ao Posto de Serviço, qual seu nível de satisfação?</p>
@@ -10,7 +10,7 @@
                 active-color="#1a00ab" :star-size="25" />
             <div class="my-3 flex flex-col">
                 <label for="obs_prazo">Observações:</label>
-                <textarea v-sanitize="text" id="obs_prazo" rows="3" v-model="postData.obs_prazo"></textarea>
+                <textarea class="min-w-0 w-full" v-sanitize="text" id="obs_prazo" rows="3" v-model="postData.obs_prazo"></textarea>
             </div>
         </div>
     </div>

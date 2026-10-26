@@ -6,14 +6,16 @@ import { toast } from 'vue3-toastify'
 export const useColabStore = defineStore('colabs', () => {
     const chkColabs = ref([])
     const colabs = ref([])
+    let requestEpoch = 0
 
     // Carrega colaboradores da API
     const loadColabs = async () => {
+        const started = requestEpoch
         try {
             const res = await axios.get('/colab')
-            colabs.value = res.data
+            if (started === requestEpoch) colabs.value = res.data
         } catch {
-            toast.error('Não foi possível carregar os profissionais.', { theme: 'colored' })
+            if (started === requestEpoch) toast.error('Não foi possível carregar os profissionais.', { theme: 'colored' })
         }
     }
 
@@ -37,12 +39,19 @@ export const useColabStore = defineStore('colabs', () => {
         chkColabs.value = []
     }
 
+    function clearPrivateData() {
+        requestEpoch++
+        colabs.value = []
+        clearSelection()
+    }
+
     return {
         colabs,
         loadColabs,
         chkColabs,
         toggleColab,
         selectAllColabs,
-        clearSelection
+        clearSelection,
+        clearPrivateData
     }
 })

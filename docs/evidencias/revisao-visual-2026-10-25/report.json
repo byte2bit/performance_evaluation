@@ -1,0 +1,200 @@
+{
+  "folder": "frontend/node_modules/.cache/visual-review-cc9964c8c4e4",
+  "database": "evaluation_isolated_0f8785e64029_v2",
+  "playwrightVersion": "1.64.1",
+  "checks": [
+    {
+      "name": "anonymous-private-redirect",
+      "passed": true
+    },
+    {
+      "name": "login-generic-error",
+      "passed": true
+    },
+    {
+      "name": "login-mobile-fits",
+      "passed": true,
+      "details": {
+        "viewport": 390,
+        "pageWidth": 390,
+        "headerRight": 0,
+        "articleWidth": null,
+        "overflowingCards": 0
+      }
+    },
+    {
+      "name": "reviewer-only-own-professional",
+      "passed": true
+    },
+    {
+      "name": "reviewer-admin-link-hidden",
+      "passed": true
+    },
+    {
+      "name": "summary-focus-trap",
+      "passed": true
+    },
+    {
+      "name": "summary-escape-and-focus",
+      "passed": true
+    },
+    {
+      "name": "submission-stays-disabled",
+      "passed": true
+    },
+    {
+      "name": "reviewer-colabs-no-confirmation-visible",
+      "passed": false
+    },
+    {
+      "name": "reviewer-registros-no-confirmation-visible",
+      "passed": false
+    },
+    {
+      "name": "records-empty-search-state",
+      "passed": true
+    },
+    {
+      "name": "password-fields-labelled",
+      "passed": true
+    },
+    {
+      "name": "home-mobile-fits",
+      "passed": false,
+      "details": {
+        "viewport": 390,
+        "pageWidth": 390,
+        "headerRight": 561.546875,
+        "articleWidth": 90,
+        "overflowingCards": 4
+      }
+    },
+    {
+      "name": "home-width-320-fits",
+      "passed": false,
+      "details": {
+        "viewport": 320,
+        "pageWidth": 320,
+        "headerRight": 561.546875,
+        "articleWidth": 20,
+        "overflowingCards": 4
+      }
+    },
+    {
+      "name": "home-width-768-fits",
+      "passed": false,
+      "details": {
+        "viewport": 768,
+        "pageWidth": 768,
+        "headerRight": 736,
+        "articleWidth": 468,
+        "overflowingCards": 4
+      }
+    },
+    {
+      "name": "mobile-menu-expands",
+      "passed": true
+    },
+    {
+      "name": "logout-unmounts-private-header",
+      "passed": true
+    },
+    {
+      "name": "admin-navigation-visible",
+      "passed": true
+    },
+    {
+      "name": "dark-identity-contrast",
+      "passed": false,
+      "details": {
+        "foreground": "rgb(31, 41, 55)",
+        "background": "rgb(17, 24, 39)",
+        "ratio": 1.21
+      }
+    },
+    {
+      "name": "insert-unique-control-ids",
+      "passed": false,
+      "details": {
+        "duplicateIds": [
+          "profissional"
+        ]
+      }
+    },
+    {
+      "name": "admin-colabs-confirmation-initially-hidden",
+      "passed": false
+    },
+    {
+      "name": "admin-colabs-confirmation-opens",
+      "passed": true
+    },
+    {
+      "name": "admin-colabs-cancel-closes",
+      "passed": false
+    },
+    {
+      "name": "admin-registros-confirmation-initially-hidden",
+      "passed": false
+    },
+    {
+      "name": "admin-registros-confirmation-opens",
+      "passed": true
+    },
+    {
+      "name": "admin-registros-cancel-closes",
+      "passed": false
+    },
+    {
+      "name": "professionals-simulated-empty-state",
+      "passed": true
+    },
+    {
+      "name": "professionals-simulated-service-error",
+      "passed": true
+    },
+    {
+      "name": "no-unexpected-page-errors",
+      "passed": true
+    },
+    {
+      "name": "no-business-write-attempts",
+      "passed": true
+    }
+  ],
+  "captures": [
+    "01-login-desktop.png",
+    "02-login-error.png",
+    "03-login-mobile.png",
+    "04-reviewer-home-desktop.png",
+    "05-reviewer-summary.png",
+    "06-reviewer-colabs-desktop.png",
+    "06-reviewer-registros-desktop.png",
+    "07-records-empty-filter.png",
+    "08-password-desktop.png",
+    "09-password-mobile.png",
+    "10-reviewer-home-mobile.png",
+    "11-home-width-320.png",
+    "11-home-width-768.png",
+    "11-mobile-menu.png",
+    "12-admin-home-desktop.png",
+    "13-admin-home-dark.png",
+    "14-admin-insert-desktop.png",
+    "14-admin-insert-mobile.png",
+    "15-admin-colabs-desktop.png",
+    "16-admin-colabs-confirmation.png",
+    "17-admin-colabs-mobile.png",
+    "15-admin-registros-desktop.png",
+    "16-admin-registros-confirmation.png",
+    "17-admin-registros-mobile.png",
+    "18-professionals-empty.png",
+    "19-professionals-service-error.png"
+  ],
+  "unexpectedPageErrors": 0,
+  "blockedBusinessWrites": [],
+  "externalRequestsBlocked": 0,
+  "chromeVersion": "156.0.8078.48",
+  "executionCompleted": true,
+  "acceptancePassed": false,
+  "completedUtc": "2026-10-25T22:21:01.615Z"
+}

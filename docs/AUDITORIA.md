@@ -21,6 +21,33 @@ O fluxo e as versões estão em `AI_CONTEXT.md`.
 
 ## Pendências por gravidade
 
+Atualização após a retomada aprovada: os achados de rotas anônimas, identidade fixa e exposição de erros descritos abaixo registram o estado anterior. A mitigação foi validada também em MySQL isolado com dados fictícios, conforme seção seguinte. Produção não foi examinada.
+
+### Mitigações do lote de autenticação
+
+- Todas as rotas de negócio existentes exigem sessão no Express. Consulta por ID/lista e ambos os caminhos de avaliação aplicam escopo de demandante na query; avaliadores não recebem dados de outros. Cadastro/exclusão e e-mail possuem restrições administrativas conforme matriz aprovada.
+- O login consulta `users2`, verifica Argon2id e atividade, regenera sessão e não emite JWT. Perfil e versão são reconsultados a cada requisição; logout, expiração, troca de senha e desativação revogam acesso.
+- Mutações exigem origem exata, JSON e CSRF; o cookie é HttpOnly, sem Domain, com Secure obrigatório em produção. O modo local só aceita frontend local. Limitadores SQL falham com 503 quando indisponíveis, sem fallback que libere a tentativa.
+- `src/js/store.js` deixou de conter mapeamento pessoal/identidade administrativa fixa; estado vem da sessão. O bundle compilado não contém os e-mails daquele mapeamento. Guardas/visibilidade no Vue complementam a autorização do backend.
+- Os handlers de dados usam campos graváveis explícitos e erros genéricos. Gravações de avaliação atribuem demandante pela sessão e verificam o profissional em transação. No lote posterior aprovado, `lib/business-validation.js` acrescentou validação de regras, tipos, comprimentos Unicode e consistência, integrada também no cadastro de profissionais. Payloads inválidos retornam 400; `/registros2` passou a ter padrões 1/25 e teto 100. Ver [PLANO_VALIDACAO_API.md](PLANO_VALIDACAO_API.md).
+- CLI administrativa com confirmação de alvo/ação e senha sem eco; nenhuma execução contra dados reais. Store/limitador não criam schema no startup e não executam limpeza automática de expirados.
+
+Evidência inicial de integração: 100 testes automatizados aprovados; build de desenvolvimento aprovado no lote anterior. Integração adicional executada em MySQL 8.0.44 separado, com 11 migrations aplicadas, contas fictícias, autorização SQL/transações, persistência após reiniciar a aplicação, expiração e revogação. Concorrência do limitador: 10 permitidas e 5 bloqueadas entre 15 chamadas por dois pools. DDL da conta da aplicação negado. A instância isolada foi reiniciada e revalidada. Segredos locais externos protegidos por DPAPI/ACL; detalhes e reprodução em [AMBIENTE_ISOLADO.md](AMBIENTE_ISOLADO.md).
+
+Atualização de recuperação: backup criptografado e restauração em outro schema isolado aprovados, com 8 tabelas/36 registros coincidentes, origem intacta e login dos dois perfis na cópia. Suíte atual: 102 testes aprovados; build de desenvolvimento aprovado. Ver [BACKUP_RESTAURACAO.md](BACKUP_RESTAURACAO.md).
+
+Atualização visual: a inspeção original no Chrome confirmou cinco problemas, posteriormente corrigidos com autorização: responsividade da avaliação/cabeçalho, confirmações de exclusão, contraste no escuro e ID duplicado. O rodapé deixou de sobrepor campos. A nova validação passou em **48/48 verificações**, com 27 capturas, 102 testes e build de desenvolvimento aprovados. Sucesso/falha de exclusão foram simulados no navegador; o banco manteve suas linhas. Evidências originais e resultado atual em [REVISAO_VISUAL.md](REVISAO_VISUAL.md).
+
+Atualização após o lote aprovado de dependências/validação: **108 testes aprovados**, integração MySQL isolada (incluindo rejeições 400 e Unicode com rollback), **48/48 verificações no Chrome** e build aprovados. Consultas npm online autorizadas: frontend **14 → 0**, backend **18 → 6** entradas (1 alta, 5 moderadas, nenhuma crítica). As restantes envolvem Nodemailer e PM2/OpenCensus/uuid; atualizações principais aguardam análise de compatibilidade e operação. Versões, aplicabilidade e evidências em [DEPENDENCIAS_SEGURANCA.md](DEPENDENCIAS_SEGURANCA.md). Os totais anteriores nas seções históricas abaixo não representam o estado atual.
+
+Pendências mantidas: recuperar em outro host/volume real; avaliar vínculos por nome e registros legados contra e-mail canônico; planejar purga de expirados; definir origens/HTTPS/proxy; desenhar persistência dos critérios/submissão e recuperação de senha; confirmar rotação SMTP; tratar as seis entradas restantes de dependências do backend. Não há certificação de produção segura.
+
+### Alto — instalação limpa bloqueada por divergências de schema, corrigida no alvo isolado
+
+- Evidência real: a cadeia histórica falhou com `ER_FK_NO_INDEX_PARENT` (1822) em `20240622215930_create_table_registros.js`; faltava índice em `colab.colab`. Também não havia migration para a coluna `registros.liderancas` usada pelos handlers.
+- Correção aprovada: migrations `20240622215800_add_colab_name_index.js` e `20261025000400_add_liderancas_to_registros.js`, preservando as históricas e elementos compatíveis preexistentes. A cadeia completa passou em schema vazio sem adaptação por fixture.
+- Limite: não há comprovação do schema de produção, dados legados ou nomes duplicados. Os dois `down` recusam remoção automática para preservar valores e dependências da FK; reversão requer plano próprio.
+
 ### Crítico — segredo anteriormente versionado
 
 - Local: histórico dos dois módulos de e-mail; remoção do código atual não elimina versões anteriores.
@@ -105,14 +132,14 @@ O bloqueio específico das dependências citadas foi tratado. Autenticação/aut
 
 ## Hipóteses e itens não verificados
 
-- Migrations declaram FK de `registros.colab` para nome de colaborador; índice compatível e esquema efetivo não foram consultados. Não concluir falha da FK sem comparar o banco isolado com as migrations.
-- As consultas selecionam `registros.liderancas`, sem coluna correspondente nas migrations examinadas. Pode existir alteração manual no banco; confirmar em ambiente isolado antes de propor migration.
+- Migrations declaram FK de `registros.colab` para nome de colaborador. A falta de índice foi reproduzida e corrigida no MySQL isolado; o vínculo por nome e o schema de produção continuam sem revisão de dados reais.
+- A coluna `registros.liderancas` passou a ter migration aditiva, aplicada somente no schema isolado. Alterações manuais em outros ambientes não foram verificadas.
 - Paginação de `/registros2` continua com interpretação preexistente de `page` e `limit`; limites ausentes ou inválidos podem provocar 500. Default, teto e respostas de validação precisam de contrato aprovado.
 - `backend/env_file` é rastreado e tem formato de configuração. Nenhum valor foi reproduzido na documentação; não se certificou que todos os valores sejam fictícios.
 - Proxy reverso, HTTPS, origem real de produção, exposição das portas, cabeçalhos operacionais, backups e recuperação não foram verificados.
 - Remetentes/cópias foram preservados. Destinatário ainda deriva de `demandante`; permitir uso da API de e-mail exige autorização e política de destinatários, não apenas escape HTML.
 - Conteúdo de e-mail, SMTP real, permissões de remetente e compatibilidade TLS não foram testados contra o provedor.
-- Listagens ainda usam marcação de modal de outro padrão; interação visual e acessibilidade dessas telas precisam de verificação em navegador isolado.
+- A marcação de modal incompatível das duas listagens foi substituída por `ConfirmDeleteModal.vue`, usando o controle Flowbite existente. Visibilidade administrativa, teclado, Cancelar/Escape, foco e limpeza ao desmontar passaram no Chrome; ver `REVISAO_VISUAL.md`.
 - Registros e exportação fazem consultas próprias e podem ficar com cópias desatualizadas. Paginação, compartilhamento de consultas e atualização da exportação dependem de escopo posterior.
 - A análise npm do backend foi iniciada na instalação do segundo lote, com triagem dos dois alertas críticos e do parsing HTTP acima. As demais entradas e as dependências do frontend ainda não foram integralmente analisadas; benchmark de desempenho não foi realizado.
 

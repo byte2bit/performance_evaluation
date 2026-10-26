@@ -225,7 +225,7 @@ function reset() {
 
                 <loading v-model:active="isLoading" :can-cancel="true" :is-full-page="fullPage" />
 
-                <div class="flex md:justify-evenly md:mt-2 bg-gray-300 rounded-md p-3">
+                <div class="flex flex-col gap-3 md:flex-row md:justify-evenly md:mt-2 bg-gray-300 rounded-md p-3">
                     <div class="inputs">
                         <label for="media">Avaliação Média:</label>
                         <input type="text" id="media" :value="avaliacao" disabled />
@@ -241,7 +241,7 @@ function reset() {
                 </div>
 
                 <!-- Perguntas com estrelas -->
-                <div class="flex gap-x-4 mt-4 sm:gap-y-3 pb-4">
+                <div class="grid grid-cols-1 gap-4 mt-4 pb-4 sm:grid-cols-2 xl:grid-cols-4">
 
                     <Qualidade :postData="postData" v-model:iQualidade="iQualidade" :optQualidade="optQualidade" />
 
@@ -253,7 +253,7 @@ function reset() {
                 </div>
                 <!-- Final Perguntas com estrelas -->
 
-                <div class="border-top mt-auto pb-3 flex justify-between items-center">
+                <div class="border-top mt-auto pb-3 flex flex-wrap gap-3 justify-between items-center">
 
                     <!-- Modal toggle -->
                     <button @click="showReview = true" aria-haspopup="dialog"
@@ -271,7 +271,7 @@ function reset() {
 
                 <ChecksModal id="default-modal" v-model="showReview">
                     <template #bodyModal>
-                        <div class="modal-dados flex">
+                        <div class="modal-dados flex flex-col gap-6 md:flex-row">
 
                             <div class="flex flex-col">
 
@@ -325,7 +325,7 @@ h5 {
 }
 
 .form {
-    height: calc(100vh - 260px);
+    min-height: calc(100vh - 260px);
 }
 
 

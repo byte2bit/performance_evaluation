@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col w-full md:w-1/4 p-4 bg-zinc-200 rounded-md">
+    <div class="flex flex-col min-w-0 w-full p-4 bg-zinc-200 rounded-md">
         <div class="star-title">
             <p>Como você avalia a qualidade do Serviço
                 Prestado?</p>
@@ -10,7 +10,7 @@
                 @click="showSubModal = postData.nota_qualidade <= 3" />
             <div class="my-3 flex flex-col">
                 <label for="obs_qualidade">Observações:</label>
-                <textarea v-sanitize="text" id="obs_qualidade" rows="3" v-model="postData.obs_qualidade"></textarea>
+                <textarea class="min-w-0 w-full" v-sanitize="text" id="obs_qualidade" rows="3" v-model="postData.obs_qualidade"></textarea>
             </div>
         </div>
 

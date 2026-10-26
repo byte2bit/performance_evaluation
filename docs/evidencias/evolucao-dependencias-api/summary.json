@@ -1,0 +1,72 @@
+{
+  "source": "Online npm audit against https://registry.npmjs.org; names and versions transmission authorized by user",
+  "backendBefore": {
+    "info": 0,
+    "low": 0,
+    "moderate": 8,
+    "high": 10,
+    "critical": 0,
+    "total": 18
+  },
+  "backendAfter": {
+    "info": 0,
+    "low": 0,
+    "moderate": 5,
+    "high": 1,
+    "critical": 0,
+    "total": 6
+  },
+  "frontendBefore": {
+    "info": 0,
+    "low": 0,
+    "moderate": 1,
+    "high": 11,
+    "critical": 2,
+    "total": 14
+  },
+  "frontendAfter": {
+    "info": 0,
+    "low": 0,
+    "moderate": 0,
+    "high": 0,
+    "critical": 0,
+    "total": 0
+  },
+  "backendRemaining": [
+    {
+      "name": "@opencensus/core",
+      "severity": "moderate"
+    },
+    {
+      "name": "@opencensus/propagation-b3",
+      "severity": "moderate"
+    },
+    {
+      "name": "@pm2/io",
+      "severity": "moderate"
+    },
+    {
+      "name": "nodemailer",
+      "severity": "high"
+    },
+    {
+      "name": "pm2",
+      "severity": "moderate"
+    },
+    {
+      "name": "uuid",
+      "severity": "moderate"
+    }
+  ],
+  "tests": {
+    "passed": 108,
+    "failed": 0
+  },
+  "visual": {
+    "passed": 48,
+    "total": 48,
+    "accepted": true
+  },
+  "build": "development build passed; frontend/dist preserved",
+  "completedUtc": "2026-10-26T02:52:54.318Z"
+}

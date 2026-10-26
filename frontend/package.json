@@ -11,14 +11,14 @@
   "dependencies": {
     "@popperjs/core": "^2.11.8",
     "@tailwindcss/vite": "^4.1.7",
-    "axios": "^1.7.2",
+    "axios": "1.20.0",
     "export-from-json": "^1.7.4",
     "flowbite": "^3.1.2",
     "lightningcss": "^1.30.1",
     "pinia": "^3.0.2",
     "tailwindcss": "^4.1.7",
     "v-sanitize-directive": "^0.0.8",
-    "vue": "^3.5.13",
+    "vue": "3.5.44",
     "vue-loading-overlay": "^6.0.6",
     "vue-router": "^4.5.1",
     "vue-star-rating": "^2.1.0",
@@ -26,10 +26,21 @@
     "vue3-easy-data-table": "^1.5.47",
     "vue3-toastify": "^0.2.1"
   },
+  "overrides": {
+    "form-data@4.x": "4.0.6",
+    "tar@7.x": "7.5.22",
+    "rollup@4.x": "4.65.0",
+    "postcss@8.x": "8.5.31",
+    "source-map-js@1.x": "1.2.2",
+    "dompurify@3.x": "3.4.17",
+    "immutable@5.x": "5.1.9",
+    "picomatch@4.x": "4.0.4",
+    "follow-redirects@1.x": "1.16.2"
+  },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.3",
     "sass-embedded": "^1.89.0",
-    "vite": "^6.3.5",
+    "vite": "6.4.4",
     "vue3-select-component": "^0.2.4"
   }
 }
