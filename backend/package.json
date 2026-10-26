@@ -24,7 +24,7 @@
     "moment": "2.31.0",
     "mysql": "*",
     "mysql2": "3.24.6",
-    "nodemailer": "^6.9.14",
+    "nodemailer": "10.2.1",
     "passport": "*",
     "passport-jwt": "*",
     "passport-local": "1.0.0",
