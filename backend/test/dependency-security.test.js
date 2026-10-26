@@ -1,11 +1,8 @@
 const assert = require('node:assert/strict')
 const { spawnSync } = require('node:child_process')
-const fs = require('node:fs/promises')
-const os = require('node:os')
 const path = require('node:path')
 const test = require('node:test')
 const proxyaddr = require('proxy-addr')
-const { Client } = require('basic-ftp')
 
 test('JSON parsing survives malformed compressed input and retains normal parsing and size limits', () => {
     // A crash regression must not terminate the test runner. This child loads
@@ -86,42 +83,10 @@ test('proxy trust does not treat arbitrary IPv4 clients as trusted IPv6 subnets'
     }
 })
 
-test('FTP directory download ignores traversal names without writing any downloaded file', async () => {
-    const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'evaluation-ftp-regression-'))
-    const client = new Client()
-    const downloads = []
-    const invalidNames = ['../escape.txt', '/escape.txt']
-    if (path.sep === '\\') invalidNames.push('..\\escape.txt')
-    client.list = async () => [...invalidNames, 'synthetic.txt']
-        .map(name => ({ name, isFile: true, isDirectory: false }))
-    client.downloadTo = async (destination, name) => { downloads.push({ destination, name }) }
-    try {
-        await client._downloadFromWorkingDir(directory)
-        assert.deepEqual(downloads, [{ destination: path.join(directory, 'synthetic.txt'), name: 'synthetic.txt' }])
-    } finally {
-        client.close()
-        // Only an empty temporary directory was created; never recurse/delete outside it.
-        await fs.rmdir(directory)
-    }
-})
-
-test('get-uri keeps its FTP stream integration with the scoped basic-ftp override', async t => {
-    const { ftp } = require('get-uri/dist/ftp')
-    const calls = []
-    t.mock.method(Client.prototype, 'access', async options => { calls.push(['access', options.host]) })
-    t.mock.method(Client.prototype, 'lastMod', async () => { throw new Error('Synthetic optional MDTM failure') })
-    t.mock.method(Client.prototype, 'list', async () => [
-        { name: 'synthetic.txt', modifiedAt: new Date('2026-10-25T12:00:00.000Z') }
-    ])
-    t.mock.method(Client.prototype, 'downloadTo', async (destination, file) => {
-        calls.push(['downloadTo', file])
-        destination.end('synthetic FTP contents')
-        return { message: 'synthetic success' }
-    })
-    const stream = await ftp(new URL('ftp://ftp.example.invalid/folder/synthetic.txt'))
-    const chunks = []
-    for await (const chunk of stream) chunks.push(chunk)
-    assert.equal(Buffer.concat(chunks).toString(), 'synthetic FTP contents')
-    assert.equal(stream.lastModified.toISOString(), '2026-10-25T12:00:00.000Z')
-    assert.deepEqual(calls, [['access', 'ftp.example.invalid'], ['downloadTo', '/folder/synthetic.txt']])
+test('removed PM2 instrumentation and FTP proxy chains cannot re-enter through the dependency lockfile', () => {
+    // The old FTP consumer tests are superseded: PM2 7 no longer installs the
+    // proxy/FTP packages or OpenCensus. Do not reinstall them merely to test them.
+    const packages = Object.keys(require('../package-lock.json').packages)
+    const legacy = /(?:^|\/)node_modules\/(?:basic-ftp|get-uri|@pm2\/io|@opencensus\/core|@opencensus\/propagation-b3|uuid)$/
+    assert.deepEqual(packages.filter(name => legacy.test(name)), [])
 })

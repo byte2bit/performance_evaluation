@@ -28,7 +28,7 @@
     "passport": "*",
     "passport-jwt": "*",
     "passport-local": "1.0.0",
-    "pm2": "*",
+    "pm2": "7.1.1",
     "rate-limiter-flexible": "11.2.3",
     "vhost": "^3.0.2"
   },

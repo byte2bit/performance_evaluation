@@ -66,7 +66,7 @@ module.exports = app => {
         ${showObs(email.itensDispon)}`
 
         return {
-            from: 'Núcleo Engenharia"<contato@nucleoengenharia.com.br>', // sender address
+            from: '"Núcleo Engenharia"<contato@nucleoengenharia.com.br>', // sender address
             // to: "silvio.ribeiro@gmail.com, silvio.ribeiro@nucleoengenharia.com.br",
             to: email.demandante + ",cc-fiscalizacao_nucleo@petrobras.com.br",
             bcc: "silvio.ribeiro@gmail.com, fernanda.anjos@nucleoengenharia.com.br, levy.rodrigues@nucleoengenharia.com.br",

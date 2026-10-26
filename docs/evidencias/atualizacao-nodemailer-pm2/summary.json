@@ -1,0 +1,65 @@
+{
+  "date": "2026-10-26",
+  "scope": "Approved local upgrades and README documentation; GitHub delivery requested separately",
+  "node": "24.12.0",
+  "npm": "11.6.2",
+  "dependencies": {
+    "nodemailer": {
+      "before": "6.9.14",
+      "after": "10.2.1"
+    },
+    "pm2": {
+      "before": "5.3.1",
+      "after": "7.1.1"
+    }
+  },
+  "backendAudit": {
+    "source": "Online npm audit against public registry; package metadata transmission previously authorized",
+    "exitCode": 0,
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    }
+  },
+  "frontendAudit": "Not repeated; previous online audit reported zero",
+  "tests": {
+    "command": "node --test backend/test/*.test.js frontend/test/*.test.js",
+    "passed": 113,
+    "failed": 0,
+    "skipped": 0,
+    "baselinePassed": 108,
+    "added": 6,
+    "retiredFtpConsumerTests": 2,
+    "replacementDependencyChainTest": 1
+  },
+  "pm2": {
+    "checksPassed": 7,
+    "checksTotal": 7,
+    "networkAttempts": 0,
+    "daemonTerminated": true,
+    "ownedProfilesInspected": 4,
+    "liveProcessesReferencedByPidFiles": 0
+  },
+  "removedNpmChains": [
+    "@pm2/io",
+    "@opencensus/core",
+    "@opencensus/propagation-b3",
+    "uuid",
+    "get-uri",
+    "basic-ftp"
+  ],
+  "mailSender": "Missing opening display-name quote corrected; mailbox preserved; tests replace all existing addresses with synthetic addresses",
+  "userChanges": "Staged Vhost example hostname api.mysite.com preserved; documentation and fixture updated",
+  "notValidated": [
+    "Real SMTP delivery and TLS handshake",
+    "WMI memory metrics (access denied)",
+    "PM2 cluster/startup/resurrect/PM2.io",
+    "Production",
+    "New MySQL integration, frontend build or visual review"
+  ],
+  "rollback": "Restore only files of the corresponding upgrade and their lockfile after preserving later changes; pre-upgrade dependency versions are in 42bb26e; fbe9e3f already contains Nodemailer upgrade and READMEs"
+}

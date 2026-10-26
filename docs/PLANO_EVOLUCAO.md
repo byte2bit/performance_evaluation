@@ -24,7 +24,13 @@ Após autorização para os audits online e aprovação explícita das regras de
 
 Evidência atual: **108 testes aprovados**, integração real em MySQL isolado, **48/48 verificações no Chrome** e build aprovados. Audit frontend: **14 → 0** entradas; backend: **18 → 6**, sendo 1 alta e 5 moderadas. As seis entradas pertencem a Nodemailer e à cadeia PM2/OpenCensus/uuid. Impactos de atualização principal precisam de análise própria, sem modificar daemon/SMTP de produção. [Relatório e evidências](DEPENDENCIAS_SEGURANCA.md).
 
-Próximas tarefas: preparar propostas de atualização principal de Nodemailer/PM2 com testes de consumidores; investigar vínculos e dados legados usando apenas fixtures; desenhar persistência dos critérios e submissão antes de ativá-la. Recuperação em outro host, proteção externa das chaves, purga, recuperação de senha e infraestrutura de produção continuam pendentes. Os registros abaixo preservam os resultados históricos de cada lote.
+Atualizações principais de Nodemailer/PM2 aprovadas e concluídas localmente em etapa posterior, descrita abaixo. Próximas tarefas: investigar vínculos e dados legados usando apenas fixtures; desenhar persistência dos critérios e submissão antes de ativá-la. Recuperação em outro host, proteção externa das chaves, purga, recuperação de senha e infraestrutura de produção continuam pendentes. Os registros abaixo preservam os resultados históricos de cada lote.
+
+### Lote posterior concluído — READMEs, Nodemailer e PM2 locais
+
+Após aprovação explícita, os READMEs da raiz/backend/frontend foram preparados primeiro, cobrindo funcionalidades, perfis, telas, API, execução e limites. Nodemailer foi fixado em 10.2.1 e PM2 em 7.1.1, com lockfile atualizado, sem mudar script de produção ou iniciar a aplicação real. Corrigida a aspa ausente no remetente de `mail2.js`, pois o compilador real demonstrou alteração da caixa interpretada.
+
+Resultado: **113 testes aprovados**, **audit backend online zero entradas (código 0)** e ciclo PM2 fictício **7/7**, com sockets exclusivos, ambiente sanitizado e zero tentativas de rede. As cadeias OpenCensus/uuid e get-uri/basic-ftp saíram da árvore npm. No Windows, os pipes globais do PM2 foram substituídos somente pelo harness em memória; nenhum daemon pessoal/operacional foi usado. Métricas WMI foram negadas e não estão validadas. Produção, SMTP real, cluster/startup/resurrect e instrumentação continuam fora dessa validação. Evidências, compatibilidade e reversão em [DEPENDENCIAS_SEGURANCA.md](DEPENDENCIAS_SEGURANCA.md#atualizacao-principal-local-nodemailer-e-pm2).
 
 ### Retomada aprovada: primeiro passo de autenticação implementado
 

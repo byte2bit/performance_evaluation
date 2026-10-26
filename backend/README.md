@@ -60,7 +60,7 @@ test/          Testes em memória, mocks e regressões
 
 `index.js` atribui `app.db` antes de carregar, via Consign: `config/passport.js` → `config/middlewares.js` → `api/validation.js` → `api/` → `config/routes.js`. Helpers em `lib/` ficam fora do autoload.
 
-`api.js` atende somente `api.nucleoengenharia.com.br`, delegando à mesma aplicação; hosts desconhecidos seguem para 404. As entradas examinadas não configuram `trust proxy`. O script PM2 inicia `index.js`, sem passar pelo wrapper Vhost. Essas entradas HTTP não comprovam a topologia ou terminação TLS de produção.
+`api.js` atende somente o hostname de exemplo `api.mysite.com`, delegando à mesma aplicação; hosts desconhecidos seguem para 404. Esse hostname foi ajustado pelo usuário no código e não comprova DNS ou configuração implantada. As entradas examinadas não configuram `trust proxy`. O script PM2 inicia `index.js`, sem passar pelo wrapper Vhost. Essas entradas HTTP não comprovam a topologia ou terminação TLS de produção.
 
 | Script existente | Comportamento |
 | --- | --- |
@@ -89,6 +89,18 @@ node --test backend/test/*.test.js
 ```
 
 A suíte cobre autenticação/autorização/CSRF, sessões, validação, handlers, e-mail com mocks, dependências e proteções dos runners. Não carrega o banco de produção nem envia e-mails reais.
+
+Os testes de compatibilidade também compilam os templates com Nodemailer real e endereços fictícios, sem entrega SMTP, verificando envelope/remetente, BCC, escape HTML, parser e opções TLS. O parser de argumentos do PM2 e as barreiras de isolamento têm testes sem daemon.
+
+O ciclo real do PM2 é opt-in:
+
+```powershell
+node backend/scripts/isolated-pm2.js
+```
+
+Esse runner cria aplicação e perfil fictícios novos no diretório temporário e executa início, reinício, parada, exclusão e encerramento do daemon exclusivo. Não inicia `index.js` nem lê `.env`. No Windows, `PM2_HOME` sozinho ainda usa pipes globais: o harness substitui os caminhos somente no cache de módulos dos filhos, antes de carregar clientes, e permite comunicação apenas pelos pipes exclusivos. Conexões TCP/HTTP/HTTPS são bloqueadas; variáveis do shell são fornecidas por allowlist, sem segredos da aplicação.
+
+O perfil temporário e seu relatório são preservados para inspeção; os processos de teste são encerrados. A validação cobre modo fork local, sem certificar cluster, startup/resurrect, integração com PM2.io ou operação em produção. A consulta de métricas via WMI foi negada pelo ambiente e não é considerada aprovada. [Evidência e reversão](../docs/DEPENDENCIAS_SEGURANCA.md#atualizacao-principal-local-nodemailer-e-pm2).
 
 As ações `Validate`, `RecoveryTest` e `VisualReview` são opt-in. `Validate` grava fixtures e pode aplicar migrations no perfil isolado; `RecoveryTest` cria backup criptografado e schema de restauração. Elas não são consultas somente leitura. Leia [AMBIENTE_ISOLADO.md](../docs/AMBIENTE_ISOLADO.md), [BACKUP_RESTAURACAO.md](../docs/BACKUP_RESTAURACAO.md) e [REVISAO_VISUAL.md](../docs/REVISAO_VISUAL.md) antes de executar.
 

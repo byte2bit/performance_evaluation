@@ -1,6 +1,6 @@
 # Ponto de retomada
 
-Registrado em **26/10/2026**, para continuar a partir de **27/10/2026**. O usuário solicitou enviar as alterações ao GitHub e preparar a continuidade. Este registro acompanha o mesmo commit do código e das evidências; não autoriza deploy ou mudanças em produção.
+Atualizado em **26/10/2026** após a retomada, atualização dos READMEs e implementação dos dois lotes locais aprovados de Nodemailer/PM2. O usuário solicitou enviar as alterações ao GitHub. Este registro acompanha o código e as evidências; não autoriza deploy ou mudanças em produção.
 
 ## Estado entregue
 
@@ -9,17 +9,21 @@ Registrado em **26/10/2026**, para continuar a partir de **27/10/2026**. O usuá
 - Backup criptografado e restauração em schema separado aprovados no lote anterior. Recuperação em outro host ainda pendente.
 - Cinco problemas visuais corrigidos e revalidados; submissão da avaliação permanece desativada.
 - Contrato de validação/paginação aprovado e implementado: notas 1–5 em passos de 0,5, consistência de média/nível/desconto, textos até 255 caracteres, IDs válidos, page=1/limit=25 e teto 100 em `/registros2`; entrada inválida retorna 400.
-- Dependências atualizadas com compatibilidade verificada. Audit online final autorizado: **frontend zero entradas; backend seis (uma alta e cinco moderadas)**. Permanecem Nodemailer e a cadeia PM2/OpenCensus/uuid.
+- READMEs da raiz/backend/frontend descrevem funcionalidades, acessos, telas/API, execução local e limites reais. O frontend usa `npm start`, sem script `dev`.
+- Nodemailer **10.2.1** e PM2 **7.1.1**, fixados após aprovação. Corrigida a aspa ausente no remetente de `mail2.js`, preservando o endereço. Cadeias npm OpenCensus/uuid e get-uri/basic-ftp removidas pelo PM2 novo.
+- Audit online do **backend: zero entradas, código 0**, após os dois lotes. O audit **frontend zero** é o resultado do lote anterior; não foi repetido.
+- Runner PM2 fictício opt-in passou **7/7**, com pipes exclusivos no Windows, ambiente sanitizado, rede bloqueada e daemon encerrado. Métricas WMI foram negadas e não estão validadas. Nenhum daemon pessoal/operacional foi usado.
+- O usuário ajustou `backend/api.js` para o hostname de exemplo `api.mysite.com` e removeu comentários inativos; alteração preservada, com teste e documentação alinhados.
 
-Últimas validações executadas: **108 testes aprovados**, integração SQL isolada aprovada, **48/48 verificações no Chrome**, build de desenvolvimento e conferência do diff aprovados. As evidências de integração e navegador foram concluídas na noite de 25/10, horário de São Paulo; os timestamps UTC dos relatórios já indicam 26/10. Não é necessário repetir essas validações sem mudanças ou nova dúvida concreta.
+Validações do lote local: **113 testes aprovados**, zero falhas/skips, audit backend zero e ciclo PM2 7/7. Evidências em [DEPENDENCIAS_SEGURANCA.md](DEPENDENCIAS_SEGURANCA.md#atualizacao-principal-local-nodemailer-e-pm2). Integração SQL isolada, **48/48 verificações no Chrome** e build de desenvolvimento aprovados continuam como evidências do lote anterior, concluídas na noite de 25/10 em São Paulo (UTC dos relatórios já indica 26/10). Não foram repetidas sem mudanças nessas áreas ou nova dúvida concreta.
 
 ## Como retomar
 
 Ler `../AGENTS.md`, [AI_CONTEXT.md](AI_CONTEXT.md), [PLANO_EVOLUCAO.md](PLANO_EVOLUCAO.md), [DEPENDENCIAS_SEGURANCA.md](DEPENDENCIAS_SEGURANCA.md) e [PLANO_VALIDACAO_API.md](PLANO_VALIDACAO_API.md). Conferir primeiro `git status`, branch e diferenças remotas; preservar qualquer trabalho posterior a este registro.
 
-Próximo lote sugerido: **análise e proposta de atualização principal do Nodemailer e PM2**, com inventário dos consumidores, compatibilidade, testes sem SMTP real e plano de reversão. A implementação desses saltos deve ser explicada antes de instalar dependências; alterações operacionais/infraestrutura exigem aprovação conforme AGENTS.md. Não executar `npm audit fix --force` nem reiniciar daemon de produção.
+Próximo lote sugerido: **investigar vínculos legados por nome/e-mail com fixtures e preparar proposta**, preservando dados reais, schema e contratos. Qualquer correção estrutural exige plano e aprovação próprios. Os saltos locais de Nodemailer/PM2 estão concluídos; não repetir instalação/audit/testes sem mudança ou dúvida concreta. Não executar `npm audit fix --force` nem reiniciar daemon de produção.
 
-Depois: investigar vínculos legados por nome/e-mail com fixtures, desenhar persistência dos arrays de critérios e submissão antes de ativá-la, planejar recuperação em outro host/proteção das chaves, purga e recuperação de senha. URLs, HTTPS e proxy de produção não estão definidos; rotação das credenciais SMTP antigas depende do responsável operacional.
+Depois: desenhar persistência dos arrays de critérios e submissão antes de ativá-la, planejar recuperação em outro host/proteção das chaves, purga e recuperação de senha. URLs, HTTPS e proxy de produção não estão definidos; rotação das credenciais SMTP antigas depende do responsável operacional. Cluster, startup/resurrect, métricas WMI e SMTP real não foram validados pelos lotes locais.
 
 ## Reiniciar o ambiente local, se necessário
 
@@ -36,7 +40,7 @@ $perfilAvaliacao = Join-Path $env:LOCALAPPDATA 'EvaluationDev/mysql-isolated-0f8
 
 ```powershell
 $env:VITE_API_URL = 'http://localhost:8001'
-npm --prefix frontend run dev -- --host localhost --port 5173 --strictPort
+npm --prefix frontend start -- --host localhost --port 5173 --strictPort
 ```
 
 Acesso em `http://localhost:5173`. Não iniciar outro processo se a porta já estiver ocupada; verificar o processo existente. Os serviços locais podem encerrar ao fechar terminais ou reiniciar o computador; o repositório e o perfil externo persistem. Não usar o bootstrap normal do backend para este teste, pois a conexão deve continuar sendo exclusivamente isolada.
@@ -51,6 +55,8 @@ node --test backend/test/*.test.js frontend/test/*.test.js
 
 Os runners `Validate`, `RecoveryTest` e `VisualReview` são opt-in; ler seus guias antes de executar. `Validate` acrescenta fixtures/schemas de controle fictícios; não é uma consulta somente leitura. A ferramenta temporária de navegador pode precisar ser preparada novamente se seu diretório tiver sido removido. Não aplicar migrations em outro ambiente com base na autorização dada para o perfil isolado.
 
+O runner `node backend/scripts/isolated-pm2.js` também é opt-in: cria perfil temporário/aplicação fictícios e daemon exclusivo, bloqueia rede e encerra somente seus processos. Não inicia a API. Perfil e relatório são preservados; ver guia em `DEPENDENCIAS_SEGURANCA.md` antes de repetir.
+
 ## Pedido para a próxima conversa
 
-> Continuar conforme AGENTS.md e docs/RETOMADA.md. Conferir o Git e preparar a proposta de tratamento dos seis alertas restantes do backend, começando por Nodemailer/PM2, sem acessar produção nem enviar e-mails reais.
+> Continuar conforme AGENTS.md e docs/RETOMADA.md. Conferir o Git e investigar vínculos legados por nome/e-mail usando fixtures para preparar uma proposta, sem alterar schema/dados reais ou ativar submissão. Nodemailer/PM2 já foram atualizados e validados localmente; consultar as evidências antes de repetir trabalho.

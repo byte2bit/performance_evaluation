@@ -1,0 +1,22 @@
+{
+  "node": "v24.12.0",
+  "pm2": "7.1.1",
+  "platform": "win32",
+  "profile": "%TEMP%/evaluation-pm2-0421767e685841c6c206b8c3",
+  "exclusiveSockets": true,
+  "checks": [
+    "empty-exclusive-daemon",
+    "start-and-sanitized-environment",
+    "restart-preserves-environment",
+    "logs-confined-to-profile",
+    "stop",
+    "delete-only-fixture",
+    "exclusive-daemon-terminated"
+  ],
+  "passed": 7,
+  "daemonTerminated": true,
+  "networkAttempts": 0,
+  "databaseAccess": false,
+  "smtpDelivery": false,
+  "completedUtc": "2026-10-26T13:51:36.093Z"
+}

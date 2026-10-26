@@ -81,7 +81,7 @@ test('importing api.js does not open a port', () => {
 test('Vhost forwards the configured host and passes unknown hosts to fallback', () => {
     const { middlewares } = bootstrap('backend/api.js', false)
     const configured = {}
-    middlewares[0]({ headers: { host: 'api.nucleoengenharia.com.br:8000' } }, configured, () => assert.fail('Unexpected fallback'))
+    middlewares[0]({ headers: { host: 'api.mysite.com:8000' } }, configured, () => assert.fail('Unexpected fallback'))
     assert.equal(configured.dispatched, true)
     let fallback = false
     const unknown = {}

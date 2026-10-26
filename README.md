@@ -76,6 +76,8 @@ node --test backend/test/*.test.js frontend/test/*.test.js
 
 Os runners `Validate`, `RecoveryTest` e `VisualReview` são opt-in e têm efeitos próprios. Leia os guias antes de executá-los. Os resultados anteriores e seus limites estão nos documentos de evidência; não equivalem a testes executados após qualquer alteração futura.
 
+Para validar o ciclo de processos do PM2 sem iniciar a aplicação ou acessar banco/SMTP, há também `node backend/scripts/isolated-pm2.js`. Esse runner opt-in cria perfil e aplicação fictícios no diretório temporário, usa sockets exclusivos, bloqueia rede e encerra seu próprio daemon. Guia e resultados em [DEPENDENCIAS_SEGURANCA.md](docs/DEPENDENCIAS_SEGURANCA.md#atualizacao-principal-local-nodemailer-e-pm2).
+
 ## Documentação
 
 - [Frontend: telas, componentes e comandos](frontend/README.md)

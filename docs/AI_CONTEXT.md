@@ -38,7 +38,8 @@ Versões conferidas nos lockfiles e nas instalações locais:
 | Express / Consign | 4.22.3 / 0.1.6 |
 | Knex / mysql / mysql2 | 3.1.0 / 2.18.1 / 3.24.6; `mysql2` usado pelo bootstrap isolado, mas não selecionado no `knexfile.js` |
 | Passport / passport-jwt | 0.7.0 / 4.0.1; estratégia Local ativa no código; JWT legado não registrado |
-| Nodemailer / Vhost | 6.9.14 / 3.0.2 |
+| Nodemailer / Vhost | 10.2.1 / 3.0.2 |
+| PM2 | 7.1.1; validação operacional somente em processo fictício isolado |
 | CORS / body-parser | 2.8.5 / 1.20.9 |
 | Transitivas corrigidas | proxy-addr 2.0.8; basic-ftp 6.2.3, com override limitado a get-uri 6.0.3 |
 | Novas dependências aprovadas | passport-local 1.0.0; express-session 1.19.0; connect-session-knex 5.0.0; argon2 0.45.1; rate-limiter-flexible 11.2.3 |
@@ -56,7 +57,7 @@ Desenvolvimento observado: navegador/Vite em `http://localhost:5173` → Axios c
 
 `frontend/vite.config.js` não configura proxy. A configuração base local do frontend aponta para uma API HTTPS na porta 8000, mas `backend/api.js` cria um servidor HTTP. Não foram inspecionados proxy reverso, terminação TLS ou ambiente implantado; não é possível concluir como essa diferença é resolvida em produção, nem qual é a origem efetiva do frontend implantado.
 
-O Vhost registra somente `api.nucleoengenharia.com.br` e delega a `index.js`. Hosts desconhecidos seguem para o 404 padrão do Express; não há fallback de aplicação registrado. Não há configuração de `trust proxy` nos arquivos de entrada examinados. O Vhost não comprova isolamento nem autentica o cliente.
+O Vhost registra somente o hostname de exemplo `api.mysite.com`, ajustado pelo usuário em 26/10/2026, e delega a `index.js`. Hosts desconhecidos seguem para o 404 padrão do Express; não há fallback de aplicação registrado. Isso não comprova DNS/configuração implantada. Não há configuração de `trust proxy` nos arquivos de entrada examinados. O Vhost não comprova isolamento nem autentica o cliente.
 
 `index.js` atribui `app.db` antes do Consign, nesta sequência:
 
@@ -162,3 +163,15 @@ As consultas online npm foram autorizadas para ambos os projetos. O frontend pas
 O usuário aprovou o contrato de [PLANO_VALIDACAO_API.md](PLANO_VALIDACAO_API.md). `lib/business-validation.js`, `lib/records.js` e `api/user.js` rejeitam entradas inválidas com 400, limitam textos a 255 caracteres Unicode, verificam notas/média/nível/desconto e IDs. `/registros2` usa page=1/limit=25, teto 100, com desempate por ID; `/registros` mantém lista completa. Nenhuma migration foi acrescentada ou aplicada neste lote.
 
 Resultado atual: **108 testes aprovados**, integração MySQL 8.0.44 isolada aprovada (incluindo entradas inválidas sem alterar linhas e sonda Unicode revertida), **48/48 verificações no Chrome** e build Vite 6.4.4 aprovados. Produção e SMTP real não foram acessados. Evidências, versões e riscos restantes em [DEPENDENCIAS_SEGURANCA.md](DEPENDENCIAS_SEGURANCA.md). Submissão da avaliação, persistência dos arrays de critérios, vínculos legados por nome/e-mail e demais pendências operacionais continuam para etapas próprias.
+
+## Continuidade atual — READMEs e atualizações principais locais
+
+Em 26/10/2026, o usuário aprovou os dois lotes locais de Nodemailer/PM2, solicitando antes a atualização dos READMEs. Criados README principal e do backend; substituído o template Vite do frontend por funcionalidades, telas, acessos, comandos e limites reais. O comando correto do frontend é `npm --prefix frontend start`; não há script `dev`.
+
+Nodemailer passou de 6.9.14 para **10.2.1** e PM2 de 5.3.1 para **7.1.1**, com versões exatas. Instalação direcionada, sem scripts de instalação nem audit automático, preservando os demais contratos. O remetente de `api/mail2.js` recebeu a aspa inicial ausente: o compilador real demonstrou que a sintaxe antiga mudava a caixa interpretada. Endereço/remetente de negócio e destinatários foram preservados; testes usam substituições fictícias.
+
+PM2 removeu a cadeia npm `@pm2/io`/OpenCensus/uuid e get-uri/basic-ftp. Dois testes do consumidor FTP removido foram substituídos por uma regressão contra a reintrodução dessas cadeias; não se reinstalaram pacotes sem consumidor. Acrescentados três testes de Nodemailer real e três de PM2/isolamento. Resultado: **113 testes aprovados**, sem falhas/skips, e **audit online backend zero entradas**, código 0. O resultado frontend zero continua sendo o audit do lote anterior; não foi consultado novamente neste lote.
+
+O runner opt-in `scripts/isolated-pm2.js` passou em sete verificações de ciclo fork, ambiente, logs e encerramento, com aplicação fictícia e rede bloqueada. No Windows, o harness precisa substituir em memória os pipes globais do PM2 por nomes exclusivos; não se alteraram os fontes do pacote nem o daemon pessoal/operacional. Zero processos vivos referenciados pelos arquivos PID dos quatro perfis fictícios na conferência final. WMI negou consulta de métricas; isso, cluster/startup/resurrect e produção não foram validados. Não houve MySQL/migrations, envio SMTP, build ou revisão visual novos; as evidências anteriores dessas áreas permanecem históricas.
+
+Evidências, compatibilidade e reversão em [DEPENDENCIAS_SEGURANCA.md](DEPENDENCIAS_SEGURANCA.md#atualizacao-principal-local-nodemailer-e-pm2). Os commits novos observados durante a execução, incluindo READMEs e Nodemailer, foram preservados. O usuário também preparou a troca do hostname de exemplo do Vhost e removeu comentários inativos em `api.js`; teste e documentação foram alinhados sem reverter sua alteração. O envio ao GitHub foi solicitado posteriormente; deploy continua fora do escopo.
