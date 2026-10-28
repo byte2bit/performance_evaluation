@@ -396,13 +396,82 @@ async function validateAuthentication(profile, report) {
 async function main() {
     const profile = loadProfile()
     const action = process.argv[2]
-    assert.ok(['ready', 'validate', 'validatelinks', 'recoverytest', 'visualreview', 'stop', 'serve'].includes(action))
+    assert.ok(['ready', 'validate', 'validatelinks', 'inventory', 'reconcilereviewed', 'validatemanagement', 'activatemanagement', 'servemanagementcopy', 'recoverytest', 'visualreview', 'stop', 'serve'].includes(action))
+    if (['validate', 'visualreview'].includes(action)) {
+        // These historical fixtures predate department IDs. Never let their
+        // generic migration path activate the new model on the source schema.
+        throw Object.assign(new Error('Use the copy-only management validation workflow.'), { code: 'LEGACY_RUNNER_REQUIRES_MANAGEMENT_REVIEW' })
+    }
+    if (action === 'inventory') {
+        phase = 'read-only-inventory'
+        const client = await mysql.createConnection(connection(profile, 'application', profile.database))
+        try {
+            const expectedMigrations = fs.readdirSync(path.join(__dirname, '../migrations')).filter(file => /^\d+_.*\.js$/.test(file) && file <= '20261026000100_link_registros_to_colab_id.js').sort()
+            const report = await require('./isolated-inventory').inventory({ profile, client, verifyServer,
+                expectedMigrations, secret: process.env.SESSION_SECRET })
+            console.log(JSON.stringify(report))
+        } catch {
+            // SQL, assertion diffs and private row contents must never reach the console.
+            throw Object.assign(new Error('Read-only inventory failed'), { code: 'INVENTORY_FAILED' })
+        } finally { await client.end() }
+        return
+    }
     phase = 'server-identity'
     const root = await rootConnection(profile, action === 'ready')
     try {
         const version = await verifyServer(root, profile)
         if (action === 'ready') { console.log(JSON.stringify({ ready: true, version })); return }
         if (action === 'stop') { await root.query('SHUTDOWN'); console.log(JSON.stringify({ stopped: true })); return }
+        if (action === 'activatemanagement') {
+            phase = 'management-activation-preconditions'
+            const report = await require('./isolated-activate-management').activate({ profile, root, verifyServer, database, startApplication, browser,
+                connectApplication: selected => mysql.createConnection(connection(selected, 'application', selected.database)),
+                approvedMapName: process.env.EVAL_DEPARTMENT_APPROVED_MAP,
+                confirmation: process.env.EVAL_DEPARTMENT_CONFIRMATION,
+                recoveryReportName: process.env.EVAL_DEPARTMENT_RECOVERY_REPORT,
+                secret: process.env.SESSION_SECRET, recoveryKey: process.env.EVAL_ISOLATED_RECOVERY_KEY,
+                progress(stage) { phase = 'activate-management-' + stage; console.log(JSON.stringify({ phase })) } })
+            console.log(JSON.stringify(report))
+            return
+        }
+        if (action === 'servemanagementcopy') {
+            phase = 'management-copy-preview'
+            const filename = process.env.EVAL_MANAGEMENT_REPORT
+            assert.match(filename || '', /^management-report-[a-f0-9]{12}\.json$/)
+            const report = JSON.parse(fs.readFileSync(path.join(profile.directory, filename), 'utf8'))
+            const target = require('./isolated-management').previewTarget(profile, report, filename)
+            const [[marker]] = await root.query('SELECT profile_id FROM ??.isolation_marker', [target]); assert.equal(marker.profile_id, profile.id)
+            const [migrations] = await root.query('SELECT name FROM ??.migrations ORDER BY name', [target])
+            assert.equal(migrations.length, 13); assert.equal(migrations.at(-1).name, '20261027000100_add_management_departments.js')
+            const runtime = await startApplication({ ...profile, database: target }, 8002)
+            console.log(JSON.stringify({ servingManagementCopy: true, url: 'http://127.0.0.1:8002', frontend: 'http://127.0.0.1:5174' }))
+            process.once('SIGINT', async () => { await runtime.close(); process.exit(0) })
+            return
+        }
+        if (action === 'validatemanagement') {
+            try {
+                const report = await require('./isolated-management').validate({ profile, root, verifyServer, database, startApplication, browser,
+                    progress(stage) { phase = 'management-' + stage; console.log(JSON.stringify({ phase })) } })
+                console.log(JSON.stringify(report))
+            } catch (error) {
+                const line = error.stack?.match(/isolated-management\.js:(\d+):/)?.[1] || 'UNKNOWN'
+                throw Object.assign(new Error('Management copy validation failed'), { code: 'MANAGEMENT_COPY_FAILED_AT_' + line })
+            }
+            return
+        }
+        if (action === 'reconcilereviewed') {
+            phase = 'reviewed-reconciliation'
+            const report = await require('./isolated-reconcile').reconcile({ profile, root, verifyServer,
+                connectApplication: selected => mysql.createConnection(connection(selected, 'application', selected.database)),
+                startApplication, browser, secret: process.env.SESSION_SECRET,
+                reviewReportName: process.env.EVAL_RECONCILE_REVIEW_REPORT,
+                recoveryReportName: process.env.EVAL_RECONCILE_RECOVERY_REPORT,
+                confirmedMap: process.env.EVAL_RECONCILE_CONFIRMED_MAP,
+                progress(stage) { phase = 'reconcile-' + stage; console.log(JSON.stringify({ phase })) }
+            })
+            console.log(JSON.stringify(report))
+            return
+        }
         if (action === 'validatelinks') {
             const report = await require('./isolated-record-links').apply({
                 profile, root, verifyServer, database, startApplication, browser, validateAuthentication,
@@ -428,6 +497,10 @@ async function main() {
             return
         }
         if (action === 'serve') {
+            const [completed] = await root.query('SELECT name FROM ??.migrations ORDER BY name', [profile.database])
+            if (completed.length !== 13 || completed.at(-1).name !== '20261027000100_add_management_departments.js') {
+                throw Object.assign(new Error('The source management transition is pending.'), { code: 'SOURCE_MANAGEMENT_MIGRATION_PENDING' })
+            }
             const [marker] = await root.query('SELECT profile_id FROM ??.isolation_marker', [profile.database])
             assert.equal(marker[0]?.profile_id, profile.id)
             const runtime = await startApplication(profile, 8001)
@@ -456,7 +529,7 @@ if (require.main === module) main().catch(error => {
         ...(typeof error.expected === 'number' && typeof error.actual === 'number' ? { expectedStatus: error.expected, actualStatus: error.actual } : {}) }))
     process.exitCode = 1
 }).finally(async () => {
-    if (process.argv[2] === 'serve' && !process.exitCode) return
+    if (['serve', 'servemanagementcopy'].includes(process.argv[2]) && !process.exitCode) return
     for (const server of servers) await new Promise(resolve => { server.closeAllConnections(); server.close(resolve) })
     for (const db of pools) await db.destroy().catch(() => {})
 })

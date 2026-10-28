@@ -20,8 +20,8 @@ test('a current assignment transfers all linked history and revokes previous-own
     for (const url of ['/registros', '/registros2?page=1&limit=100']) {
         assert.deepEqual((await previous.request('GET', url)).json().map(row => row.id), [1, 3])
     }
-    // Fixture-only reassignment. No public editing endpoint or real database.
-    app.state.tables.colab[0].demandante = 'other@example.invalid'
+    // Fixture-only department reassignment; no real database.
+    app.state.tables.gerencias[0].demandante_id = 3
     for (const url of ['/registros?demandante=' + email, '/registros2?page=1&limit=100']) {
         assert.deepEqual((await previous.request('GET', url)).json(), [])
         const rows = (await current.request('GET', url)).json()
@@ -43,11 +43,11 @@ test('a current assignment transfers all linked history and revokes previous-own
     assert.deepEqual(app.state.tables.registros, snapshots)
     assert.equal(app.state.writes.length, 0)
 
-    app.state.tables.colab[0].demandante = email
+    app.state.tables.gerencias[0].demandante_id = 2
     assert.equal((await previous.request('GET', '/registros/1')).status, 200)
     assert.equal((await current.request('GET', '/registros/1')).status, 404)
     app.state.tables.users2[1].admin = 1
-    app.state.tables.colab[0].demandante = 'other@example.invalid'
+    app.state.tables.gerencias[0].demandante_id = 3
     assert.equal((await previous.request('GET', '/registros/1')).status, 200)
 })
 
@@ -66,7 +66,7 @@ test('namesakes with different owners never cross record scopes even if author e
 
 test('ID selection disambiguates authorized namesakes while legacy ambiguous names return 409 on both write paths', async t => {
     const app = await harness(t)
-    app.state.tables.colab.push({ id: 3, colab: 'Profissional A', demandante: email })
+    app.state.tables.colab.push({ id: 3, colab: 'Profissional A', gerencia_id: 1, deletedAt: null, demandante: email })
     const reviewer = app.client(); await reviewer.login()
     const headers = { 'X-CSRF-Token': await reviewer.csrf() }
     for (const url of ['/registros', '/registros2']) {
@@ -113,27 +113,26 @@ test('invalid, unauthorized, nonexistent and stale ID selections never fall back
     assert.equal(app.state.writes.length, 0)
 })
 
-test('current owner is read from colab on every request, using the existing exact canonical email policy', async t => {
+test('current owner is read by department/account ID on every request, without trusting legacy email text', async t => {
     const app = await harness(t)
     const reviewer = app.client(); await reviewer.login()
     for (const demandante of [email.toUpperCase(), email + ' ', 'missing@example.invalid']) {
         app.state.tables.colab[0].demandante = demandante
-        assert.deepEqual((await reviewer.request('GET', '/registros')).json(), [])
-        assert.equal((await reviewer.request('GET', '/registros/1')).status, 404)
+        assert.equal((await reviewer.request('GET', '/registros/1')).status, 200)
     }
-    app.state.tables.colab[0].demandante = email
-    assert.equal((await reviewer.request('GET', '/registros/1')).status, 200)
+    app.state.tables.colab[0].gerencia_id = null
+    assert.equal((await reviewer.request('GET', '/registros/1')).status, 404)
 })
 
 test('MySQL history scope is a parameterized ID subquery applied before pagination, without author/name fallback', async () => {
     const db = knex({ client: 'mysql' })
     db.client.acquireConnection = () => assert.fail('No SQL connection allowed')
     try {
-        const query = scopeRecords(db, db('registros').select('id', 'colab_id', 'demandante'), { email, admin: false })
+        const query = scopeRecords(db, db('registros').select('id', 'colab_id', 'demandante'), { id: 2, email, admin: false })
             .orderBy('id').limit(25).offset(25).toSQL()
-        assert.match(query.sql, /`colab_id` in \(select `id` from `colab` where BINARY `demandante` = \?\)/)
+        assert.match(query.sql, /`gerencia_id` in \(select `id` from `gerencias` where `demandante_id` = \?\)/)
         assert.ok(query.sql.indexOf('where') < query.sql.indexOf('limit'))
-        assert.deepEqual(query.bindings, [email, 25, 25])
+        assert.deepEqual(query.bindings, [2, 25, 25])
         assert.doesNotMatch(query.sql, /`colab` =| or /i)
         assert.doesNotMatch(scopeRecords(db, db('registros'), { admin: true }).toSQL().sql, /where|colab_id/)
         assert.throws(() => scopeRecords(db, db('registros')), /Authentication/)

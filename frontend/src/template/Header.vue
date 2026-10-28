@@ -49,7 +49,7 @@
 
                 <div :class="{ hidden: !menuOpen }" class="w-full md:block md:w-auto" id="navbar-default">
                     <ul
-                        class="text-sm flex flex-col p-4 md:p-0 mt-4 border  text-white border-gray-100 rounded-lg md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0">
+                        class="text-sm flex flex-col p-4 md:p-0 mt-4 border text-white border-gray-100 rounded-lg md:flex-row md:flex-wrap md:gap-x-6 md:gap-y-3 md:mt-0 md:border-0">
                         <li>
                             <router-link to="/"
                                 class="block py-2 px-3 rounded-sm md:bg-transparent md:p-0 hover:text-yellow-200"
@@ -73,6 +73,12 @@
                                 <!-- class="block py-2 px-3 text-white rounded-sm hover:bg-blue-900  md:border-0 md:hover:text-yellow-200 md:p-0  "> -->
                                 Lista de profissionais
                             </router-link>
+                        </li>
+                        <li v-if="auth.user?.admin">
+                            <router-link to="/demandantes" class="block py-2 px-3 md:p-0 hover:text-yellow-200">Demandantes</router-link>
+                        </li>
+                        <li v-if="auth.user?.admin">
+                            <router-link to="/gerencias" class="block py-2 px-3 md:p-0 hover:text-yellow-200">Gerências</router-link>
                         </li>
                         <li v-if="auth.user?.admin">
                             <router-link to="/inserir"

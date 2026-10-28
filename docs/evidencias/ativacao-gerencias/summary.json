@@ -1,0 +1,78 @@
+{
+  "completedUtc": "2026-10-28T00:33:49.590Z",
+  "scope": "explicitly approved activation on the existing isolated fictional MySQL source only",
+  "success": true,
+  "sourceActivationApproved": true,
+  "userMapChoice": 1,
+  "map": "G01:P01,P02:D02",
+  "departmentName": "Gerência de Testes",
+  "owner": "existing current evaluator",
+  "sourceMigrations": 13,
+  "departmentsCreated": 1,
+  "professionalsAssigned": 2,
+  "evaluationsPreserved": 8,
+  "accountsUnchanged": true,
+  "legacyProfessionalFieldsPreserved": true,
+  "allEvaluationFieldsPreservedAfterBrowserCheck": true,
+  "sourceSchemaApplied": true,
+  "sourceMapApplied": true,
+  "copyVerifiedBeforeSource": true,
+  "approvedMapArtifact": "department-map-approved-da2479e94559.evalinventory",
+  "reviewArtifact": "department-map-review-16f12bae727d.evalinventory",
+  "manifest": "management-activation-manifest-38219e46b984.evalinventory",
+  "applicationReport": "management-activation-report-38219e46b984.json",
+  "freshBackup": {
+    "artifact": "backup-49892036b2c4.evalbackup",
+    "report": "recovery-report-49892036b2c4.json",
+    "tablesCompared": 8,
+    "rowsCompared": 46,
+    "ddlAndContentsMatch": true,
+    "sourceUnchangedBeforeActivation": true,
+    "recoveredAdminAndEvaluatorLogin": true
+  },
+  "copyHttpAndSourceHttp": {
+    "anonymousDenied": true,
+    "twoProfessionalsVisible": true,
+    "eightEvaluationsVisible": true,
+    "currentDepartmentAndOwnerDerived": true,
+    "originalAuthorshipPreserved": true
+  },
+  "validation": {
+    "tests": 176,
+    "passed": 176,
+    "failed": 0,
+    "skipped": 0,
+    "newActivationTests": 6,
+    "sourceChromeChecks": 9,
+    "sourceChromeJavascriptErrors": 0,
+    "sourceBrowserBusinessWrites": false,
+    "finalReadOnlySourceComparison": true,
+    "frontendUnchangedDuringActivation": true,
+    "previousImplementationMockChromeChecks": 72,
+    "previousImplementationDevelopmentBuildPassed": true,
+    "powershellSyntaxErrors": 0
+  },
+  "initialAttempt": {
+    "failedBeforeSourceAttempt": true,
+    "reason": "migration account lacked DDL privileges on the new recovery copy",
+    "sourceAndCopyStayedAtBaseline12": true,
+    "fixedWithCopyScopedGrant": true,
+    "failureCheckpointPreserved": "management-activation-report-3e86ebe842ab.json"
+  },
+  "services": {
+    "mainFrontend": "http://localhost:5173",
+    "mainApi": "http://localhost:8001",
+    "mainFrontendHttp": 200,
+    "mainAnonymousSessionHttp": 401,
+    "mainApiRestartedWithSchema13": true,
+    "oldPreviewProcessesStopped": true,
+    "previewCopyDataPreserved": true
+  },
+  "smtpDelivery": false,
+  "newAccountsCreatedOnSource": false,
+  "limitations": [
+    "The explicit choice grants the current evaluator access to professional B as well as A.",
+    "Other environments, production, another-host recovery, commit, push and deployment were not authorized or performed.",
+    "DDL is not reversed automatically; retained encrypted backup and protected manifests are required for a separately reviewed recovery."
+  ]
+}

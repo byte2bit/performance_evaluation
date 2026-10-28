@@ -10,7 +10,9 @@ Este é um **único sistema full stack já existente**, desenvolvido manualmente
 
 **Banco de dados:** MySQL.
 
-**Estado da autenticação:** login por Passport Local e sessões está **implementado e validado em MySQL 8.0.44 isolado, com contas fictícias**. As 12 migrations passaram nesse alvo autorizado, incluindo vínculo por ID e histórico do demandante atual; oito avaliações legadas permanecem sem vínculo até conciliação revisada. Segredos locais estão fora do repositório. Configuração e ativação de produção permanecem pendentes. A presença do Passport nas dependências não comprova que outro ambiente esteja habilitado.
+**Gestão por gerências:** modelo confirmado de um demandante por gerência, várias gerências por demandante e uma gerência por profissional. Após autorização e mapa explícito, a **13ª migration foi aplicada no perfil MySQL isolado original**, com validação prévia em cópia. Os dois profissionais fictícios pertencem à **Gerência de Testes**, com o avaliador atual como demandante; oito avaliações, contas e demais campos foram preservados. Aplicação principal ativa em localhost:5173/8001. Outros mapas/alvos exigem aprovação própria. Evidências em `docs/PLANO_GESTAO_GERENCIAS.md`.
+
+**Estado da autenticação:** login por Passport Local e sessões está **implementado e validado em MySQL 8.0.44 isolado, com contas fictícias**. As 13 migrations passaram nesse alvo autorizado, incluindo vínculo por ID e histórico pelo demandante atual da gerência. As oito avaliações legadas foram conciliadas por mapa revisado e confirmado somente nesse perfil fictício, após backup e validação em cópia; ver `docs/REVISAO_CONCILIACAO.md`. Segredos locais estão fora do repositório. Configuração e ativação de produção permanecem pendentes. A presença do Passport nas dependências não comprova que outro ambiente esteja habilitado.
 
 **Vhost:** é utilizado dentro de um único sistema. Descubra sua finalidade, os hosts atendidos e suas dependências pelo código. **Não presuma** que exista uma arquitetura multi-tenant, SSO ou múltiplos sistemas independentes.
 

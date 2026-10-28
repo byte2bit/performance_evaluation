@@ -1,4 +1,4 @@
-const { scope, isAdmin } = require('./auth/identity')
+const { scope, isAdmin, active, normalizeEmail } = require('./auth/identity')
 const validation = require('./business-validation')
 
 const fields = ['colab', 'colab_id', 'avaliacao', 'nivel', 'desconto', 'demandante', 'liderancas',
@@ -7,7 +7,7 @@ const fields = ['colab', 'colab_id', 'avaliacao', 'nivel', 'desconto', 'demandan
 function scopeRecords(db, query, user) {
     if (!user) throw Object.assign(new Error('Authentication required'), { status: 401 })
     // Author snapshots never grant access. NULL/unreconciled links are admin-only.
-    return isAdmin(user) ? query : query.whereIn('colab_id', scope(db('colab').select('id'), user))
+    return isAdmin(user) ? query : query.whereIn('colab_id', scope(db('colab').select('id'), user, db))
 }
 
 function createRecords(db, { paginated = false } = {}) {
@@ -36,17 +36,22 @@ function createRecords(db, { paginated = false } = {}) {
         if (!record) return res.status(400).send('Dados de avaliação inválidos.')
         try {
             const saved = await db.transaction(async trx => {
+                const actor = await trx('users2').where({ id: req.user.id }).forShare().first()
+                if (!active(actor) || actor.session_version !== req.user.session_version) return 403
                 const byId = Object.hasOwn(record, 'colab_id')
-                const candidates = await scope(trx('colab').select('id', 'colab')
-                    .where(byId ? { id: record.colab_id } : { colab: record.colab }), req.user)
-                    .forShare().limit(2)
+                const candidates = await scope(trx('colab').select('id', 'colab', 'gerencia_id')
+                    .whereNull('deletedAt').where(byId ? { id: record.colab_id } : { colab: record.colab }), actor, trx).limit(2)
                 if (!candidates.length) return 403
                 if (candidates.length !== 1) return 409
-                const professional = candidates[0]
+                const selected = candidates[0]
+                const department = await trx('gerencias').where({ id: selected.gerencia_id }).whereNull('deletedAt').forShare().first()
+                if (!department || (!isAdmin(actor) && department.demandante_id !== actor.id)) return 403
+                const professional = await trx('colab').select('id', 'colab', 'gerencia_id', 'deletedAt').where({ id: selected.id }).forShare().first()
+                if (!professional || professional.deletedAt != null || professional.gerencia_id !== department.id) return 403
                 if (byId && professional.colab !== record.colab) return 409
                 record.colab_id = professional.id
                 record.colab = professional.colab
-                record.demandante = req.user.email
+                record.demandante = normalizeEmail(actor.email)
                 await trx('registros').insert(record)
                 return 204
             })

@@ -1,5 +1,7 @@
 # Backend — API de avaliação de desempenho
 
+**Estado atual:** gestão por gerências ativada no perfil MySQL isolado original, com 13 migrations, após mapa explícito, backup e validação na cópia. API principal retomada em localhost:8001; os dois profissionais pertencem à Gerência de Testes do avaliador atual, preservando as oito avaliações. Outros ambientes não foram ativados. [Modelo, endpoints, concorrência e evidências](../docs/PLANO_GESTAO_GERENCIAS.md).
+
 API Express do [Sistema de Avaliação de Desempenho](../README.md), com Knex/MySQL, autenticação por Passport Local e sessões persistentes. Implementa as regras de acesso e validação usadas pela interface Vue.
 
 ## Funcionalidades e acesso
@@ -108,4 +110,6 @@ O perfil temporário e seu relatório são preservados para inspeção; os proce
 
 As ações `Validate`, `RecoveryTest` e `VisualReview` são opt-in. `Validate` grava fixtures e pode aplicar migrations no perfil isolado; `RecoveryTest` cria backup criptografado e schema de restauração. Elas não são consultas somente leitura. Leia [AMBIENTE_ISOLADO.md](../docs/AMBIENTE_ISOLADO.md), [BACKUP_RESTAURACAO.md](../docs/BACKUP_RESTAURACAO.md) e [REVISAO_VISUAL.md](../docs/REVISAO_VISUAL.md) antes de executar.
 
-Recuperação de senha por e-mail, purga de expirados, vínculos legados e configuração operacional permanecem pendentes. Acompanhe [PLANO_EVOLUCAO.md](../docs/PLANO_EVOLUCAO.md) e [DEPENDENCIAS_SEGURANCA.md](../docs/DEPENDENCIAS_SEGURANCA.md).
+`Inventory` é somente leitura no MySQL e grava detalhe criptografado externo. `ReconcileReviewed` é uma operação de escrita específica do mapa confirmado R01–R08 → P01: os oito vínculos já foram aplicados no perfil fictício, após backup/cópia e testes. Não repetir o lote, inferir novos mapas ou usar `ValidateLinks` no schema com 12 migrations. [Autorização, comandos históricos e evidências](../docs/REVISAO_CONCILIACAO.md#aplicação-confirmada-e-executada).
+
+Recuperação de senha por e-mail, purga de expirados, revisão de dados em outros alvos e configuração operacional permanecem pendentes. Acompanhe [PLANO_EVOLUCAO.md](../docs/PLANO_EVOLUCAO.md) e [DEPENDENCIAS_SEGURANCA.md](../docs/DEPENDENCIAS_SEGURANCA.md).

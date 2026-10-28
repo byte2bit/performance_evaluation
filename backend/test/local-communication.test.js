@@ -188,6 +188,7 @@ test('professional registration sends its payload to /colab using the shared cli
     let notified = false
     component.methods.save.call({
         postData: payload,
+        selectedDepartment: { id: 1 }, loading: false, saving: false, loadError: '',
         reset() { reset = true },
         notify() { notified = true }
     })

@@ -1,6 +1,10 @@
 # Vínculo por ID e histórico do demandante atual
 
+**Evolução do modelo em 27/10/2026:** usuário confirmou atribuição por gerência: um responsável por gerência, várias gerências por demandante, uma gerência por profissional. Após cópia e mapa explícito, a **origem isolada recebeu a migration 13** e a Gerência de Testes foi atribuída ao avaliador atual, incluindo ambos os profissionais. Oito avaliações e autoria preservadas. [Novo modelo, testes e ativação](PLANO_GESTAO_GERENCIAS.md#ativação-autorizada-na-origem). O restante deste documento registra o modelo/transições anteriores.
+
 Modelo aprovado e implementado localmente em **26/10/2026**, inicialmente com autorização apenas para escrever a migration. Depois, o usuário solicitou **aplicar a pendência**, autorizando backup/cópia, aplicação e validação no perfil MySQL isolado documentado. A **12ª migration está aplicada nesse alvo**, com dados fictícios; nenhum outro ambiente ou SMTP real foi usado. A decisão inicial de manter acesso com o autor foi substituída explicitamente pela regra abaixo.
+
+**Estado atual em 27/10/2026:** após inventário, revisão e confirmação específica, os oito vínculos R01–R08 → P01 foram aplicados nesse perfil fictício com backup atual e testes na cópia antes da origem. Oito avaliações vinculadas, nenhuma sem vínculo/órfã; demais campos/contas/profissionais preservados. **152 testes aprovados** e leitura real confirmada para avaliador atual/administrador. Relatos abaixo sobre vínculos nulos registram estados anteriores, não a situação atual. [Aplicação, evidências e limites](REVISAO_CONCILIACAO.md#aplicação-confirmada-e-executada).
 
 ## Regra de acesso
 
@@ -100,3 +104,36 @@ Depois, somente a 12ª migration foi aplicada na origem, em 280 ms no conjunto f
 Suíte padrão final: **127 testes aprovados**, zero falhas/skips, incluindo quatro novos testes das barreiras do runner SQL. Não houve novo build/Chrome, pois a interface não mudou nesta etapa; o build de implementação anterior permanece aprovado. Zero arquivos temporários de credenciais remanescentes. A instância iniciada pela tarefa foi encerrada ao final, retornando ao estado parado anterior, com dados/migration persistidos. Não houve commit, push, deploy ou envio real de e-mail.
 
 [Relatório SQL sanitizado](evidencias/vinculos-demandante-atual/mysql-validation-report.json). A próxima etapa é revisar a conciliação dos registros legados, sem inferir identidade pelo nome/e-mail do autor.
+
+## Inventário somente leitura aprovado — 27/10/2026
+
+O primeiro lote de conciliação foi aprovado e executado, limitado a implementar/testar o inventário e consultar o perfil fictício existente. Isso não autoriza aplicar associações, provisionar contas ou corrigir atribuições. A proposta de aplicação permanece uma etapa posterior.
+
+`backend/scripts/isolated-inventory.js`, acionado por `Inventory` no launcher, usa conexão dedicada da conta SQL da aplicação, sem abrir conexão root nessa ação. Verifica perfil externo, servidor/diretório/porta/UUID/bind, schema selecionado, marcador exclusivo, tabelas InnoDB, lista exata das 12 migrations e tipo/nulabilidade de `colab_id`. Usa `REPEATABLE READ` e `START TRANSACTION WITH CONSISTENT SNAPSHOT, READ ONLY`, terminando com `ROLLBACK`, inclusive em falhas de leitura. Não executa DML/DDL, login, inicialização da aplicação ou SMTP. O módulo de identidade importado é puro; nenhum `.env`, `index.js` ou `knexfile.js` é carregado.
+
+Os candidatos e grupos duplicados são consultados segundo a collation MySQL, com indicação separada das diferenças textuais exatas. A autoria não seleciona candidatos. A análise de e-mail normalizado serve apenas para diagnóstico; nenhum dado é normalizado no banco nem usado para ampliar permissões. O inventário recusa resultados acima de 10 mil linhas por consulta e se destina somente ao conjunto isolado pequeno. O snapshot de dados não substitui controle operacional contra DDL concorrente; não alterar schema durante a execução.
+
+Com o MySQL isolado já iniciado:
+
+```powershell
+$perfilAvaliacao = Join-Path $env:LOCALAPPDATA 'EvaluationDev/mysql-isolated-0f8785e64029'
+./backend/scripts/isolated-mysql.ps1 -Action Inventory -ProfileDirectory $perfilAvaliacao
+```
+
+A ação não inicia/para serviços. A API existente pode permanecer ativa: são leituras consistentes sem locks de escrita explícitos. A saída contém apenas contagens, versão, número de migrations e basename do artefato. Falhas não imprimem SQL, stack, diferenças de assertions ou linhas privadas. Não executar `Validate` ou `ValidateLinks` como substitutos.
+
+O detalhe selecionado contém IDs, nomes, matrículas, autor/datas dos registros sem vínculo e diagnósticos de atribuição; não consulta hashes, senhas, observações ou notas. É gravado exclusivamente em `inventory-<id>.evalinventory` no perfil externo, com criação exclusiva, sem versão em texto puro. Usa AES-256-GCM e chave HKDF-SHA256 derivada do segredo de sessão existente, com contexto exclusivo de inventário e salt do perfil. A identidade de perfil/schema/artefato é autenticada. Nenhum segredo ou cofre é alterado. `decryptDetails` permite futura revisão em memória, sem comando que imprima dados privados. A rotação/perda desse segredo impede abrir relatórios anteriores sem sua versão correspondente; o cofre DPAPI continua dependente da identidade Windows e este artefato não é backup do banco.
+
+Resultado em **27/10/2026 às 19:58, horário de São Paulo**: MySQL 8.0.44, 12 migrations, collation das tabelas consultadas `utf8mb4_0900_ai_ci`. Oito avaliações, dois profissionais e duas contas. Todos os oito vínculos permanecem nulos e cada avaliação tem um candidato pelo nome; não há candidatos múltiplos, pares apenas equivalentes por collation, nomes/matrículas duplicados ou vínculos órfãos no snapshot. Os dois profissionais estão sem matrícula e uma atribuição não encontra conta correspondente. Esses resultados não comprovam identidade histórica nem autorizam vinculação automática.
+
+Artefato protegido: `inventory-c9ef67f5d8ab.evalinventory`. A releitura/descriptografia autenticada do arquivo persistido foi executada em memória, confirmando as contagens sem exibir dados privados. Apenas o [resumo sanitizado](evidencias/inventario-conciliacao/summary.json) está no repositório.
+
+Validação executada: **141/141 testes**, zero falhas/skips, incluindo 11 novos testes de escopo/servidor/schema/marcador/migrations/engine/coluna, snapshot somente leitura, falha/limite de leitura, candidatos por collation, atribuições, criptografia e sanitização. Parser PowerShell: zero erros. Não houve novas dependências, migrations, escrita SQL, alteração do frontend, build/Chrome novo, envio de e-mail, commit/push ou deploy. Os serviços locais foram preservados.
+
+Próximo lote: revisar evidências para cada associação e resolver por decisão explícita o cadastro sem conta. Ausência de matrícula e candidato único por nome continuam limitações. Casos sem evidência permanecem nulos/administrativos. Qualquer aplicação exige aprovação específica, backup atual e validação em cópia; não reutilizar o runner da transição 11→12.
+
+## Revisão posterior das propostas
+
+Após novo pedido para prosseguir, a revisão somente leitura confirmou igualdade dos campos inventariados e propôs R01–R08 → P01 (Profissional fictício A), ainda aguardando confirmação. O cadastro sem conta corresponde a P02 (Profissional fictício B), coerente com o controle negativo do runner, sem participação nas propostas. Não houve associação, alteração de atribuição ou provisionamento. A revisão individual protegida foi autenticada e preservada; evidências, limitações e plano de aplicação ainda não autorizado em [REVISAO_CONCILIACAO.md](REVISAO_CONCILIACAO.md).
+
+Essa confirmação foi posteriormente recebida e a aplicação concluída, conforme o estado atual no topo e o resultado no guia de revisão. O artefato original da revisão continua imutável; o manifesto criptografado separado registra o mapa confirmado, os valores anteriores e a identidade do backup. Não repetir o lote aplicado nem reaproveitar sua autorização para outros mapas/alvos.

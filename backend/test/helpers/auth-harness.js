@@ -21,7 +21,8 @@ function database() {
                 { id: 4, name: 'Conta inativa', email: 'inactive@example.invalid', admin: 1, active: 0, deletedAt: null, session_version: 0, password: 'hash:' + password },
                 { id: 5, name: 'Conta excluída', email: 'deleted@example.invalid', admin: 1, active: 1, deletedAt: 'synthetic-date', session_version: 0, password: 'hash:' + password }
             ],
-            colab: [{ id: 1, colab: 'Profissional A', demandante: email }, { id: 2, colab: 'Profissional B', demandante: 'other@example.invalid' }],
+            gerencias: [{ id: 1, nome: 'Gerência A', demandante_id: 2, deletedAt: null }, { id: 2, nome: 'Gerência B', demandante_id: 3, deletedAt: null }],
+            colab: [{ id: 1, colab: 'Profissional A', gerencia_id: 1, deletedAt: null, demandante: email }, { id: 2, colab: 'Profissional B', gerencia_id: 2, deletedAt: null, demandante: 'other@example.invalid' }],
             registros: [{ id: 1, colab_id: 1, colab: 'Profissional A', demandante: email }, { id: 2, colab_id: 2, colab: 'Profissional B', demandante: 'other@example.invalid' }]
         }
     }
@@ -49,7 +50,7 @@ function database() {
             },
             whereNull(key) { predicates.push(row => row[key] == null); return this },
             whereIn(key, subquery) {
-                predicates.push(row => row[key] != null && subquery.fixtureRows().some(candidate => candidate.id === row[key]))
+                predicates.push(row => row[key] != null && (Array.isArray(subquery) ? subquery.includes(row[key]) : subquery.fixtureRows().some(candidate => candidate.id === row[key])))
                 return this
             },
             whereRaw(sql, bindings) {
@@ -62,11 +63,13 @@ function database() {
             fixtureRows() { return result() },
             then(resolve, reject) { return Promise.resolve(result()).then(resolve, reject) },
             async insert(value) {
+                if (table === 'users2' && state.tables.users2.some(row => row.email.toLowerCase() === value.email.toLowerCase())) throw { code: 'ER_DUP_ENTRY' }
                 const row = { id: state.tables[table].length + 1, ...value }
                 state.tables[table].push(row); state.writes.push({ table, action: 'insert' }); return [row.id]
             },
             async update(values) {
                 const rows = selected()
+                if (table === 'users2' && values.email && state.tables.users2.some(row => !rows.includes(row) && row.email.toLowerCase() === values.email.toLowerCase())) throw { code: 'ER_DUP_ENTRY' }
                 for (const row of rows) for (const [key, value] of Object.entries(values)) row[key] = value?.increment ? row[key] + 1 : value
                 state.writes.push({ table, action: 'update' }); return rows.length
             },
@@ -77,7 +80,11 @@ function database() {
         }
         return query
     }
-    db.transaction = callback => callback(db)
+    db.transaction = async callback => {
+        const before = structuredClone(state.tables), writes = state.writes.length
+        try { return await callback(db) }
+        catch (error) { state.tables = before; state.writes.length = writes; throw error }
+    }
     db.raw = sql => { assert.equal(sql, 'session_version + 1'); return { increment: true } }
     return { db, state }
 }
@@ -85,8 +92,9 @@ function database() {
 async function harness(t, { authConfig = config() } = {}) {
     const { db, state } = database()
     const store = new MemoryStore() // Tests only. Runtime always uses the SQL store.
+    const passwords = { async hash(value) { return 'hash:' + value }, async verify(hash, value) { return hash === 'hash:' + value } }
     const auth = createAuth({ db, config: authConfig, store, now: () => state.now,
-        passwords: { async hash(value) { return 'hash:' + value }, async verify(hash, value) { return hash === 'hash:' + value } },
+        passwords,
         limit: kind => (req, res, next) => {
             const status = state.limits[kind]
             return status ? res.status(status).send('synthetic limit/service response') : next()
@@ -95,6 +103,7 @@ async function harness(t, { authConfig = config() } = {}) {
     const app = express()
     app.config = { passport: auth }
     app.api = {
+        management: require('../../lib/management').createManagement(db, passwords),
         auth: auth.handlers, user: require('../../api/user')(Object.assign(app, { db })),
         registros: require('../../api/registros')(app),
         mail: { mail(req, res) { state.mails++; res.status(204).end() } },

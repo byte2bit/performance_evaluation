@@ -1,0 +1,47 @@
+{
+  "completedUtc": "2026-10-27T22:58:37.172Z",
+  "scope": "existing isolated fictional MySQL profile only",
+  "success": true,
+  "mysqlVersion": "8.0.44",
+  "migrationCount": 12,
+  "tableCollations": ["utf8mb4_0900_ai_ci"],
+  "readOnlyTransaction": true,
+  "automaticBackfill": false,
+  "persistedArtifactAuthenticated": true,
+  "encryptedArtifact": "inventory-c9ef67f5d8ab.evalinventory",
+  "counts": {
+    "records": 8,
+    "professionals": 2,
+    "accounts": 2,
+    "unlinkedRecords": 8,
+    "linkedRecords": 0,
+    "orphanedLinks": 0,
+    "unlinkedWithoutCandidates": 0,
+    "unlinkedWithOneCandidate": 8,
+    "unlinkedWithMultipleCandidates": 0,
+    "collationOnlyCandidatePairs": 0,
+    "duplicateNameGroups": 0,
+    "duplicateRegistrationGroups": 0,
+    "missingRegistrations": 2,
+    "assignmentsWithIssues": 1,
+    "nonCanonicalAssignments": 0,
+    "assignmentsWithoutAccount": 1,
+    "assignmentsWithoutActiveExactAccount": 1,
+    "nonCanonicalAccountEmails": 0
+  },
+  "validation": {
+    "command": "node --test backend/test/*.test.js frontend/test/*.test.js",
+    "tests": 141,
+    "passed": 141,
+    "failed": 0,
+    "skipped": 0,
+    "newInventoryTests": 11,
+    "powershellSyntaxErrors": 0
+  },
+  "limitations": [
+    "Name candidates are not proof of historical identity; every decision remains pending review.",
+    "No SQL writes, migrations, account provisioning, SMTP, commit, push or deployment were performed.",
+    "Protected details and keys remain outside Git; session secret rotation affects decryption of existing inventory artifacts.",
+    "The frontend and authentication model were not changed; build and browser checks were not repeated."
+  ]
+}

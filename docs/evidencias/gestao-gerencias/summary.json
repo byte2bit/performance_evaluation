@@ -1,0 +1,57 @@
+{
+  "completedUtc": "2026-10-27T23:51:04.707Z",
+  "scope": "management by departments, local implementation and isolated copy validation only",
+  "success": true,
+  "mysqlVersion": "8.0.44",
+  "sourceMigrations": 12,
+  "copyMigrations": 13,
+  "sourceDatabase": "evaluation_isolated_0f8785e64029_v2",
+  "copyDatabase": "evaluation_isolated_0f8785e64029_v2_mgmt_5e14e8056c25",
+  "encryptedBackup": "management-backup-5e14e8056c25.evalbackup",
+  "protectedReport": "management-report-5e14e8056c25.json",
+  "migrationAppliedOnlyToCopy": "20261027000100_add_management_departments.js",
+  "backupAuthenticated": true,
+  "restoredBusinessAndDdlMatch": true,
+  "sourceBusinessAndSchemaPreserved": true,
+  "noAutomaticSourceDepartmentAssignment": true,
+  "checks": {
+    "unassignedLegacyAdminOnly": true,
+    "explicitCopyFixtureAssignment": true,
+    "departmentTransferExistingSessions": true,
+    "renamePreservesHistoricalRows": true,
+    "concurrentTransferBlocksStaleWrite": true,
+    "archivePreservesHistoryAndBlocksWrites": true,
+    "accountEditsDeletionAndSessionRevocation": true,
+    "originalEvaluationRowsPreserved": true
+  },
+  "validation": {
+    "tests": 170,
+    "passed": 170,
+    "failed": 0,
+    "skipped": 0,
+    "newTests": 18,
+    "developmentBuild": true,
+    "newChromeGroups": 40,
+    "existingManagementChromeGroups": 32,
+    "javascriptPageErrors": 0,
+    "newBrowserRequestsFullyMocked": true,
+    "screenshotsInspected": true
+  },
+  "preview": {
+    "frontend": "http://127.0.0.1:5174",
+    "api": "http://127.0.0.1:8002",
+    "copyOnly": true,
+    "frontendHttp": 200,
+    "anonymousSessionHttp": 401,
+    "clientApiTargetVerified": true
+  },
+  "sourceActivationApproved": false,
+  "smtpDelivery": false,
+  "dependenciesInstalled": false,
+  "limitations": [
+    "Source migration and reviewed professional-to-department mapping require separate approval.",
+    "Do not restart the source API with the new code before schema/data activation.",
+    "The preview retains fictional test archives and a logically deleted test account.",
+    "No production, another-host recovery, deployment, commit or push was performed."
+  ]
+}

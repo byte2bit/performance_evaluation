@@ -1,5 +1,3 @@
-const { normalizeEmail } = require('./auth/identity')
-
 const has = (value, key) => Object.hasOwn(value, key)
 const object = value => value !== null && typeof value === 'object' && !Array.isArray(value) &&
     [Object.prototype, null].includes(Object.getPrototypeOf(value))
@@ -34,10 +32,10 @@ function pagination(query = {}) {
 
 function professional(body) {
     if (!object(body) || !text(body.colab, { required: true })) return null
-    const demandante = normalizeEmail(body.demandante)
-    if (!demandante) return null
-    const result = { colab: body.colab, demandante }
-    for (const field of ['matricula', 'ppu', 'servico', 'funcao', 'liderancas', 'gerencia']) {
+    const gerenciaId = id(body.gerencia_id)
+    if (gerenciaId === null) return null
+    const result = { colab: body.colab, gerencia_id: gerenciaId }
+    for (const field of ['matricula', 'ppu', 'servico', 'funcao', 'liderancas']) {
         if (!has(body, field)) continue
         if (!text(body[field], { nullable: true })) return null
         result[field] = body[field]

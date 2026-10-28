@@ -12,9 +12,9 @@ function publicUser(user) {
     return { id: user.id, name: user.name, email: normalizeEmail(user.email), admin: isAdmin(user) }
 }
 
-function scope(query, user) {
+function scope(query, user, db) {
     if (!user) throw Object.assign(new Error('Authentication required'), { status: 401 })
-    return isAdmin(user) ? query : query.whereRaw('BINARY ?? = ?', ['demandante', user.email])
+    return isAdmin(user) ? query : query.whereIn('gerencia_id', db('gerencias').select('id').where({ demandante_id: user.id }))
 }
 
 module.exports = { normalizeEmail, flag, active, isAdmin, publicUser, scope }

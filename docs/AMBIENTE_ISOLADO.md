@@ -1,6 +1,10 @@
 # MySQL isolado e autenticação local
 
+**Gestão por gerências ativada:** origem fictícia agora com 13 migrations e o mapa explícito aprovado: Gerência de Testes, ambos os profissionais, avaliador atual. Backup/restauração e cópia passaram antes da origem; oito avaliações/contas/demais campos preservados. Principal em `http://localhost:5173`, API `http://localhost:8001`, usando `Serve`. Prévia antiga encerrada, dados preservados. **176 testes** e nove verificações Chrome reais aprovados. [Modelo, backup e evidências](PLANO_GESTAO_GERENCIAS.md#ativação-autorizada-na-origem). Relatos inferiores de baseline 12 ou ativação pendente são históricos.
+
 Validado em 25/10/2026, com autorização para criar instância separada, aplicar migrations corretivas somente nela e provisionar contas fictícias. Nenhuma configuração, credencial ou dado de produção foi alterado. Nenhum e-mail foi enviado.
+
+**Estado atual em 27/10/2026:** as oito avaliações fictícias foram conciliadas pelo mapa revisado/confirmado R01–R08 → P01. Backup novo/restauração de 8 tabelas/46 registros, testes na cópia e revalidação precederam a transação na origem. Oito vinculados, nenhum sem vínculo/órfão, 12 migrations mantidas; demais campos/contas/profissionais preservados. API retomada e leitura dos oito confirmada para avaliador atual/administrador. **152 testes aprovados**. Relatos anteriores abaixo sobre vínculos nulos ou instância parada são históricos. [Resultado e artefatos](REVISAO_CONCILIACAO.md#aplicação-confirmada-e-executada).
 
 **Estado posterior em 26/10/2026:** após nova autorização, a **12ª migration foi aplicada e validada neste perfil isolado**, primeiro em cópia recuperada e depois no schema original. As oito avaliações anteriores foram preservadas com vínculo nulo; continuam administrativas até conciliação. A instância estava parada antes da tarefa e foi novamente encerrada ao final; API local não ficou em execução. Outros ambientes não foram alterados. [Modelo e evidências](PLANO_VINCULOS.md).
 

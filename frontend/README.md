@@ -14,14 +14,19 @@ Interface Vue 3 do [sistema de avaliação](../README.md), com Vite, Vue Router,
 | `/colabs` | Tabela de colaboradores com pesquisa, ordenação e confirmação de exclusão administrativa. | Autenticado |
 | `/excel` | Exportação dos registros em XLS. | Administrador |
 | `/checkall` | Exemplo auxiliar de seleção de checkboxes, incluindo selecionar todos. | Autenticado |
+| `/demandantes` | Cadastro de contas de demandantes, edição de nome/e-mail e exclusão lógica com revogação de sessões. | Administrador |
+| `/gerencias` | Cadastro/edição de gerências, transferência de demandante por seleção e arquivamento. | Administrador |
+| `/editar-profissional/:id` | Edição por ID, incluindo nome e transferência para outra gerência. | Administrador |
 
 O formulário calcula média, nível e desconto e permite notas em passos de 0,5. Qualidade e disponibilidade incluem critérios associados. **A submissão da avaliação permanece desativada**: seu formato persistente e a ativação do envio precisam de etapa própria. A API já possui endpoints de gravação, com regras descritas em [PLANO_VALIDACAO_API.md](../docs/PLANO_VALIDACAO_API.md).
 
 Administradores consultam todos os dados; o demandante atual recebe o histórico completo dos profissionais atualmente atribuídos à sua conta, inclusive avaliações de outros autores. O anterior perde acesso após a transferência. A coluna **Avaliador original** preserva a autoria; ela não filtra a lista. As guardas Vue controlam a navegação; a autorização efetiva é feita pelo backend.
 
-A seleção e o resumo usam IDs para distinguir homônimos, com matrícula ou identificador do cadastro quando necessário. O backend correspondente tem a 12ª migration validada no MySQL isolado; registros legados sem vínculo são administrativos até conciliação. Outros ambientes não foram habilitados. [Plano e limitações](../docs/PLANO_VINCULOS.md).
+A seleção e o resumo usam IDs para distinguir homônimos, com matrícula ou identificador do cadastro quando necessário. O backend correspondente tem a 12ª migration validada no MySQL isolado; suas oito avaliações fictícias foram conciliadas após revisão/confirmação e já são consultáveis pelo avaliador atual e administrador. Registros sem vínculo em outros alvos continuam administrativos até conciliação própria; esses ambientes não foram habilitados. [Revisão, resultado e limites](../docs/REVISAO_CONCILIACAO.md).
 
 ## Sessão e interface
+
+O código deriva a atribuição da gerência: conta por ID → gerências → profissionais. Em Inserir/Editar profissional, a gerência é selecionada e o demandante aparece automaticamente, somente leitura. Remover profissional arquiva e preserva seu histórico. **Fluxos ativos em `http://localhost:5173`**, API `http://localhost:8001`, após aplicar a 13ª migration e o mapa aprovado no MySQL isolado. Os dois profissionais pertencem à Gerência de Testes do avaliador atual. A prévia antiga foi encerrada, preservando seus dados de teste. [Guia e evidências](../docs/PLANO_GESTAO_GERENCIAS.md).
 
 - Sessão recebida da API, sem identidade fixa e sem JWT no navegador.
 - Axios com credenciais, token CSRF em memória e tratamento de sessão expirada.

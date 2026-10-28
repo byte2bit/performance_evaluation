@@ -26,6 +26,7 @@ function page(name, axios, identity = user) {
     const options = module.exports
     const instance = { ...options.data() }
     for (const [name, method] of Object.entries(options.methods)) instance[name] = method.bind(instance)
+    for (const [name, getter] of Object.entries(options.computed || {})) Object.defineProperty(instance, name, { get: getter.bind(instance) })
     return { instance, notifications }
 }
 
@@ -106,7 +107,9 @@ for (const success of [true, false]) {
         const { instance, notifications } = page('Inserir', {
             post(url, data) { assert.equal(url, '/colab'); submitted = { ...data }; return request.promise }
         })
-        Object.assign(instance.postData, { colab: 'Profissional fictício', matricula: 'TEST', demandante: user.email })
+        Object.assign(instance.postData, { colab: 'Profissional fictício', matricula: 'TEST', gerencia_id: 1 })
+        instance.loading = false
+        instance.gerencias = [{ id: 1, nome: 'Gerência fictícia', demandante: user.email, demandante_disponivel: true }]
         const snapshot = { ...instance.postData }
         const pending = instance.save()
         assert.deepEqual({ ...instance.postData }, snapshot)

@@ -1,12 +1,42 @@
 # Plano de evolução
 
-Atualizado em 26/10/2026. As prioridades do item 16 do AGENTS.md são critérios de ordenação; não significam aprovação automática de arquitetura, autenticação, contratos ou schema. O ponto de continuidade, ambiente local e próximo lote estão em [RETOMADA.md](RETOMADA.md).
+**Pausado pelo usuário em 28/10/2026**, com autorização para commit/push das alterações locais já desenvolvidas e preparação da retomada. Não prosseguir para a migration 14 sem retomada e aprovação do plano. Ver [RETOMADA.md](RETOMADA.md). Relatos inferiores sobre ausência de autorização para commit/push são históricos e não abrangem este envio solicitado.
+
+Atualizado em 27/10/2026. As prioridades do item 16 do AGENTS.md são critérios de ordenação; não significam aprovação automática de arquitetura, autenticação, contratos ou schema. O ponto de continuidade, ambiente local e próximo lote estão em [RETOMADA.md](RETOMADA.md).
+
+### Próximo reforço — profissional sempre com demandante
+
+Regra reafirmada pelo usuário: manter o vínculo por gerência para todos os profissionais, inclusive arquivados. Validações existentes conferidas e dois testes acrescentados: **178/178 aprovados**. [Plano revisável de migration 14, backup/cópia, impactos e aceitação](PLANO_GESTAO_GERENCIAS.md#vínculo-obrigatório-de-todo-profissional--reforço-pendente-de-aprovação). Necessita aprovação antes de implementar/executar a mudança de nulabilidade; origem permanece no baseline 13.
+
+### Estado atual — gestão por gerências ativada
+
+Ativação autorizada concluída no perfil fictício: usuário escolheu Gerência de Testes para ambos os profissionais, com o avaliador atual. Após backup/restauração atualizados e aplicação/HTTP na cópia, origem recebeu a 13ª migration e o mapa em transação. Uma gerência, dois profissionais e oito avaliações preservadas; contas/campos legados intactos. **176 testes** e nove grupos Chrome reais aprovados, mais comparação SQL final. Principal em localhost:5173/8001, prévia antiga encerrada. [Resultado e evidências](PLANO_GESTAO_GERENCIAS.md#ativação-autorizada-na-origem).
+
+Próximo escopo a definir: critérios/submissão, recuperação em outro host/proteção de chaves ou auditoria durável de alterações administrativas. Não repetir aplicadores de baseline 12, inferir novos mapas, executar down ou operar produção. Autorizações deste lote não abrangem novos mapas/alvos, commit/push, SMTP ou submissão de avaliações.
+
+### Histórico — preparação da ativação revisada
+
+Confirmado/implementado o modelo conta por ID → uma ou mais gerências → profissionais, com um responsável atual por gerência e uma gerência por profissional. CRUD administrativo e arquivamento, criação de avaliadores, seleção da gerência e responsável derivado. **170 testes, build, 72 grupos Chrome** e oito grupos reais MySQL/HTTP aprovados. Migration 13 aplicada **só em cópia**, com backup/restauração autenticados e origem/schema de negócio preservados. Prévia em 127.0.0.1:5174 / API :8002. [Guia e evidências](PLANO_GESTAO_GERENCIAS.md).
+
+Próximo lote depende de mapa revisado das gerências/contas/profissionais da origem e aprovação específica de schema/mapa/ativação. Não inferir vínculos de textos, reiniciar a API da origem com código novo antes da transição ou importar as fixtures da cópia. A origem continua com 12 migrations. Submissão e infraestrutura de produção seguem pendentes, sem ativação implícita.
+
+### Estado mais recente — conciliação confirmada e aplicada
+
+Mapa R01–R08 → P01 confirmado e aplicado no perfil fictício, após backup/restauração de 8 tabelas/46 registros e validação em cópia. **152 testes aprovados**, rollback dos oito updates, espera real por lock, replay recusado e HTTP reais na cópia; origem só atualizada após sucesso e revalidação. Oito vinculados, nenhum nulo/órfão, 12 migrations mantidas, demais campos/profissionais/contas preservados. API retomada, com leitura dos oito confirmada para avaliador atual/administrador na origem. P02 e matrículas ausentes inalterados. [Resultado e evidências](REVISAO_CONCILIACAO.md#aplicação-confirmada-e-executada).
+
+Próximas etapas: planejar persistência de critérios/submissão e recuperação em outro host/proteção de chaves, com escopo/prioridade definidos pelo usuário. A submissão continua desativada. Não repetir conciliação/ValidateLinks, inferir novos mapas, migrar outros alvos ou operar produção. Lote sem nova dependência/migration, build/Chrome, commit/push ou deploy.
+
+### Lote anterior — inventário somente leitura
+
+Primeiro lote de conciliação aprovado e concluído: ação `Inventory`, conexão da aplicação em transação `READ ONLY`, barreiras de identidade/schema/migrations e detalhe criptografado no perfil externo. **141 testes aprovados**, incluindo 11 novos; execução MySQL isolada e releitura autenticada do artefato aprovadas. Oito registros continuam sem vínculo, cada um com candidato único por nome. Dois profissionais sem matrícula; uma atribuição sem conta correspondente. Nenhuma associação, correção de atribuição ou conta foi aplicada. [Procedimento, evidências e limites](PLANO_VINCULOS.md#inventário-somente-leitura-aprovado--27102026).
+
+Revisão posterior concluída, com nova coleta `READ ONLY` igual nos campos inventariados: propostas R01–R08 → P01, coerentes com as fixtures. A atribuição sem conta pertence a P02, controle negativo do runner, e não integra as associações. O mapa foi posteriormente confirmado e aplicado conforme estado atual acima. A revisão inicial não alterou código nem repetiu os 141 testes; esse resultado foi sucedido pelos 152 do aplicador. Sem novas migrations, alterações de frontend ou autenticação; build/Chrome anteriores continuam históricos.
 
 ### Estado mais recente — interface, temas e checkpoint de continuidade
 
 Concluídas as revisões visuais de registros, profissionais, cadastro, página inicial e login, seguidas de alternância de tema persistida, dropdown da conta e modais padronizados. Última validação: **130 testes**, build development e **78 grupos Chrome com API simulada** aprovados. Contratos, autorização e envio de avaliações desativado preservados. Ver [REVISAO_PAGINAS_GESTAO.md](REVISAO_PAGINAS_GESTAO.md). O usuário solicitou guardar a continuidade e enviar este conjunto ao GitHub; próximos trabalhos continuam sujeitos ao escopo/autorização próprios.
 
-Próxima etapa proposta: planejar revisão/conciliação dos oito registros legados, sem associação automática nem nova migration. A execução do plano dependerá de aprovação. O estado dos serviços locais deve ser conferido na retomada; eles foram reabertos após o lote SQL.
+O inventário da revisão/conciliação foi posteriormente aprovado e executado, conforme o estado mais recente acima. Associações continuam pendentes de revisão e aprovação. O estado dos serviços locais deve ser conferido na retomada; eles foram reabertos após o lote SQL.
 
 ### Lote anterior — vínculo por ID e migration validados no MySQL isolado
 

@@ -27,14 +27,14 @@ test('evaluation classification preserves the existing boundary bands and fracti
 
 test('schema text limits count Unicode characters without truncation and preserve optional nulls', () => {
     const maximum = '😀'.repeat(255)
-    const person = validation.professional({ colab: maximum, demandante: ' Reviewer@Example.Invalid ', matricula: null })
-    assert.deepEqual(person, { colab: maximum, demandante: email, matricula: null })
+    const person = validation.professional({ colab: maximum, gerencia_id: '1', demandante: 'ignored@example.invalid', matricula: null })
+    assert.deepEqual(person, { colab: maximum, gerencia_id: 1, matricula: null })
     assert.equal(validation.evaluation(validEvaluation({ obs_qualidade: maximum })).obs_qualidade, maximum)
     assert.equal(validation.evaluation(validEvaluation({ obs_qualidade: maximum + 'x' })), null)
-    assert.equal(validation.professional({ colab: maximum + 'x', demandante: email }), null)
-    for (const field of ['matricula', 'ppu', 'servico', 'funcao', 'liderancas', 'gerencia']) {
+    assert.equal(validation.professional({ colab: maximum + 'x', gerencia_id: 1 }), null)
+    for (const field of ['matricula', 'ppu', 'servico', 'funcao', 'liderancas']) {
         for (const value of [false, 7, [], {}, maximum + 'x']) {
-            assert.equal(validation.professional({ colab: 'Fictício', demandante: email, [field]: value }), null)
+            assert.equal(validation.professional({ colab: 'Fictício', gerencia_id: 1, [field]: value }), null)
         }
     }
 })
@@ -123,7 +123,7 @@ test('professional validation and ID guards preserve valid statuses and protect 
     }
     assert.equal(app.state.writes.length, 0)
     assert.equal(app.state.tables.colab.length, originalRows)
-    const saved = await admin.request('POST', '/colab', { colab: 'Novo fictício', demandante: ' REVIEWER@EXAMPLE.INVALID ',
+    const saved = await admin.request('POST', '/colab', { colab: 'Novo fictício', gerencia_id: 1, demandante: ' REVIEWER@EXAMPLE.INVALID ',
         ppu: null, matricula: '123', id: 999, admin: true }, { 'X-CSRF-Token': token })
     assert.equal(saved.status, 204)
     const person = app.state.tables.colab.at(-1)

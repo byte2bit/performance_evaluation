@@ -1,6 +1,6 @@
 <template>
   <ManagementPage title="Lista de profissionais" description="Consulte os profissionais, suas áreas de atuação e os responsáveis.">
-    <template #actions><router-link v-if="identity.admin" to="/inserir" class="mp-button mp-button-primary"><span aria-hidden="true">+</span> Inserir profissional</router-link></template>
+    <template #actions><div class="mp-row-actions"><button v-if="identity.admin" type="button" class="mp-button mp-button-secondary" @click="showArchived = !showArchived; loadColabs()">{{ showArchived ? 'Mostrar ativos' : 'Incluir arquivados' }}</button><router-link v-if="identity.admin" to="/inserir" class="mp-button mp-button-primary"><span aria-hidden="true">+</span> Inserir profissional</router-link></div></template>
     <section class="mp-card" aria-label="Lista de profissionais">
       <div class="mp-toolbar">
         <div class="mp-search">
@@ -16,9 +16,10 @@
       <EasyDataTable class="mp-data-table" theme-color="#1d4ed8" show-index id="tabela" :headers="visibleHeaders" :items="colabs"
         v-model:items-selected="itemsSelected" rowsPerPageMessage="linhas por página:" rowsOfPageSeparatorMessage="de"
         emptyMessage="Não há dados disponíveis" :buttons-pagination="true" :search-value="searchValue" alternating>
-        <template #item-colab="item"><span class="mp-person">{{ item.colab }}</span></template>
+        <template #item-colab="item"><span class="mp-person">{{ item.colab }}</span><small v-if="item.deletedAt"> · Arquivado</small><small v-else-if="!item.gerencia_id"> · Gerência não definida</small></template>
         <template #item-operation="colab">
-          <button v-if="identity.admin" type="button" class="mp-delete" :aria-label="`Remover profissional ${colab.colab}`"
+          <router-link v-if="canManage(colab)" :to="`/editar-profissional/${colab.id}`" class="mp-edit" :aria-label="`Editar profissional ${colab.colab}`">Editar</router-link>
+          <button v-if="canManage(colab)" type="button" class="mp-delete" :aria-label="`Arquivar profissional ${colab.colab}`"
             aria-haspopup="dialog" aria-controls="delete-colab-modal" @click="modal(colab)">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v5m4-5v5"/></svg>
           </button>
@@ -27,7 +28,7 @@
       <p class="mp-table-note">Deslize a tabela para consultar todos os dados dos profissionais.</p>
     </section>
     <ConfirmDeleteModal v-if="identity.admin" id="delete-colab-modal" v-model="showDelete" @confirm="deleteItem">
-      Remover profissional: <b>{{ colab }}</b> ?
+      Arquivar profissional: <b>{{ colab }}</b>? Ele sairá da seleção para novas avaliações e o histórico será preservado.
     </ConfirmDeleteModal>
   </ManagementPage>
 </template>
@@ -64,6 +65,7 @@ export default {
             itemsSelected: [],
             colabId: "",
             showDelete: false,
+            showArchived: false,
             searchValue: "",
         }
     },
@@ -77,14 +79,15 @@ export default {
         visibleHeaders() { return this.identity.admin ? this.headers : this.headers.filter(header => header.value !== 'operation') }
     },
     methods: {
+        canManage(row) { return this.identity.admin && !row.deletedAt && Object.hasOwn(row, 'deletedAt') && Object.hasOwn(row, 'gerencia_id') },
         notify() {
-            toast.success("Profissional removido.", {
+            toast.success("Profissional arquivado.", {
                 autoClose: 1000,
                 theme: 'colored',
             })
         },
         loadColabs() {
-            return axios.get('/colab')
+            return axios.get(this.showArchived ? '/colab?estado=todos' : '/colab')
                 .then(res => {
                     this.colabs = res.data
                 }).catch(() => {

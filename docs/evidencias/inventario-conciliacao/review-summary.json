@@ -1,0 +1,33 @@
+{
+  "completedUtc": "2026-10-27T23:05:55.606Z",
+  "scope": "existing isolated fictional MySQL profile only",
+  "sourceArtifact": "inventory-c9ef67f5d8ab.evalinventory",
+  "sourceArtifactSha256": "d3f4ed32e97244155fbbdb5ee17815beba38e624dea5cc8cd80fe535455e66e0",
+  "encryptedArtifact": "inventory-review-b20980a65853.evalinventory",
+  "encryptedReviewAuthenticated": true,
+  "sourceSnapshotUnchanged": true,
+  "readOnlySqlReview": true,
+  "cases": [
+    {"alias": "R01", "candidate": "P01", "decision": "pending_confirmation"},
+    {"alias": "R02", "candidate": "P01", "decision": "pending_confirmation"},
+    {"alias": "R03", "candidate": "P01", "decision": "pending_confirmation"},
+    {"alias": "R04", "candidate": "P01", "decision": "pending_confirmation"},
+    {"alias": "R05", "candidate": "P01", "decision": "pending_confirmation"},
+    {"alias": "R06", "candidate": "P01", "decision": "pending_confirmation"},
+    {"alias": "R07", "candidate": "P01", "decision": "pending_confirmation"},
+    {"alias": "R08", "candidate": "P01", "decision": "pending_confirmation"}
+  ],
+  "allCandidatesMatchDeclaredFixture": true,
+  "allNamesMatchExactly": true,
+  "allAuthorsMatchFixtureSession": true,
+  "allCreationDatesBeforeRecordedLinkMigrationCompletion": true,
+  "negativeFixtureConsistent": true,
+  "approvedForApplication": false,
+  "sqlWrites": false,
+  "limitations": [
+    "Fixture compatibility supports a proposal, not definitive per-record historical identity.",
+    "Selected snapshot fields and counts were compared; ratings, observations and account hashes were not collected.",
+    "No immutable per-record creation-to-professional-ID audit was found in the examined code and reports.",
+    "Application requires explicit mapping confirmation, a new verified backup and tests on a restored copy."
+  ]
+}

@@ -1,10 +1,15 @@
 param(
-    [ValidateSet('Initialize', 'Start', 'NewSchema', 'Validate', 'ValidateLinks', 'RecoveryTest', 'VisualReview', 'Stop', 'Serve', 'Info')]
+    [ValidateSet('Initialize', 'Start', 'NewSchema', 'Validate', 'ValidateLinks', 'Inventory', 'ReconcileReviewed', 'ValidateManagement', 'ActivateManagement', 'ServeManagementCopy', 'RecoveryTest', 'VisualReview', 'Stop', 'Serve', 'Info')]
     [string]$Action = 'Info',
     [string]$ProfileDirectory,
     [string]$MySqlBinary = 'C:/Program Files/MySQL/MySQL Server 8.0/bin/mysqld.exe',
     [string]$VisualToolDirectory,
-    [string]$RecoveryReportName
+    [string]$RecoveryReportName,
+    [string]$ReviewReportName,
+    [string]$ConfirmReviewedMap,
+    [string]$ManagementReportName,
+    [string]$ApprovedDepartmentMapName,
+    [string]$ConfirmDepartmentMap
 )
 
 $ErrorActionPreference = 'Stop'
@@ -24,7 +29,7 @@ function Read-Vault([string]$directory) {
 
 function Invoke-IsolatedNode([string]$verb, [string]$directory) {
     $secrets = Read-Vault $directory
-    if ($verb -eq 'recoverytest' -and -not $secrets.ContainsKey('recovery')) {
+    if ($verb -in @('recoverytest', 'validatemanagement') -and -not $secrets.ContainsKey('recovery')) {
         $secrets.recovery = New-RandomSecret
         $plain = [Text.Encoding]::UTF8.GetBytes(($secrets | ConvertTo-Json -Compress))
         try {
@@ -44,12 +49,19 @@ function Invoke-IsolatedNode([string]$verb, [string]$directory) {
         SESSION_SECRET = $secrets.session
         AUTH_RATE_LIMIT_SECRET = $secrets.limiter
         NODE_ENV = 'development'
-        FRONTEND_ORIGIN = 'http://localhost:5173'
+        FRONTEND_ORIGIN = $(if ($verb -eq 'servemanagementcopy') { 'http://127.0.0.1:5174' } else { 'http://localhost:5173' })
         SESSION_SAME_SITE = 'lax'
         TRUST_PROXY = $null
-        EVAL_ISOLATED_RECOVERY_KEY = $(if ($verb -eq 'recoverytest') { $secrets.recovery } else { $null })
+        EVAL_ISOLATED_RECOVERY_KEY = $(if ($verb -in @('recoverytest', 'validatemanagement', 'activatemanagement')) { $secrets.recovery } else { $null })
         EVAL_VISUAL_TOOL_DIRECTORY = $(if ($verb -eq 'visualreview') { $VisualToolDirectory } else { $null })
         EVAL_ISOLATED_LINKS_RECOVERY_REPORT = $(if ($verb -eq 'validatelinks') { $RecoveryReportName } else { $null })
+        EVAL_RECONCILE_RECOVERY_REPORT = $(if ($verb -eq 'reconcilereviewed') { $RecoveryReportName } else { $null })
+        EVAL_RECONCILE_REVIEW_REPORT = $(if ($verb -eq 'reconcilereviewed') { $ReviewReportName } else { $null })
+        EVAL_RECONCILE_CONFIRMED_MAP = $(if ($verb -eq 'reconcilereviewed') { $ConfirmReviewedMap } else { $null })
+        EVAL_MANAGEMENT_REPORT = $(if ($verb -eq 'servemanagementcopy') { $ManagementReportName } else { $null })
+        EVAL_DEPARTMENT_APPROVED_MAP = $(if ($verb -eq 'activatemanagement') { $ApprovedDepartmentMapName } else { $null })
+        EVAL_DEPARTMENT_CONFIRMATION = $(if ($verb -eq 'activatemanagement') { $ConfirmDepartmentMap } else { $null })
+        EVAL_DEPARTMENT_RECOVERY_REPORT = $(if ($verb -eq 'activatemanagement') { $RecoveryReportName } else { $null })
     }
     $previous = @{}
     try {

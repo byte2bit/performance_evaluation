@@ -140,4 +140,4 @@ async function recover({ profile, root, startApplication, browser }) {
     }
 }
 
-module.exports = { recover, seal, unseal, assertFreshTarget }
+module.exports = { recover, seal, unseal, assertFreshTarget, mysqlClient: client }

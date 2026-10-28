@@ -24,7 +24,7 @@ function loadApplication(identity = { id: 1, name: 'Usuário fictício', email: 
     const pages = new Map([
         ['src/components/pages/Form.vue', 'Form'],
         ['src/components/ListCheckboxes.vue', 'ListCheckboxes'],
-        ...['Inserir', 'Registros', 'Colabs', 'Excel', 'Login', 'ChangePassword'].map(name => [`src/components/pages/${name}.vue`, name]),
+        ...['Inserir', 'Registros', 'Colabs', 'Excel', 'Login', 'ChangePassword', 'Demandantes', 'Gerencias'].map(name => [`src/components/pages/${name}.vue`, name]),
         ['src/components/utils/CheckAll.vue', 'CheckAll']
     ].map(([file, name]) => [path.resolve(frontend, file), {
         name,
@@ -148,7 +148,7 @@ for (const [location, name] of [
 
 test('menu clicks replace the page without nested anchors or hash navigation', async t => {
     const { root, router } = await mount(t, '/')
-    for (const [location, name] of [['/registros', 'Registros'], ['/colabs', 'Colabs'], ['/inserir', 'Inserir'], ['/', 'Form']]) {
+    for (const [location, name] of [['/registros', 'Registros'], ['/colabs', 'Colabs'], ['/inserir', 'Inserir'], ['/demandantes', 'Demandantes'], ['/gerencias', 'Gerencias'], ['/', 'Form']]) {
         const link = find(root, target => target.tag === 'a' && target.props.href === location)[0]
         assert.ok(link, `Missing menu link: ${location}`)
         assert.equal(link.children.flatMap(child => find(child, target => target.tag === 'a')).length, 0)
@@ -176,7 +176,7 @@ test('history back restores the initial form and collaborator list', async t => 
 
 test('all existing pages redirect anonymous users to login before mounting private content', async t => {
     const { root, router } = await mount(t, '/', null)
-    for (const location of ['/', '/registros', '/colabs', '/inserir', '/excel', '/checkall', '/senha']) {
+    for (const location of ['/', '/registros', '/colabs', '/inserir', '/excel', '/checkall', '/senha', '/demandantes', '/gerencias', '/editar-profissional/1']) {
         await router.push(location)
         await Vue.nextTick()
         assert.equal(router.currentRoute.value.name, 'Login')
@@ -188,7 +188,7 @@ test('all existing pages redirect anonymous users to login before mounting priva
 test('evaluators cannot navigate to administrator pages and do not see the insertion link', async t => {
     const identity = { id: 2, name: 'Avaliador fictício', email: 'test@example.invalid', admin: false }
     const { root, router } = await mount(t, '/', identity)
-    for (const location of ['/inserir', '/excel']) {
+    for (const location of ['/inserir', '/excel', '/demandantes', '/gerencias', '/editar-profissional/1']) {
         await router.push(location)
         assert.equal(router.currentRoute.value.name, 'Form')
     }

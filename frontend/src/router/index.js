@@ -25,6 +25,9 @@ const CheckAll = () => import(/* webpackChunkName: "checkall" */ '@/components/u
 const routes = [
     { path: '/login', name: 'Login', component: () => import('@/components/pages/Login.vue'), meta: { public: true } },
     { path: '/senha', name: 'Senha', component: () => import('@/components/pages/ChangePassword.vue') },
+    { path: '/demandantes', name: 'Demandantes', meta: { admin: true }, component: () => import('@/components/pages/Demandantes.vue') },
+    { path: '/gerencias', name: 'Gerencias', meta: { admin: true }, component: () => import('@/components/pages/Gerencias.vue') },
+    { path: '/editar-profissional/:id', name: 'EditarProfissional', meta: { admin: true }, component: Inserir },
     {
         path: "/",
         name: "Form",

@@ -1,14 +1,17 @@
 const { createRecords } = require('../lib/records')
 const { scope } = require('../lib/auth/identity')
 const validation = require('../lib/business-validation')
+const { createManagement, decorate } = require('../lib/management')
 
 module.exports = app => {
+    const management = createManagement(app.db)
     const getColab = async (req, res) => {
         try {
-            const rows = await scope(app.db('colab')
-                .select('id', 'colab', 'matricula', 'ppu', 'servico', 'funcao', 'liderancas', 'gerencia', 'demandante'), req.user)
+            let query = app.db('colab').select('id', 'colab', 'matricula', 'ppu', 'servico', 'funcao', 'liderancas', 'gerencia', 'gerencia_id', 'deletedAt')
+            if (!req.user.admin || req.query.estado !== 'todos') query = query.whereNull('deletedAt')
+            const rows = await scope(query, req.user, app.db)
                 .orderBy('colab')
-            return res.json(rows)
+            return res.json(await decorate(app.db, rows))
         } catch { return res.status(500).send('Não foi possível carregar os profissionais.') }
     }
     const getColabById = async (req, res) => {
@@ -16,26 +19,12 @@ module.exports = app => {
         if (professionalId === null) return res.status(400).send('Identificador inválido.')
         try {
             const row = await scope(app.db('colab')
-                .select('id', 'colab', 'matricula', 'ppu', 'servico', 'funcao', 'liderancas', 'gerencia', 'demandante'), req.user)
+                .select('id', 'colab', 'matricula', 'ppu', 'servico', 'funcao', 'liderancas', 'gerencia', 'gerencia_id', 'deletedAt')
+                .whereNull('deletedAt'), req.user, app.db)
                 .where({ id: professionalId }).first()
-            return row ? res.json(row) : res.status(404).send('Profissional não encontrado.')
+            return row ? res.json((await decorate(app.db, [row]))[0]) : res.status(404).send('Profissional não encontrado.')
         } catch { return res.status(500).send('Não foi possível carregar o profissional.') }
     }
-    const newColab = async (req, res) => {
-        const professional = validation.professional(req.body)
-        if (!professional) return res.status(400).send('Dados de profissional inválidos.')
-        try {
-            await app.db('colab').insert(professional)
-            return res.status(204).send()
-        } catch { return res.status(500).send('Não foi possível registrar o profissional.') }
-    }
-    const removeColab = async (req, res) => {
-        const professionalId = validation.id(req.params.id)
-        if (professionalId === null) return res.status(400).send('Identificador inválido.')
-        try {
-            await app.db('colab').where({ id: professionalId }).del()
-            return res.status(204).send()
-        } catch { return res.status(400).send('Não foi possível remover o profissional.') }
-    }
-    return { ...createRecords(app.db), getColab, getColabById, newColab, removeColab }
+    return { ...createRecords(app.db), getColab, getColabById,
+        newColab: management.saveProfessional, updateColab: management.saveProfessional, removeColab: management.removeProfessional }
 }

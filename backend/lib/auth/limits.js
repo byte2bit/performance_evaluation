@@ -10,6 +10,7 @@ function createLimits(db, config, Limiter = RateLimiterMySQL) {
         tableCreated: true, clearExpiredByTimeout: false, keyPrefix: prefix, points, duration
     })
     const budgets = {
+        management: [[limiter('management-user', 30, 900), req => req.user.id]],
         csrf: [[limiter('csrf-ip', 100, 900), req => req.ip]],
         signin: [
             [limiter('signin-ip', 100, 900), req => req.ip],

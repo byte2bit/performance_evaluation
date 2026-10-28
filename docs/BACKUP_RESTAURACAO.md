@@ -1,5 +1,7 @@
 # Backup e restauração no MySQL isolado
 
+**Último backup pré-ativação de gerências:** `backup-49892036b2c4.evalbackup`, com restauração/igualdade de **8 tabelas/46 registros** e login dos dois perfis confirmados em 27/10/2026 às 21:31. Origem permaneceu intacta nessa etapa. Depois da validação em cópia, a origem recebeu a 13ª migration e o mapa aprovado, sem alteração das oito avaliações/contas/campos legados. A cópia `_restore_49892036b2c4` também passou a ter o mapa; não confundir seu estado atual com o backup anterior à migration. [Resultado e artefatos](PLANO_GESTAO_GERENCIAS.md#ativação-autorizada-na-origem). Relatos abaixo são históricos.
+
 Executado em 25/10/2026, a pedido do usuário, exclusivamente na instância fictícia descrita em [AMBIENTE_ISOLADO.md](AMBIENTE_ISOLADO.md). A origem e o serviço MySQL80 existente foram preservados. Não constitui validação de recuperação de produção.
 
 ## Procedimento reproduzível
@@ -57,3 +59,11 @@ Após autorização para aplicar a pendência de vínculos, `RecoveryTest` confi
 O teste de FK inicialmente esperava apenas os erros 1452/1451; o MySQL com a conta restrita retornou as variantes 1216/1217. O teste foi ajustado para reconhecer as rejeições equivalentes, mantendo falha para qualquer outro erro ou ausência de rejeição. [Referência oficial dos erros](https://dev.mysql.com/doc/mysql-errors/8.0/en/server-error-reference.html). Foram geradas cópias novas após falhas de teste; as anteriores foram preservadas e nenhuma tentativa modificou o schema original antes da aprovação de toda a validação na cópia.
 
 Depois dos testes completos, a origem recebeu somente a 12ª migration. Contas, profissionais, autoria e oito avaliações foram comparados e preservados; os vínculos antigos permanecem nulos. Nenhum backfill foi executado. Zero arquivos temporários `recovery-client-*.cnf` ou `secrets.recovery.tmp` remanesceram na conferência final. A instância isolada foi parada ao encerrar, voltando ao estado anterior. [Relatório SQL](evidencias/vinculos-demandante-atual/mysql-validation-report.json) e [plano de vínculos](PLANO_VINCULOS.md).
+
+## Backup anterior à conciliação confirmada — 27/10/2026
+
+Após confirmação específica do mapa R01–R08 → P01, a API local foi suspensa. `RecoveryTest` gerou `backup-f1c9e61f498e.evalbackup` e restaurou em `evaluation_isolated_0f8785e64029_v2_restore_f1c9e61f498e`, com **8 tabelas/46 registros**, DDL/conteúdo coincidentes, origem preservada e login dos dois perfis recuperado. A contagem inclui sessões/limites; continuam sendo oito avaliações. Conclusão do backup em **27/10/2026 às 20:14, horário de São Paulo**, já com 12 migrations e antes dos vínculos. Relatório externo: `recovery-report-f1c9e61f498e.json`.
+
+A cópia só foi alterada depois dessa igualdade. Após rollback, concorrência/repetição e HTTP reais passarem nela, o aplicador revalidou origem e aplicou seus oito vínculos sem modificar demais campos de negócio. A cópia preservada passou a conter os vínculos/testes e já não é uma cópia integralmente igual ao backup anterior. O backup criptografado e o manifesto privado com estado anterior foram preservados, sem limpeza de schemas.
+
+API retomada, MySQL/frontend mantidos. Nenhuma migration ou SMTP novo. **152 testes aprovados**, além da validação real da aplicação e inventário final. Mesmos limites de recuperação em outro host/DPAPI descritos acima; nenhuma restauração automática sobre a origem foi executada. [Resultado e resumo sanitizado](REVISAO_CONCILIACAO.md#aplicação-confirmada-e-executada).

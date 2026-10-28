@@ -1,4 +1,22 @@
 /* Shared palette and controls; each page opts in through .management-page. */
+.management-page .mp-admin-form { padding: 24px; }
+.management-page .mp-admin-form h2 { font-size: 18px; font-weight: 700; margin: 0 0 12px; }
+.management-page .mp-admin-form > p { color: var(--mp-muted); font-size: 13px; line-height: 1.7; margin: 12px 0 20px; }
+.management-page .mp-admin-actions, .management-page .mp-row-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.management-page .mp-admin-actions { margin-top: 24px; }
+.management-page .mp-admin-list { margin-top: 24px; }
+.management-page .mp-table-scroll { overflow-x: auto; }
+.management-page .mp-native-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
+.management-page .mp-native-table th, .management-page .mp-native-table td { padding: 16px 20px; border-bottom: 1px solid var(--mp-line); vertical-align: middle; overflow-wrap: anywhere; min-width: 130px; }
+.management-page .mp-native-table th { background: var(--mp-muted-bg); color: var(--mp-muted); font-weight: 600; }
+.management-page .mp-native-table small { color: var(--mp-muted); }
+.management-page .mp-button-danger { background: var(--mp-surface); color: #b91c1c; border-color: var(--mp-line); }
+.dark .management-page .mp-button-danger { color: #fca5a5; }
+.management-page button:disabled { opacity: .55; cursor: not-allowed; }
+.management-page .mp-feedback { padding: 16px 24px; margin: 0 0 20px; color: var(--mp-text); background: var(--mp-muted-bg); border: 1px solid var(--mp-line); border-radius: 10px; line-height: 1.7; font-size: 13px; }
+.management-page .mp-feedback-error { color: #b91c1c; }
+.dark .management-page .mp-feedback-error { color: #fca5a5; }
+.management-page .mp-edit { display: inline-block; padding: 8px; text-decoration: underline; color: var(--mp-accent); }
 .management-page {
     flex: 1;
     width: 100%;
