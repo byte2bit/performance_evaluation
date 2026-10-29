@@ -21,7 +21,7 @@ Sistema web para avaliação de profissionais, consulta de avaliações e gestã
 
 Autenticação por Passport Local, sessões persistentes, autorização, proteção CSRF, limitação de requisições, expiração e revogação estão implementadas. Senhas usam Argon2id; cookies de sessão são HttpOnly, com regras específicas para HTTPS em produção.
 
-As **12 migrations** e os fluxos de autenticação/dados foram validados em **MySQL 8.0.44 isolado, com contas fictícias**. Backup criptografado e restauração em schema separado também foram exercitados nesse ambiente. Isso não comprova configuração ou ativação em produção.
+As **14 migrations** e os fluxos de autenticação/dados foram validados em **MySQL 8.0.44 isolado, com contas fictícias**. O vínculo obrigatório `colab.gerencia_id` foi reforçado após backup/restauração e validação em cópia. Isso não comprova configuração ou ativação em produção.
 
 **A 12ª migration foi aplicada e validada somente no perfil MySQL isolado documentado.** Após revisão e confirmação específica, as oito avaliações legadas desse perfil fictício foram vinculadas ao profissional A, com backup atual, testes na cópia e preservação dos demais campos. Não há associação automática por nome. Outros ambientes exigem preparação e autorização próprias. [Revisão e evidências da aplicação](docs/REVISAO_CONCILIACAO.md).
 
@@ -47,9 +47,9 @@ Consign carrega autenticação, middlewares, handlers e rotas nessa ordem. `back
 
 ## Desenvolvimento local
 
-**A aplicação principal está ativa em `http://localhost:5173`**, API `http://localhost:8001`, com a 13ª migration e o mapa aprovados no MySQL isolado. A Gerência de Testes reúne os dois profissionais e tem o avaliador atual como responsável; as oito avaliações foram preservadas. A prévia antiga foi encerrada, com seus dados mantidos para consulta. [Modelo, ativação e evidências](docs/PLANO_GESTAO_GERENCIAS.md).
+**A aplicação principal está ativa em `http://localhost:5173`**, API `http://localhost:8001`, com as 14 migrations e o mapa aprovados no MySQL isolado. A Gerência de Testes reúne os dois profissionais e tem o avaliador atual como responsável; as oito avaliações foram preservadas. A prévia antiga foi encerrada, com seus dados mantidos para consulta. [Modelo, ativação e evidências](docs/PLANO_GESTAO_GERENCIAS.md).
 
-O perfil documentado já possui as 13 migrations, as oito avaliações fictícias conciliadas e os dois profissionais vinculados à gerência aprovada. Avaliador atual e administrador tiveram a leitura confirmada por HTTP e no Chrome. MySQL, API e frontend permanecem em execução; confira os serviços antes de iniciar duplicatas. Os comandos abaixo iniciam o ambiente existente quando necessário e não aplicam migrations em outros alvos.
+O perfil documentado já possui as 14 migrations, as oito avaliações fictícias conciliadas e os dois profissionais vinculados à gerência aprovada. A leitura de avaliador/administrador foi reconfirmada por HTTP no baseline 14; Chrome é evidência do lote anterior. MySQL isolado em `127.0.0.1:50470`, API e frontend permanecem em execução; confira os serviços antes de iniciar duplicatas. Os comandos abaixo iniciam o ambiente existente quando necessário e não aplicam migrations em outros alvos.
 
 O ambiente registrado usa **Node.js 24.12.0**, npm 11.6.2, PowerShell 7 e MySQL 8.0.44 isolado. As dependências de frontend e backend têm manifestos e lockfiles separados. A instalação precisa preservar esses lockfiles; Argon2 possui componente nativo.
 

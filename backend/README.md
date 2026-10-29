@@ -1,6 +1,6 @@
 # Backend — API de avaliação de desempenho
 
-**Estado atual:** gestão por gerências ativada no perfil MySQL isolado original, com 13 migrations, após mapa explícito, backup e validação na cópia. API principal retomada em localhost:8001; os dois profissionais pertencem à Gerência de Testes do avaliador atual, preservando as oito avaliações. Outros ambientes não foram ativados. [Modelo, endpoints, concorrência e evidências](../docs/PLANO_GESTAO_GERENCIAS.md).
+**Estado atual:** gestão por gerências ativada no perfil MySQL isolado original, com 14 migrations. A 14ª tornou `colab.gerencia_id` obrigatório, após autorização, backup/restauração e SQL/HTTP na cópia antes da origem. API principal retomada em localhost:8001, MySQL isolado em 127.0.0.1:50470; dois profissionais na Gerência de Testes do avaliador atual, oito avaliações e contas/demais campos preservados. `Serve` exige estrutura/baseline 14. Outros ambientes não foram ativados. [Modelo, endpoints, concorrência e evidências](../docs/PLANO_GESTAO_GERENCIAS.md).
 
 API Express do [Sistema de Avaliação de Desempenho](../README.md), com Knex/MySQL, autenticação por Passport Local e sessões persistentes. Implementa as regras de acesso e validação usadas pela interface Vue.
 
@@ -14,7 +14,7 @@ API Express do [Sistema de Avaliação de Desempenho](../README.md), com Knex/My
 - Envio administrativo de templates HTML individuais ou em grupo por Nodemailer, com conteúdo dinâmico escapado e configuração externa.
 - CLI de contas, migrations Knex e ferramentas para validação e recuperação em MySQL isolado.
 
-A autenticação e a cadeia de 12 migrations foram validadas em MySQL 8.0.44 isolado com dados fictícios. Produção depende de configuração, schema e provisionamento próprios. A submissão da avaliação no frontend continua desativada, embora os endpoints de gravação existam.
+A autenticação e a cadeia de 14 migrations foram validadas em MySQL 8.0.44 isolado com dados fictícios. Produção depende de configuração, schema e provisionamento próprios. A submissão da avaliação no frontend continua desativada, embora os endpoints de gravação existam.
 
 O vínculo por `registros.colab_id` tem a **12ª migration aplicada no perfil isolado** após backup/restauração e testes reais em cópia. FKs, collation, transferência de acesso e concorrência passaram; as oito avaliações anteriores permaneceram nulas, sem associação automática. A conciliação desses registros e a aplicação em outros ambientes exigem etapas próprias. [Plano e evidências](../docs/PLANO_VINCULOS.md).
 

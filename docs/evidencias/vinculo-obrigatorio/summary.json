@@ -1,0 +1,70 @@
+{
+  "completedUtc": "2026-10-29T00:16:35.061Z",
+  "scope": "explicitly approved 13-to-14 transition on the original fictional isolated MySQL profile only",
+  "success": true,
+  "migration": "20261028000100_require_colab_gerencia.js",
+  "sourceMigrations": 14,
+  "copyVerifiedBeforeSource": true,
+  "sourceSchemaApplied": true,
+  "column": "colab.gerencia_id INT UNSIGNED NOT NULL",
+  "indexesAndRestrictiveForeignKeysPreserved": true,
+  "otherColumnDefinitionsPreserved": true,
+  "professionalsPreserved": 2,
+  "evaluationsPreserved": 8,
+  "departmentsPreserved": 1,
+  "accountsAndBusinessRowsPreserved": true,
+  "backup": {
+    "artifact": "backup-d22f7f4af567.evalbackup",
+    "report": "recovery-report-d22f7f4af567.json",
+    "tablesCompared": 9,
+    "rowsCompared": 49,
+    "ddlAndContentsMatch": true,
+    "recoveredAdminAndEvaluatorLogin": true
+  },
+  "protectedArtifacts": {
+    "manifest": "required-department-manifest-b54bf1288a79.evalinventory",
+    "report": "required-department-report-b54bf1288a79.json"
+  },
+  "copyChecks": {
+    "archivedMissingLinkRejectedBeforeDdl": true,
+    "repeatedTransitionRejected": true,
+    "omittedAndNullInsertRejected": true,
+    "nullUpdateIncludingArchivedRejected": true,
+    "invalidParentsAndParentDeletionRejected": true,
+    "sqlProbesRolledBack": true,
+    "httpCreateTransferAndArchivePassed": true,
+    "archivedDepartmentOwnerDeletionBlocked": true,
+    "onlyNewFixtureIdsRemovedFromCopy": true,
+    "originalBusinessRowsPreserved": true
+  },
+  "copyAndSourceHttp": {
+    "adminAndEvaluatorLogin": true,
+    "professionalAndHistoryAccessPreserved": true,
+    "adminAuthorizationPreserved": true
+  },
+  "validation": {
+    "tests": 190,
+    "passed": 190,
+    "failed": 0,
+    "skipped": 0,
+    "newTests": 12,
+    "powershellSyntaxErrors": 0,
+    "frontendChanged": false,
+    "buildAndBrowserChecksRepeated": false
+  },
+  "services": {
+    "frontend": "http://localhost:5173",
+    "frontendHttp": 200,
+    "api": "http://localhost:8001",
+    "anonymousSessionHttp": 401,
+    "apiRestartedWithBaseline14": true,
+    "isolatedMysql": "127.0.0.1:50470"
+  },
+  "smtpDelivery": false,
+  "limitations": [
+    "No production or other environment was changed; no new dependency, commit, push or deployment.",
+    "Authentication checks update sessions and limiter counters, while accounts and business rows remain unchanged.",
+    "MySQL DDL commits implicitly. Retained encrypted backup, copy and checkpoints support a separately reviewed recovery; there is no automatic down.",
+    "Read-only HTTP checks do not constitute browser visual validation."
+  ]
+}

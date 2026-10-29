@@ -396,7 +396,7 @@ async function validateAuthentication(profile, report) {
 async function main() {
     const profile = loadProfile()
     const action = process.argv[2]
-    assert.ok(['ready', 'validate', 'validatelinks', 'inventory', 'reconcilereviewed', 'validatemanagement', 'activatemanagement', 'servemanagementcopy', 'recoverytest', 'visualreview', 'stop', 'serve'].includes(action))
+    assert.ok(['ready', 'validate', 'validatelinks', 'inventory', 'reconcilereviewed', 'validatemanagement', 'activatemanagement', 'enforceprofessionaldepartment', 'servemanagementcopy', 'recoverytest', 'visualreview', 'stop', 'serve'].includes(action))
     if (['validate', 'visualreview'].includes(action)) {
         // These historical fixtures predate department IDs. Never let their
         // generic migration path activate the new model on the source schema.
@@ -422,6 +422,15 @@ async function main() {
         const version = await verifyServer(root, profile)
         if (action === 'ready') { console.log(JSON.stringify({ ready: true, version })); return }
         if (action === 'stop') { await root.query('SHUTDOWN'); console.log(JSON.stringify({ stopped: true })); return }
+        if (action === 'enforceprofessionaldepartment') {
+            phase = 'required-department-preconditions'
+            const report = await require('./isolated-required-department').enforce({ profile, root, verifyServer, database, startApplication, browser,
+                confirmation: process.env.EVAL_REQUIRED_DEPARTMENT_CONFIRMATION, secret: process.env.SESSION_SECRET,
+                recoveryKey: process.env.EVAL_ISOLATED_RECOVERY_KEY,
+                progress(stage) { phase = 'required-department-' + stage; console.log(JSON.stringify({ phase })) } })
+            console.log(JSON.stringify(report))
+            return
+        }
         if (action === 'activatemanagement') {
             phase = 'management-activation-preconditions'
             const report = await require('./isolated-activate-management').activate({ profile, root, verifyServer, database, startApplication, browser,
@@ -497,12 +506,8 @@ async function main() {
             return
         }
         if (action === 'serve') {
-            const [completed] = await root.query('SELECT name FROM ??.migrations ORDER BY name', [profile.database])
-            if (completed.length !== 13 || completed.at(-1).name !== '20261027000100_add_management_departments.js') {
-                throw Object.assign(new Error('The source management transition is pending.'), { code: 'SOURCE_MANAGEMENT_MIGRATION_PENDING' })
-            }
-            const [marker] = await root.query('SELECT profile_id FROM ??.isolation_marker', [profile.database])
-            assert.equal(marker[0]?.profile_id, profile.id)
+            try { await require('./isolated-required-department').assertStructure(root, profile.database, 14, profile.id) }
+            catch { throw Object.assign(new Error('The required department schema is not ready.'), { code: 'SOURCE_REQUIRED_DEPARTMENT_TRANSITION_PENDING' }) }
             const runtime = await startApplication(profile, 8001)
             console.log(JSON.stringify({ serving: true, url: 'http://localhost:' + runtime.server.address().port }))
             process.once('SIGINT', async () => { await runtime.close(); process.exit(0) })

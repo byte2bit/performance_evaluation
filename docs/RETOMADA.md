@@ -1,6 +1,30 @@
 # Ponto de retomada
 
-## Pausa solicitada — 28/10/2026
+## Pausa preparada e envio solicitado — 28/10/2026
+
+O usuário pediu para **preparar a continuidade para depois e enviar as alterações ao GitHub**. Está autorizado o commit/push do lote já concluído: migration 14, aplicador isolado, launcher, testes, evidências sanitizadas e documentação, incluindo a troca autorizada da porta MySQL. Essa autorização não aprova novas implementações, outras migrations/alvos, produção ou deploy.
+
+**Ponto de parada:** baseline 14 aplicado somente no perfil fictício isolado; `colab.gerencia_id` obrigatório, dois profissionais, uma gerência, oito avaliações e contas/demais campos preservados. Última suíte executada no lote: **190/190 aprovados**, zero falhas/skips. Não repetir testes SQL, backup, migrations ou build apenas para retomar; conferir primeiro o Git e os serviços. A submissão de avaliações permanece desativada.
+
+**Próximo trabalho recomendado, ainda sem execução aprovada:** preparar um plano de recuperação em outro host e proteção das chaves. O backup já foi restaurado localmente, mas o cofre DPAPI depende do usuário Windows atual. Definir destino isolado, disponibilidade segura das chaves/credenciais, critérios de recuperação e autorização própria antes de provisionar ou restaurar em outro alvo. Depois, planejar auditoria administrativa durável e persistência dos critérios/submissão, conforme prioridade confirmada pelo usuário.
+
+Para retomar: ler `AGENTS.md`, este documento e o plano de gestão; conferir `git status`, `git log -1` e a branch `master`, preservando trabalho posterior. O remoto `origin` é `byte2bit/performance_evaluation`; a consulta ao GitHub antes deste envio confirmou `master` em `c10aeb1ddf071daa670906c02249d04b03817ff8`. O commit deste checkpoint deve ser identificado pelo Git após o envio. Os serviços locais foram mantidos; não iniciar duplicatas. Um clone não contém datadir, cofre, backups ou manifestos privados. Os relatos inferiores de ausência de autorização para commit/push descrevem o estado anterior a este pedido.
+
+Conferência para este envio: 15 arquivos de código/testes/documentação/evidência sanitizada revisados, diff sem erros de whitespace e nenhuma ocorrência dos padrões de chaves/tokens verificados. Nenhum `.env`, cofre, backup, manifesto privado ou build integra o conjunto. Frontend 200 e API sem sessão 401 reconfirmados; processos preservados. Os 190 testes são o resultado executado no lote de implementação; não foram repetidos na preparação documental, nem foram executadas novas migrations, testes SQL ou SMTP.
+
+## Estado atual — vínculo obrigatório aplicado em 28/10/2026
+
+O usuário retomou e **aprovou implementar/executar o plano da migration 14 somente no perfil MySQL fictício isolado, primeiro em cópia e depois na origem**. Concluído às **21:16, horário de São Paulo**: `colab.gerencia_id` obrigatório, unsigned, índice/FKs preservados. Uma Gerência de Testes, dois profissionais, oito avaliações e todas as contas/demais campos preservados. [Procedimento e evidências](PLANO_GESTAO_GERENCIAS.md#vínculo-obrigatório-de-todo-profissional--reforço-aplicado-no-perfil-isolado).
+
+**190/190 testes aprovados**, zero falhas/skips; parser PowerShell e diff sem erros. Backup/restauração atuais de **9 tabelas/49 registros** passaram antes de testar a migration, rejeições SQL, cadastro/transferência/arquivamento e exclusão protegida na cópia. Origem revalidada antes do DDL e comparada após login/leitura por administrador e avaliador. Fonte: [resumo sanitizado](evidencias/vinculo-obrigatorio/summary.json). Build/Chrome não foram repetidos, pois o frontend não mudou; não confundir HTTP real com revisão visual.
+
+**Serviços conferidos após retomar a API:** frontend `localhost:5173` **200**, API `localhost:8001/session` sem sessão **401**, MySQL isolado `127.0.0.1:50470`. A porta foi trocada de 50070 após aprovação porque o Windows reservou a faixa anterior; cópias da configuração ficaram no perfil protegido. `Serve` agora exige cadeia/estrutura 14. Não iniciar duplicatas nem repetir `EnforceProfessionalDepartment`, conciliação ou aplicadores históricos.
+
+Artefatos privados externos: `backup-d22f7f4af567.evalbackup`, `recovery-report-d22f7f4af567.json`, `required-department-manifest-b54bf1288a79.evalinventory`, `required-department-report-b54bf1288a79.json` e cópia `_restore_d22f7f4af567`. Preservar para recuperação separadamente planejada; não executar `down`. DDL tem commits implícitos. Sessões/contadores mudam nos testes HTTP, mas os dados de negócio e as contas foram preservados.
+
+No início da execução, o Git estava em `master`, `c10aeb1`, igual à referência local `origin/master`. O envio do lote e da documentação da porta foi posteriormente autorizado, conforme pausa no topo; deploy e próximos lotes não foram aprovados. Persistência de critérios/submissão, recuperação em outro host/proteção de chaves e auditoria durável precisam de escopo/aprovação próprios; submissão continua desativada. Os registros abaixo são históricos.
+
+## Histórico — pausa solicitada em 28/10/2026
 
 O usuário pediu para **pausar a implementação, preparar a retomada e enviar as alterações ao GitHub**. Este pedido autoriza o commit/push do conjunto local já desenvolvido (inventário, conciliação, gestão por gerências, testes e documentação), sem aprovar a migration 14 ou qualquer nova implementação. Os relatos inferiores de commit/push não autorizado registram o estado anterior a este pedido.
 
@@ -8,13 +32,13 @@ O usuário pediu para **pausar a implementação, preparar a retomada e enviar a
 
 Conferência para o envio em 28/10/2026: suíte completa reexecutada com **178/178 aprovados**, zero falhas/skips; diff sem erros de whitespace; 53 arquivos de código/testes/documentação revisados quanto a caminhos privados/gerados, tokens e chaves. Nenhum `.env`, backup, manifesto criptografado, cofre ou artefato de build integra o conjunto. Remoto existente: `origin`, repositório `byte2bit/performance_evaluation`, branch `master`.
 
-**Para retomar:** ler AGENTS.md e este documento; conferir Git/branch e estado dos serviços; revisar o [plano do vínculo obrigatório](PLANO_GESTAO_GERENCIAS.md#vínculo-obrigatório-de-todo-profissional--reforço-pendente-de-aprovação). Aguardar a retomada explícita do usuário e sua aprovação desse plano antes de implementar/aplicar o reforço no schema. Não repetir migrations/aplicadores de transição já concluídos nem preencher associações automaticamente. A submissão de avaliações permanece desativada.
+**Instrução histórica da pausa:** ler AGENTS.md e este documento; conferir Git/branch e estado dos serviços; revisar o [plano do vínculo obrigatório](PLANO_GESTAO_GERENCIAS.md#vínculo-obrigatório-de-todo-profissional--reforço-aplicado-no-perfil-isolado). A retomada e aprovação foram posteriormente recebidas e a execução está registrada no topo. Não repetir migrations/aplicadores de transição já concluídos nem preencher associações automaticamente. A submissão de avaliações permanece desativada.
 
 Credenciais, cofre DPAPI, datadir MySQL, backups e manifestos privados estão fora do repositório e não acompanham o envio ao GitHub. Um clone em outra máquina não restaura esse ambiente; seguir os guias de isolamento/recuperação com aprovação própria. Pausar a implementação não encerra automaticamente os serviços locais; verificar portas antes de iniciar processos novamente. Esta etapa não executa migrations, escreve dados MySQL, envia e-mails ou faz deploy.
 
 ## Regra confirmada — profissional sempre com demandante
 
-O usuário determinou que todo profissional deve sempre manter um demandante associado. O modelo continua por gerência, inclusive no arquivamento. Cadastro/edição e exclusão protegida já impõem o vínculo na aplicação; a coluna `colab.gerencia_id` ainda aceita nulo por causa da transição da migration 13. [Diagnóstico, arquivos, critérios, riscos e plano do reforço estrutural](PLANO_GESTAO_GERENCIAS.md#vínculo-obrigatório-de-todo-profissional--reforço-pendente-de-aprovação). Nova migration/ativação ainda não implementada nem executada: dependem de aprovação do plano conforme AGENTS.md. Nenhuma nova atribuição de dados foi inferida.
+O usuário determinou que todo profissional deve sempre manter um demandante associado. O modelo continua por gerência, inclusive no arquivamento. Na confirmação inicial, cadastro/edição e exclusão protegida já impunham o vínculo na aplicação, mas `colab.gerencia_id` aceitava nulo pela transição da migration 13. [Diagnóstico, arquivos, critérios, riscos e execução posterior do reforço estrutural](PLANO_GESTAO_GERENCIAS.md#vínculo-obrigatório-de-todo-profissional--reforço-aplicado-no-perfil-isolado). A migration 14 foi posteriormente aprovada/aplicada conforme o estado atual no topo; nenhuma nova atribuição de dados foi inferida.
 
 Adicionados dois testes de regressão para cadastro/edição sem vínculo ou com responsável ausente/inativo/excluído, com dados fictícios e rollback no mock. Suíte completa executada nesta etapa: **178 testes aprovados, zero falhas/skips**. Alterados somente testes e documentação; sem nova migration, escrita no MySQL ou alteração do runtime.
 
@@ -115,7 +139,7 @@ Depois: desenhar persistência dos arrays de critérios e submissão antes de at
 
 ## Reiniciar o ambiente local, se necessário
 
-O perfil abaixo já recebeu as 13 migrations, a conciliação revisada dos oito registros e a associação dos dois profissionais à Gerência de Testes; avaliador atual e administrador tiveram sua leitura confirmada. Iniciar MySQL e API somente se os serviços estiverem parados. Esses comandos não migram ou conciliam outros ambientes.
+O perfil abaixo já recebeu as 14 migrations, a conciliação revisada dos oito registros e a associação dos dois profissionais à Gerência de Testes; avaliador atual e administrador tiveram sua leitura confirmada. Iniciar MySQL e API somente se os serviços estiverem parados. Esses comandos não migram ou conciliam outros ambientes.
 
 Na raiz do projeto, em PowerShell 7, com o mesmo usuário Windows que criou o cofre:
 
@@ -149,4 +173,4 @@ O runner `node backend/scripts/isolated-pm2.js` também é opt-in: cria perfil t
 
 ## Pedido para a próxima conversa
 
-> Retomar conforme AGENTS.md, docs/RETOMADA.md e docs/PLANO_GESTAO_GERENCIAS.md. Implementação pausada a pedido em 28/10/2026; usuário autorizou enviar ao GitHub o conjunto já desenvolvido. Gestão por gerências ativada somente no MySQL fictício isolado, baseline 13, uma Gerência de Testes com ambos os profissionais e o avaliador atual; oito avaliações e demais campos/contas preservados. Última suíte: 178 testes aprovados. Todo profissional deve manter demandante por gerência; reforço NOT NULL no banco está planejado, mas a migration 14 ainda não foi implementada/aplicada nem aprovada. Revisar o plano e obter aprovação antes dessa etapa. Conferir Git e serviços antes de iniciar processos em localhost:5173/8001. Credenciais/backups/manifestos estão externos. Não repetir transições, executar down, inferir mapas, tocar produção ou ativar submissão. Novos commits/pushes exigem autorização própria.
+> Retomar conforme AGENTS.md, docs/RETOMADA.md e docs/PLANO_GESTAO_GERENCIAS.md. Implementação pausada a pedido em 28/10/2026, com autorização para enviar este lote ao GitHub. Migration 14 aprovada/aplicada somente no perfil MySQL fictício isolado após backup/restauração e validação na cópia. Todo profissional mantém gerência/demandante por ID, com gerencia_id NOT NULL; uma Gerência de Testes, dois profissionais, oito avaliações e contas/demais campos preservados. Última suíte: 190/190 aprovados. API localhost:8001, frontend localhost:5173, MySQL isolado 127.0.0.1:50470; conferir Git/serviços antes de iniciar duplicatas. Próximo passo recomendado: planejar recuperação em outro host/proteção das chaves, sem executar antes de aprovar o escopo/destino. Credenciais/backups/manifestos externos; clone não restaura o ambiente. Não repetir transições, executar down, inferir mapas, tocar produção ou ativar submissão. Próximos escopos e futuros commits/pushes exigem autorização própria.

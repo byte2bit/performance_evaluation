@@ -1,12 +1,14 @@
 # Plano de evolução
 
-**Pausado pelo usuário em 28/10/2026**, com autorização para commit/push das alterações locais já desenvolvidas e preparação da retomada. Não prosseguir para a migration 14 sem retomada e aprovação do plano. Ver [RETOMADA.md](RETOMADA.md). Relatos inferiores sobre ausência de autorização para commit/push são históricos e não abrangem este envio solicitado.
+**Reforço concluído e implementação pausada em 28/10/2026:** usuário aprovou implementar/aplicar a migration 14 somente no MySQL fictício isolado, com backup/restauração e validação prévia em cópia. Baseline 14 ativo, `colab.gerencia_id` obrigatório; dados de negócio/contas preservados. **190/190 testes aprovados**, zero falhas/skips. Posteriormente solicitou preparar a continuidade e enviar este lote ao GitHub, autorizando seu commit/push. Ver [RETOMADA.md](RETOMADA.md). Novas implementações, outros alvos e deploy não foram aprovados.
+
+**Próximo passo recomendado após retomar:** elaborar o plano de recuperação em outro host/proteção das chaves. Definir destino isolado, disponibilidade segura das credenciais e critérios de recuperação; obter autorização específica antes de provisionar/restaurar em outro alvo. Auditoria administrativa durável e persistência dos critérios/submissão seguem como lotes posteriores, ainda sem execução aprovada.
 
 Atualizado em 27/10/2026. As prioridades do item 16 do AGENTS.md são critérios de ordenação; não significam aprovação automática de arquitetura, autenticação, contratos ou schema. O ponto de continuidade, ambiente local e próximo lote estão em [RETOMADA.md](RETOMADA.md).
 
-### Próximo reforço — profissional sempre com demandante
+### Reforço concluído — profissional sempre com demandante
 
-Regra reafirmada pelo usuário: manter o vínculo por gerência para todos os profissionais, inclusive arquivados. Validações existentes conferidas e dois testes acrescentados: **178/178 aprovados**. [Plano revisável de migration 14, backup/cópia, impactos e aceitação](PLANO_GESTAO_GERENCIAS.md#vínculo-obrigatório-de-todo-profissional--reforço-pendente-de-aprovação). Necessita aprovação antes de implementar/executar a mudança de nulabilidade; origem permanece no baseline 13.
+Regra implementada na aplicação e reforçada estruturalmente para todos os profissionais, inclusive arquivados. [Plano aprovado, execução da migration 14 e evidências](PLANO_GESTAO_GERENCIAS.md#vínculo-obrigatório-de-todo-profissional--reforço-aplicado-no-perfil-isolado). Backup/restauração de 9 tabelas/49 registros, cópia com SQL/HTTP reais, revalidação e aplicação na origem passaram. Mantidos dois profissionais, uma gerência, oito avaliações e contas/campos; API retomada. Próximos escopos de critérios/submissão, recuperação em outro host e auditoria durável precisam de planejamento/aprovação próprios. Não repetir transições já concluídas nem executar `down`.
 
 ### Estado atual — gestão por gerências ativada
 

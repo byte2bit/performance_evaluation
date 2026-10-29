@@ -227,6 +227,6 @@ mysql.createConnection = async () => {
         const child = spawnSync(process.execPath, ['--require', preload, path.resolve(__dirname, '../scripts/isolated-auth.js'), action], { env, encoding: 'utf8', timeout: 10000, windowsHide: true })
         assert.equal(child.status, 1)
         const result = JSON.parse(child.stderr.trim())
-        assert.equal(result.code, action === 'serve' ? 'SOURCE_MANAGEMENT_MIGRATION_PENDING' : 'LEGACY_RUNNER_REQUIRES_MANAGEMENT_REVIEW')
+        assert.equal(result.code, action === 'serve' ? 'SOURCE_REQUIRED_DEPARTMENT_TRANSITION_PENDING' : 'LEGACY_RUNNER_REQUIRES_MANAGEMENT_REVIEW')
     }
 })

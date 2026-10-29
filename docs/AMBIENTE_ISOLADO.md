@@ -1,5 +1,7 @@
 # MySQL isolado e autenticação local
 
+**Estado atual em 28/10/2026:** após aprovação específica, a **14ª migration** reforçou `colab.gerencia_id` como `INT UNSIGNED NOT NULL`, primeiro na cópia restaurada e depois na origem fictícia. Backup/restauração de 9 tabelas/49 registros, SQL/HTTP na cópia e comparações integrais passaram. Dois profissionais, uma gerência, oito avaliações e contas/demais campos preservados. **190/190 testes aprovados**, sem falhas/skips; API retomada em localhost:8001, frontend localhost:5173 e MySQL 127.0.0.1:50470. `Serve` exige baseline/estrutura 14. [Procedimento, artefatos e limites](PLANO_GESTAO_GERENCIAS.md#vínculo-obrigatório-de-todo-profissional--reforço-aplicado-no-perfil-isolado). Relatos de baseline 13 ou inferior abaixo são históricos. Não repetir `EnforceProfessionalDepartment` nem os aplicadores anteriores.
+
 **Gestão por gerências ativada:** origem fictícia agora com 13 migrations e o mapa explícito aprovado: Gerência de Testes, ambos os profissionais, avaliador atual. Backup/restauração e cópia passaram antes da origem; oito avaliações/contas/demais campos preservados. Principal em `http://localhost:5173`, API `http://localhost:8001`, usando `Serve`. Prévia antiga encerrada, dados preservados. **176 testes** e nove verificações Chrome reais aprovados. [Modelo, backup e evidências](PLANO_GESTAO_GERENCIAS.md#ativação-autorizada-na-origem). Relatos inferiores de baseline 12 ou ativação pendente são históricos.
 
 Validado em 25/10/2026, com autorização para criar instância separada, aplicar migrations corretivas somente nela e provisionar contas fictícias. Nenhuma configuração, credencial ou dado de produção foi alterado. Nenhum e-mail foi enviado.
@@ -13,12 +15,14 @@ Validado em 25/10/2026, com autorização para criar instância separada, aplica
 | Item | Valor |
 | --- | --- |
 | MySQL | 8.0.44, binário já instalado, processo separado do serviço MySQL80 |
-| Endereço | `127.0.0.1:50070`, acesso somente por loopback |
+| Endereço | `127.0.0.1:50470`, acesso somente por loopback |
 | Perfil externo | `%LOCALAPPDATA%/EvaluationDev/mysql-isolated-0f8785e64029` |
 | Schema atual | `evaluation_isolated_0f8785e64029_v2` |
 | Administrador fictício | `admin@example.invalid` |
 | Avaliador fictício | `reviewer@example.invalid` |
 | Segredos | `secrets.dpapi`, criptografia DPAPI CurrentUser e ACL restrita ao usuário Windows atual e SYSTEM |
+
+Em 28/10/2026, após autorização, a porta deste perfil foi alterada de `50070` para `50470`: o Windows passou a reservar o intervalo `50060–50159`, impedindo a inicialização na porta anterior. Somente `profile.json` e `my.ini` externos tiveram a porta atualizada, com cópias prévias no próprio diretório protegido. O schema, o diretório de dados e as credenciais foram mantidos. Referências anteriores à porta `50070` nas evidências são históricas.
 
 As senhas são aleatórias e distintas; as contas usam hashes Argon2id. Os segredos de sessão e HMAC também são independentes, gerados a partir de 32 bytes aleatórios. O launcher descriptografa o cofre em memória, fornece variáveis somente ao processo filho e restaura o ambiente ao encerrar. O cofre não é portável para outra identidade Windows; não deve ser copiado para o Git. A validação usa as credenciais internamente, sem mostrá-las em logs ou argumentos. Não há senha padrão ou cadastro público.
 
