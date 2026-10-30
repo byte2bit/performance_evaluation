@@ -1,0 +1,44 @@
+{
+  "success": true,
+  "target": "inova_nucleo_compat_20261029",
+  "copyMatchesVerifiedBackup": true,
+  "readOnly": true,
+  "accounts": 25,
+  "professionals": 100,
+  "records": 498,
+  "departmentTextGroups": 5,
+  "departmentCandidates": [
+    {
+      "alias": "G01",
+      "professionals": 40,
+      "candidateAccounts": 0
+    },
+    {
+      "alias": "G02",
+      "professionals": 23,
+      "candidateAccounts": 0
+    },
+    {
+      "alias": "G03",
+      "professionals": 16,
+      "candidateAccounts": 0
+    },
+    {
+      "alias": "G04",
+      "professionals": 20,
+      "candidateAccounts": 0
+    },
+    {
+      "alias": "G05",
+      "professionals": 1,
+      "candidateAccounts": 0
+    }
+  ],
+  "recordsWithSingleCandidate": 440,
+  "recordsWithoutCandidate": 58,
+  "recordsWithAmbiguousCandidates": 0,
+  "assignmentsApproved": 0,
+  "dataChanged": false,
+  "encryptedDetails": "candidates.evalinventory",
+  "completedUtc": "2026-10-29T19:51:45.810Z"
+}

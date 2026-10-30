@@ -1,0 +1,49 @@
+{
+  "success": true,
+  "target": "inova_nucleo_compat_20261029",
+  "backupTables": 14,
+  "backupRows": 683,
+  "backupAuthenticated": true,
+  "fixtures": {
+    "realHttpAndSqlPassed": true,
+    "fixtureAccounts": 9,
+    "sqlSessionsAndLimitsExercised": true,
+    "bcryptArgon2UpgradePassed": true,
+    "sessionCsrfRotationPassed": true,
+    "previousVersionRevoked": true,
+    "invalidAccountsRejected": true,
+    "rateLimit429Observed": true,
+    "injectedPreCommitFailureRolledBack": true,
+    "sessionAwaitedCommit": true,
+    "concurrentStateChangePreserved": true,
+    "innodbWaitersObserved": 2,
+    "concurrentLoginStatuses": [
+      200,
+      401
+    ],
+    "fixtureQueries": 403,
+    "queryTargets": [
+      "e2b_accounts_fixture",
+      "e2b_limits_fixture",
+      "e2b_sessions_fixture"
+    ]
+  },
+  "fixtureTablesRemoved": 3,
+  "originalStatePreservedBeforeActivation": true,
+  "activationRollbackVerified": true,
+  "accountsActivated": 25,
+  "sessionVersion": 1,
+  "administrativeProfilesPreserved": 2,
+  "hashesPreserved": 25,
+  "otherFieldsAndTablesPreserved": true,
+  "sourceUnchanged": true,
+  "professionals": 100,
+  "records": 498,
+  "assignmentsChanged": 0,
+  "operationalLoginsAttempted": 0,
+  "migrationsExecuted": 0,
+  "privilegesChanged": false,
+  "applicationSwitched": false,
+  "ephemeralServerStopped": true,
+  "completedUtc": "2026-10-30T02:15:09.519Z"
+}

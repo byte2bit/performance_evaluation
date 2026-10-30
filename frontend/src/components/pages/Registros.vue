@@ -11,12 +11,24 @@
           </div>
           <p id="ajuda-registros">A busca considera todos os campos da tabela.</p>
         </div>
-        <span class="mp-count">Total: <strong>{{ colabcUser.length }}</strong></span>
+        <span class="mp-count">Exibindo: <strong>{{ filteredRecords.length }}</strong> de {{ colabcUser.length }}</span>
       </div>
-      <EasyDataTable class="mp-data-table mp-records-table" theme-color="#1d4ed8" show-index id="tabela" :headers="visibleHeaders" :items="colabcUser"
+      <div class="mp-period" role="group" aria-label="Pesquisar por período">
+        <label for="registros-inicio">Data inicial<input id="registros-inicio" class="mp-input" type="date" v-model="startDate" :aria-invalid="Boolean(dateError)" aria-describedby="registros-periodo-ajuda" /></label>
+        <label for="registros-fim">Data final<input id="registros-fim" class="mp-input" type="date" v-model="endDate" :aria-invalid="Boolean(dateError)" aria-describedby="registros-periodo-ajuda" /></label>
+        <button type="button" class="mp-button mp-button-secondary" @click="clearFilters">Limpar filtros</button>
+      </div>
+      <p id="registros-periodo-ajuda" class="mp-period-hint" :class="{ 'mp-period-error': dateError }" :role="dateError ? 'alert' : undefined">{{ dateError || 'O período inclui as duas datas e considera a data de gravação da avaliação.' }}</p>
+      <p v-if="loading" class="mp-record-status" role="status">Carregando registros…</p>
+      <div v-if="loadError" class="mp-record-status" role="alert">{{ loadError }} <button type="button" class="mp-history-link" @click="loadRegs()">Tentar novamente</button></div>
+      <EasyDataTable class="mp-data-table mp-records-table" theme-color="#1d4ed8" show-index id="tabela" :headers="visibleHeaders" :items="filteredRecords"
          rowsPerPageMessage="linhas por página:" rowsOfPageSeparatorMessage="de"
-        emptyMessage="Não há dados disponíveis" :buttons-pagination="true" :search-value="searchValue" alternating>
-        <template #item-colab="item"><span class="mp-person">{{ item.colab }}</span></template>
+        :empty-message="loading ? 'Carregando registros…' : dateError ? 'Corrija o período informado.' : colabcUser.length ? 'Nenhuma avaliação encontrada para os filtros informados.' : 'Não há dados disponíveis'" :buttons-pagination="true" alternating>
+        <template #item-colab="item">
+          <button v-if="hasProfessionalId(item)" type="button" class="mp-person mp-history-link" aria-haspopup="dialog" aria-controls="professional-history-modal" :aria-label="`Consultar avaliações de ${item.colab}, profissional ${item.colab_id}`" @click="openHistory(item)">{{ item.colab }}</button>
+          <span v-else class="mp-person">{{ item.colab }}<span class="mp-unlinked">Sem vínculo por ID</span></span>
+        </template>
+        <template #item-created_at="item">{{ formatRecordDate(item.created_at) }}</template>
         <template #item-operation="registro">
           <button v-if="dados.admin" type="button" class="mp-delete" :aria-label="`Remover registro de ${registro.colab}`"
             aria-haspopup="dialog" aria-controls="delete-registro-modal" @click="modal(registro)">
@@ -24,11 +36,13 @@
           </button>
         </template>
       </EasyDataTable>
-      <p class="mp-table-note">Deslize a tabela para consultar todas as notas e observações.</p>
+      <p class="mp-table-note">Clique no nome do profissional para consultar seu histórico completo.<span v-if="dados.admin"> A exportação XLS inclui todo o histórico autorizado.</span></p>
     </section>
     <ConfirmDeleteModal v-if="dados.admin" id="delete-registro-modal" v-model="showDelete" @confirm="deleteItem">
       Remover registro de: <b>{{ registro }}</b> ?
     </ConfirmDeleteModal>
+    <ProfessionalHistoryModal v-model="showHistory" :professional-name="historyName" :professional-id="historyId"
+      :records="historyRecords" :loading="historyLoading" :error="historyError" @retry="refreshHistory" />
   </ManagementPage>
 </template>
 
@@ -36,6 +50,9 @@
 import ManagementPage from "@/components/utils/ManagementPage.vue";
 import axios from "@/plugins/axios.js";
 import ConfirmDeleteModal from "@/components/utils/ConfirmDeleteModal.vue";
+import ProfessionalHistoryModal from "@/components/utils/ProfessionalHistoryModal.vue";
+import { filterRecords, formatRecordDate, periodError } from "@/components/utils/record-history.js";
+import "@/styles/record-history.css";
 import Vue3EasyDataTable from "vue3-easy-data-table";
 import "vue3-easy-data-table/dist/style.css";
 
@@ -58,6 +75,18 @@ export default {
       regId: "",
       showDelete: false,
       searchValue: "",
+      startDate: "",
+      endDate: "",
+      loading: false,
+      loadError: "",
+      disposed: false,
+      loadGeneration: 0,
+      showHistory: false,
+      historyId: null,
+      historyName: "",
+      historyLoading: false,
+      historyError: "",
+      historyGeneration: 0,
       headers: [
         { text: "Profissional", value: "colab", sortable: true, width: 200 },
         { text: "Data Aval.", value: "created_at", sortable: true },
@@ -84,12 +113,16 @@ export default {
     ManagementPage,
     EasyDataTable: Vue3EasyDataTable,
     ConfirmDeleteModal,
+    ProfessionalHistoryModal,
     toast,
     dados,
     Excel,
   },
   computed: {
     visibleHeaders() { return this.dados.admin ? this.headers : this.headers.filter(header => header.value !== 'operation'); },
+    dateError() { return periodError(this.startDate, this.endDate); },
+    filteredRecords() { return filterRecords(this.colabcUser, this.startDate, this.endDate, this.searchValue, this.visibleHeaders.filter(header => header.value !== 'operation').map(header => header.value)); },
+    historyRecords() { return this.historyError || this.historyLoading ? [] : this.registros.filter(record => this.hasProfessionalId(record) && Number(record.colab_id) === Number(this.historyId)); },
   },
   methods: {
     notify() {
@@ -98,30 +131,43 @@ export default {
         theme: "colored",
       });
     },
-    loadRegs() {
-      return axios
-        .get("/registros")
-        .then((res) => {
-          this.registros = res.data;
-
-          this.admin = dados.admin;
-
-          // The API authorizes by the professional's current owner. The author
-          // snapshot may belong to a previous owner or an administrator.
-          this.colabcUser = this.registros;
-
-          //converte data
-          var data = this.registros.map((registro) => {
-            let a = registro.created_at.split("T")[0];
-            let d = a.split("-");
-            let dat = d[2] + "/" + d[1] + "/" + d[0];
-            registro.created_at = dat;
-            return registro.created_at;
-          });
-        })
-        .catch(() => {
-          toast.error('Não foi possível carregar os registros.', { theme: 'colored' });
-        });
+    formatRecordDate,
+    hasProfessionalId(record) { return /^\d+$/.test(String(record.colab_id)) && Number.isSafeInteger(Number(record.colab_id)) && Number(record.colab_id) > 0; },
+    clearFilters() { this.startDate = ''; this.endDate = ''; this.searchValue = ''; },
+    async loadRegs() {
+      const generation = ++this.loadGeneration;
+      this.loading = true;
+      this.loadError = '';
+      try {
+        const { data } = await axios.get('/registros');
+        if (this.disposed || generation !== this.loadGeneration) return false;
+        this.registros = data;
+        this.colabcUser = data;
+        return true;
+      } catch {
+        if (!this.disposed && generation === this.loadGeneration) {
+          this.loadError = 'Não foi possível carregar os registros.';
+          toast.error(this.loadError, { theme: 'colored' });
+        }
+        return false;
+      } finally { if (!this.disposed && generation === this.loadGeneration) this.loading = false; }
+    },
+    openHistory(record) {
+      if (!this.hasProfessionalId(record)) return;
+      this.historyId = Number(record.colab_id);
+      this.historyName = record.colab;
+      this.showHistory = true;
+      return this.refreshHistory();
+    },
+    async refreshHistory() {
+      const generation = ++this.historyGeneration;
+      this.historyLoading = true;
+      this.historyError = '';
+      // Reauthorize a fresh read before opening the detailed history.
+      const loaded = await this.loadRegs();
+      if (this.disposed || generation !== this.historyGeneration) return;
+      this.historyLoading = false;
+      if (!loaded) this.historyError = 'Não foi possível atualizar o histórico. Tente novamente.';
     },
     loadReg(registro) {
       this.registro = { ...registro };
@@ -153,5 +199,6 @@ export default {
   mounted() {
     this.loadRegs();
   },
+  beforeUnmount() { this.disposed = true; this.loadGeneration++; this.historyGeneration++; },
 };
 </script>

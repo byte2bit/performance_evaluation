@@ -1,0 +1,21 @@
+{
+  "success": true,
+  "ready": false,
+  "action": "preflight",
+  "target": "inova_nucleo_compat_20261029",
+  "mysqlVersion": "8.0.44",
+  "backupAuthenticated": true,
+  "copyMatchesBaseline": true,
+  "sourceMatchesBaseline": true,
+  "originalTables": 9,
+  "originalRows": 680,
+  "coreCounts": { "users2": 25, "colab": 100, "registros": 498 },
+  "legacyMigrationEntries": 7,
+  "missingPrivileges": ["REFERENCES"],
+  "otherCopyConnections": 0,
+  "ddlExecuted": false,
+  "migrationsExecuted": 0,
+  "privilegesChanged": false,
+  "applicationSwitched": false,
+  "completedUtc": "2026-10-30T00:18:56.699Z"
+}

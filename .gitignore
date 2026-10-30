@@ -6,3 +6,9 @@ dist/
 coverage/
 *.log
 obsoleto
+
+# Artefatos operacionais privados; apenas relatórios sanitizados vão para o Git.
+*.dpapi
+*.evalbackup
+*.evalinventory
+client-*.cnf

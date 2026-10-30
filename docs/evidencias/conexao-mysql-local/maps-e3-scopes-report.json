@@ -1,0 +1,21 @@
+{
+  "success": true,
+  "target": "inova_nucleo_compat_20261029",
+  "sqlAuthorizationScopes": [
+    {
+      "actor": "chosen-owner",
+      "recordsVisible": 498
+    },
+    {
+      "actor": "administrator",
+      "recordsVisible": 498
+    },
+    {
+      "actor": "unassigned-evaluator",
+      "recordsVisible": 0
+    }
+  ],
+  "distinctActorsVerified": 3,
+  "readOnly": true,
+  "completedUtc": "2026-10-30T03:03:25.909Z"
+}

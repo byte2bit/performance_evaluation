@@ -1,0 +1,20 @@
+{
+  "dateLocal": "2026-10-29",
+  "target": "inova_nucleo_compat_20261029",
+  "responsibleAccountChosenByUser": 12,
+  "responsibleAccountAvailableVerifiedReadOnly": true,
+  "departmentGroups": [
+    { "alias": "G01", "professionals": 40, "proposedResponsibleAccountId": 12 },
+    { "alias": "G02", "professionals": 23, "proposedResponsibleAccountId": 12 },
+    { "alias": "G03", "professionals": 16, "proposedResponsibleAccountId": 12 },
+    { "alias": "G04", "professionals": 20, "proposedResponsibleAccountId": 12 },
+    { "alias": "G05", "professionals": 1, "proposedResponsibleAccountId": 12 }
+  ],
+  "invalidDepartmentLabels": 0,
+  "recordProposalSelectedByUser": { "binaryExactUniqueCandidates": 395, "pendingCollationOnly": 45, "pendingWithoutCandidates": 58, "totalPending": 103 },
+  "assignmentsApplied": 0,
+  "e3MigrationsWrittenOrApplied": 0,
+  "e3PreviewStarted": false,
+  "e3ExecutionApproved": false,
+  "individualNamesEmailsOrHashesPrinted": false
+}

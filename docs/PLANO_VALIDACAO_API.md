@@ -1,5 +1,7 @@
 # Validação e paginação da API — regras aprovadas e implementadas
 
+**Complemento aprovado em 29/10/2026:** os dois POSTs de avaliações recusam duplicidade de `colab_id` no mês da gravação com 409, independentemente do avaliador. O banco fornece o instante persistido; nenhum timestamp enviado pelo cliente é aceito. Sem migration. [Contrato mensal, concorrência e testes](REGISTROS_HISTORICO.md).
+
 Proposta apresentada e posteriormente aprovada explicitamente pelo usuário. As regras abaixo foram implementadas em `backend/lib/business-validation.js`, `backend/lib/records.js` e `backend/api/user.js`, preservando rotas e autorização. O diagnóstico inicial permanece como histórico; o resultado está ao final.
 
 ## Diagnóstico e objetivo

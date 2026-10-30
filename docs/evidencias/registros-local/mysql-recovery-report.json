@@ -1,0 +1,14 @@
+{
+  "success": true,
+  "sourceDatabase": "evaluation_isolated_0f8785e64029_v2",
+  "restoredDatabase": "evaluation_isolated_0f8785e64029_v2_restore_20261029a001",
+  "encryptedArtifact": "backup-20261029a001.evalbackup",
+  "encryption": "AES-256-GCM; separate key in DPAPI vault",
+  "tablesCompared": 9,
+  "rowsCompared": 52,
+  "ddlAndContentsMatch": true,
+  "sourceUnchanged": true,
+  "recoveredAdminAndEvaluatorLogin": true,
+  "elapsedMs": 1700,
+  "completedUtc": "2026-10-29T18:18:46.986Z"
+}

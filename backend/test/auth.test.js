@@ -86,6 +86,7 @@ test('record writes use session identity, ignore protected fields and reject pro
     const app = await harness(t); const client = app.client(); await client.login()
     const headers = { 'X-CSRF-Token': await client.csrf() }
     for (const url of ['/registros', '/registros2']) {
+        app.state.recordedAt = url === '/registros' ? '2026-10-29 12:00:00' : '2026-11-01 00:00:00'
         const own = await client.request('POST', url, validEvaluation({ demandante: 'other@example.invalid',
             id: 999, admin: true, created_at: 'synthetic' }), headers)
         assert.equal(own.status, 204)
@@ -94,7 +95,7 @@ test('record writes use session identity, ignore protected fields and reject pro
         assert.equal(saved.colab_id, 1)
         assert.notEqual(saved.id, 999)
         assert.equal(saved.admin, undefined)
-        assert.equal(saved.created_at, undefined)
+        assert.equal(saved.created_at, app.state.recordedAt)
         const count = app.state.tables.registros.length
         assert.equal((await client.request('POST', url, validEvaluation({ colab: 'Profissional B' }), headers)).status, 403)
         assert.equal(app.state.tables.registros.length, count)

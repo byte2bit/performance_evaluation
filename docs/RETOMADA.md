@@ -1,5 +1,138 @@
 # Ponto de retomada
 
+## Checkpoint para continuar depois — 30/10/2026
+
+Usuário solicitou preparar a retomada e enviar os arquivos ao GitHub. Destino conferido: `byte2bit/performance_evaluation`, branch `master`. Este checkpoint reúne as mudanças de Registros, regra mensal, recuperação portável em memória, compatibilidade/acesso/mapas da cópia MySQL e redefinição solicitada da conta 12. Código, testes, documentação e evidências sanitizadas compõem o envio; banco, cofres, backups, `.env`, logs, caches e capturas locais ficam fora do Git. A `.gitignore` também passou a recusar os formatos operacionais privados.
+
+**Última validação executada:** 321/321 testes aprovados, zero falhas/skips, após a redefinição; nenhum código de execução mudou depois dessa suíte. Build e revisões de Registros/SQL/HTTP/UI foram executados nos lotes documentados abaixo; não precisam ser repetidos apenas para retomar a conversa. Revisão do diff, JSON, sintaxes e conteúdo pendente realizada para o checkpoint. A busca local por formatos de credenciais/dados individuais não encontrou ocorrências; a tentativa de scanner do GitHub ficou indisponível por ausência de GitHub Advanced Security, sem declarar varredura remota aprovada.
+
+Para retomar nesta máquina:
+
+1. Ler este bloco e as duas atualizações seguintes. Conferir Git e serviços antes de iniciar duplicatas; a disponibilidade descrita abaixo é a última observação, não uma garantia futura.
+2. Usar `local-inova-preview.ps1 -Action Status` com a confirmação E3 abaixo; se necessário, trocar somente a ação por `Start`. A prévia usa frontend **5174** e API **8002**, conectados exclusivamente à cópia `127.0.0.1:3306/inova_nucleo_compat_20261029`. Este checkpoint não solicitou nem executou parada dos serviços.
+3. Para consultar as credenciais redefinidas da conta **12**, usar `./backend/scripts/local-inova-reset-password.ps1 -Action Show` no PowerShell 7. Não executar Reset/ResumePrepared novamente. Não pedir senha pelo chat.
+4. Escolher um próximo escopo pequeno: revisar os **103 registros pendentes**; implementar persistência dos critérios e submissão ainda desativada; ou planejar o pacote operacional de recuperação portável, conforme preferência anterior de frase-senha guardada separadamente. Nenhum desses trabalhos foi iniciado por este checkpoint.
+
+**Não repetir** criação/restauração, E1, E2B, ApplyMaps, VerifyScopes ou migrations/down nos alvos já concluídos. Não modificar a origem `inova_nucleo`, trocar o perfil 50470 ou testar em domínio definitivo. Sem deploy. O GitHub guarda o projeto e relatórios sanitizados; os dados e as chaves DPAPI permanecem no perfil protegido desta máquina. Retomada em outro computador exige planejamento de recuperação, pois o clone sozinho não restaura banco ou segredos. O hash do commit será informado na conversa; esta seção não tenta incluir o hash do próprio commit.
+
+## Atualização posterior — senha da conta 12 redefinida
+
+Usuário pediu redefinição e confirmou **ID 12**, somente na cópia local. Concluída em `2026-10-30T03:36:56.492Z`, com backup criptografado autenticado, Argon2id e incremento de versão de sessão. Outras 24 contas, identidade/perfil/vínculos e origem preservados. Credenciais entregues apenas em janela local/cofre DPAPI; para reabrir, executar `./backend/scripts/local-inova-reset-password.ps1 -Action Show`. **Não repetir Reset/ResumePrepared.** Prévia 5174/8002 segue ativa, 25 contas habilitadas (24 bcrypt/uma Argon2id). [Resultado, diagnóstico da tentativa revertida e operação](REDEFINICAO_CONTA_LOCAL.md), [relatório](evidencias/conexao-mysql-local/password-reset-account12-20261030-report.json). As afirmações inferiores de preservação dos 25 hashes descrevem o estado anterior a esta redefinição explícita.
+
+## Estado atual — E3 concluído e prévia em execução
+
+Usuário autorizou este lote com “prossiga” após o [plano concreto E3](PLANO_MAPAS_PREVIA_INOVA.md). Backup atualizado de 14 tabelas/683 linhas, ensaio revertido e mapa aplicados em `2026-10-30T02:53:27.225Z`, **somente na cópia `127.0.0.1:3306/inova_nucleo_compat_20261029`**. Cinco gerências sob a conta 12, 100 profissionais e 395 avaliações vinculados; 103 avaliações continuam sem vínculo e administrativas (45 por collation/58 sem candidato). Terceira migration própria aplicada: gerência unsigned obrigatória; sete entradas legadas, 25 contas/hashes/perfis, campos históricos e origem preservados. Conta 12 já era administradora; SQL com três atores distintos confirmou 498/498/0 leituras permitidas.
+
+**Prévia disponível: [http://localhost:5174/login](http://localhost:5174/login), API http://localhost:8002.** Cofre e cookie `evaluation.inova.local.sid` próprios, rehash bcrypt → Argon2id apenas após senha válida nesse launcher e SMTP bloqueado. Nenhum login de conta existente automatizado; o usuário digita suas credenciais atuais somente na interface. **315/315 testes, build, HTTP anônimo/CSRF/CORS, saúde dos dois processos e revisão visual anônima 1440/390 passaram.** A abertura no navegador padrão foi solicitada; capturas de QA headless ficaram no cache ignorado.
+
+Para conferir ou retomar os serviços, no PowerShell 7 na raiz:
+
+```powershell
+./backend/scripts/local-inova-preview.ps1 -Action Status -Confirmation 'inova_nucleo_compat_20261029:3306:maps-e3-owner12-exact395-preview'
+```
+
+Trocar somente `Status` por `Start` para iniciar/reconhecer a prévia, `Check` para validar o alvo ou `Stop` para encerrar somente seus processos identificados. Não executar novamente `VerifyScopes` (relatório exclusivo já gravado), ApplyMaps, E1, E2B, criação/restauração ou down. Backup/manifests/cofre externos preservados em `%LOCALAPPDATA%/EvaluationDev/inova-nucleo-compat-20261029`, ACL restrita, nenhum CNF/falha E3. Startup não exige que hashes/versões/contagens continuem congelados após uso legítimo.
+
+[Resultado, arquivos, comandos e limites](PLANO_MAPAS_PREVIA_INOVA.md#resultado-da-execução-e3), [resumo sanitizado](evidencias/conexao-mysql-local/maps-e3-validation-summary.json). Origem e perfil 50470 não foram trocados; API anterior 8001 respondeu, frontend 5173 não respondeu na conferência e não foi iniciado/parado neste lote. Revisar os 103 pendentes ou alterar a origem exige novo escopo. **As seções inferiores registram etapas históricas e suas pendências à época.**
+
+## E2B aprovado/aplicado na cópia — 29/10/2026, 23:15
+
+Usuário solicitou “continue” após a proposta concreta do [plano E2B](PLANO_ATIVACAO_ACESSO_LOCAL.md), autorizando backup, criação/limpeza das três tabelas de ensaio, SQL/HTTP e ativação das 25 contas **somente em `127.0.0.1:3306/inova_nucleo_compat_20261029`**. Implementados runner `local-mysql-access.js`, barreira de driver `local-access-guard.js`, ensaios `local-access-fixtures.js` e ações `PreflightAccess`/`ActivateAccess`. **298/298 testes passaram**, incluindo 13 novos; sintaxes/diff conferidos.
+
+Preflight confirmou estado E1/mapa/privilégios. Backup autenticado de **14 tabelas/683 linhas** precedeu DDL. SQL/HTTP real passou: nove contas em três tabelas próprias, sessões/limites SQL, rehash, cookie/CSRF, estados inválidos/429/logout/revogação; falha injetada pré-commit com rollback real, sessão aguardando commit e alteração concorrente preservada. **Dois waiters InnoDB distintos e respostas 200/401**; 403 consultas do driver restritas às fixtures. Servidor/worker/pools encerrados, três objetos removidos por propriedade e estado das 14 tabelas comparado antes da ativação.
+
+Ensaio dos 25 IDs revertido; ativação definitiva concluída em `2026-10-30T02:15:09.519Z` (29/10, 23:15 em São Paulo). **25 contas ativas/versão um, 25 hashes originais e dois perfis administrativos preservados**; demais campos/tabelas, 100 profissionais, 498 avaliações e origem intactos. Zero logins de contas existentes, resets, grants, migrations ou mapas. API principal permanece no perfil anterior. [Relatório real](evidencias/conexao-mysql-local/access-e2b-report.json), [resumo](evidencias/conexao-mysql-local/access-e2b-summary.json).
+
+Backup/manifests externos preservados, ACL restrita conferida, sem CNF/artefato de falha; só relatório sanitizado no Git. **Não repetir E2B, E1, CreateCopy/InspectCopy ou down** com esses alvos/artefatos. Nenhum novo schema, domínio, SMTP, dependência, frontend/build/Chrome ou troca de API.
+
+Próxima informação solicitada: IDs responsáveis por G01–G05 (40/23/16/20/1 profissionais). Preparado [roteiro SQL local somente leitura](REVISAO_MAPAS_INOVA.md), sem nomes/e-mails em docs; não executar suas consultas com saída individual nas ferramentas do agente. Inspeção agregada confirmou **395 candidatos binários exatos + 45 apenas por collation**, além dos 58 sem candidato já preservados. Nenhum vínculo aprovado/aplicado; precisam de revisão, plano de preenchimento/obrigatoriedade e ativação local posterior. Os registros inferiores são históricos.
+
+**Escolhas respondidas neste lote:** usuário indicou **ID 12 para todos os cinco grupos** (disponibilidade validada em leitura) e **propor 395 vínculos binariamente exatos, mantendo 103 pendentes**. Não foi autorização de DML/schema/preview. [Plano E3 concreto preparado](PLANO_MAPAS_PREVIA_INOVA.md): backup pós-E2B, cinco gerências, 100 profissionais/395 avaliações por mapa fechado, terceira migration própria para gerência obrigatória e prévia localhost:5174/8002 com cookies/segredos separados, preservando principal/origem. **Ainda depende de aprovação de execução**. Nenhuma migration E3 escrita, mapa aplicado, cofre de prévia criado ou serviço de prévia iniciado. [Resumo sanitizado](evidencias/conexao-mysql-local/maps-selection-summary.json).
+
+## E2A aprovado e concluído — código/testes sintéticos, 29/10/2026
+
+Usuário aprovou o [plano E2A](PLANO_ACESSO_MYSQL_LOCAL.md), mantendo senhas e atualizando para Argon2id após login válido. Implementados serviço `lib/auth/credentials.js`, adaptador/formato/worker `legacy-bcrypt*.js` e pequena delegação na estratégia Passport. **Padrão continua Argon2id**, nenhum launcher/configuração operacional injeta o legado. Apenas `$2a$10$`, até 72 bytes UTF-8, sem NUL/UTF-16 malformado; fila/tempo/workers limitados e encerramento explícito. Rehash fora do lock, releitura bloqueada/confirmação de estado/hash/versão, update condicionado e versão incrementada antes de criar sessão. Nenhuma ativação/reset implícito.
+
+**285/285 testes passaram**, 29 novos: criptografia real sobre fixtures públicas/sintéticas, falhas/limites do worker, conflitos de conta/rehash, SQL Knex simulado e HTTP real em loopback com DB simulado/MemoryStore de testes. Sessão espera commit, falhas não autenticam, cookie/CSRF rotacionam e versões antigas são revogadas. [Resultado e limites](PLANO_ACESSO_MYSQL_LOCAL.md#resultado-de-e2a-e-contrato-interno--29102026), [evidência](evidencias/conexao-mysql-local/access-e2a-summary.json).
+
+**Sem acesso a MySQL/cofre/backup operacional, sem migration/conta/hash real alterado, sem dependências novas, SMTP, reinício ou troca de API**. Frontend/build/Chrome dispensados. A integração real deste fluxo em MySQL permanece pendente.
+
+Na pergunta de planejamento seguinte, o usuário escolheu **todas as 25 contas existentes** para acesso inicial. [Plano E2B concreto preparado](PLANO_ATIVACAO_ACESSO_LOCAL.md), **ainda sem execução aprovada**: backup pós-E1/mapa privado, três tabelas de ensaio de nomes fechados na mesma cópia para SQL/HTTP, limpeza somente desses objetos e ativação condicional dos 25 IDs com hashes/perfis preservados. Sem outro schema, login de contas existentes ou troca da API; servidor efêmero de fixtures é encerrado. Não usar `accounts.js activate` (redefine senha), relaxar launcher 50470 para 3306, repetir E1 ou inferir mapas de gerências/histórico. Os registros inferiores são históricos.
+
+## E1 aplicado e validado na cópia — 29/10/2026, 21:28
+
+Após o usuário solicitar continuar, novo preflight retornou `ready=true`: requisito `REFERENCES` atendido, backup autenticado, origem/cópia preservadas e sem concorrentes. **Duas migrations E1 aplicadas exclusivamente em `127.0.0.1:3306/inova_nucleo_compat_20261029`**, ledger próprio batch 1. Três tabelas InnoDB; três FKs restritivas verificadas, dois updates inválidos rejeitados, sondas revertidas e campos históricos integralmente comparados. **680 linhas originais, 25 hashes/contas, 100 profissionais, 498 avaliações, outras seis tabelas e sete migrations legadas preservados. Origem intacta.** Zero contas ativas, vínculos ou rehash; sessões/limites/gerências vazios. API/perfil anterior preservados.
+
+Execução concluída em `2026-10-30T00:28:10.725Z` (29/10, 21:28 em São Paulo). Três checkpoints criptografados/relatório preservados no perfil externo, ACL restrita conferida, sem falha parcial; somente relatório sanitizado copiado ao Git. [Resultado e evidências](PLANO_COMPATIBILIDADE_INOVA.md#resultado-da-execução-e1--29102026-2128). Nenhum código alterado neste lote; **256 testes aprovados na preparação anterior**, não repetidos agora. Sem frontend/build/Chrome/SMTP.
+
+**Não repetir `PreflightCompatibility`/`ApplyCompatibility`, CreateCopy/InspectCopy ou `down` neste alvo**: existem artefatos de execução e o schema já diverge legitimamente do backup inicial. Não chamar migrations compartilhadas nem o launcher isolado 50470 para este alvo.
+
+Usuário escolheu **manter as senhas atuais e atualizar para Argon2id após login válido**. Inspeção em leitura confirmou 25 `$2a$` custo 10, e-mails canônicos/válidos sem duplicação normalizada, dois administradores ainda inativos. [Plano E2A](PLANO_ACESSO_MYSQL_LOCAL.md) preparado para aprovação de código/testes sintéticos; nenhuma autenticação implementada neste lote. E2B ainda exige escolha das contas a ativar, backup pós-E1 e launcher próprio; gerências/histórico exigem mapas revisados. Origem, login operacional e ativação da aplicação continuam fora do escopo concluído. Os registros inferiores são históricos.
+
+## E1 aprovado e preparado; falta privilégio na cópia — 29/10/2026
+
+O usuário aprovou o [plano E1](PLANO_COMPATIBILIDADE_INOVA.md) ao solicitar “prosseguir”. Implementados duas migrations em `backend/compat/inova/migrations`, capacidade/guardas, runner `local-mysql-compat.js`, ações opt-in `PreflightCompatibility`/`ApplyCompatibility` e 14 testes novos. **256/256 testes passaram**, parser PowerShell e diff conferidos. Nenhuma dependência ou configuração da aplicação alterada.
+
+Preflight real às 21:18 (São Paulo; 2026-10-30T00:18:56.699Z) autenticou backup e comparou origem/cópia integralmente: nove tabelas/680 linhas, sete migrations legadas, sem concorrente na cópia. **`ready=false`: falta somente `REFERENCES` no alvo `127.0.0.1:3306/inova_nucleo_compat_20261029`. Nenhum DDL, ledger E1, migration, grant, conta ou vínculo aplicado.** O `ALL PRIVILEGES` específico da conta vale para a origem, sem estender-se à cópia. Origem, cópia e API/perfil anterior intactos. [Evidência sanitizada](evidencias/conexao-mysql-local/compat-preflight-report.json), [validações](evidencias/conexao-mysql-local/compat-validation-summary.json).
+
+Próximo passo depende de ação administrativa: conceder apenas `REFERENCES` na cópia ao usuário/host configurado, conforme SQL com placeholders no plano. Não há credencial administrativa disponibilizada; não alterar privilégios sem autorização própria nem pedir senha no chat. Depois disso, a aprovação E1 existente continua válida: preflight deve retornar `ready=true` antes de aplicar; não pedir novamente autorização para o mesmo lote/alvo. **DDL e sondas transacionais reais ainda não validados.** Preservar os artefatos existentes; não executar CreateCopy/InspectCopy, cadeia compartilhada, down, novos mapas ou ativação. Os checkpoints inferiores são históricos.
+
+## Backup/cópia do MySQL local concluídos em 29/10/2026
+
+O usuário autorizou prosseguir com backup e cópia somente em **`127.0.0.1:3306/inova_nucleo_compat_20261029`**. Concluído às 16:45 (São Paulo): **9 tabelas MyISAM/680 linhas**, com 25 contas/hashes, 100 profissionais e 498 avaliações preservados, DDL/conteúdo coincidentes e origem intacta. Usados bloqueios READ nas tabelas da origem, sem bloqueio global, engine alterado ou migrations. A conta já tinha os privilégios necessários; nenhum grant ou senha alterado.
+
+Inventário privado às 16:51 confirmou 440 candidatos textuais e 58 avaliações sem candidato; G01–G05 reúnem 40/23/16/20/1 profissionais, sem candidatos de conta nas comparações usadas. **Nenhuma associação aprovada/aplicada**. Detalhes ficam criptografados fora do Git. Ferramentas em `local-mysql-copy.js/.ps1` e `local-mysql-review.js`; **242 testes aprovados**, parser/diff conferidos. [Resultado completo](PLANO_CONEXAO_MYSQL_LOCAL.md#6-inspeção-inicial-e-resultado-da-execução-autorizada), [resumo sanitizado](evidencias/conexao-mysql-local/validation-summary.json).
+
+Pasta externa protegida `%LOCALAPPDATA%/EvaluationDev/inova-nucleo-compat-20261029` contém backup, cofre DPAPI, manifesto e candidatos. Preservar todos; zero `.cnf` temporários ao final. **Não repetir CreateCopy/InspectCopy** com esse alvo/artefatos existentes. Backend `mysql` conectou em leitura à cópia, mas **a API não foi trocada**: serviços anteriores continuam (frontend 200; API sem sessão 401).
+
+**Próxima aprovação necessária: E1**, [plano de compatibilidade somente na cópia](PLANO_COMPATIBILIDADE_INOVA.md): converter três tabelas gerenciadas para InnoDB e adicionar estruturas/campos em trilha própria, preservando hashes/colunas antigas, sem ativar contas nem vincular registros. Nenhuma migration desse plano escrita/aplicada. Não usar a cadeia histórica, alterar ledger legado, ligar API ou modificar a origem. A integração solicitada continua pendente de schema, acesso e mapas aprovados. Exportação portável continua fora desta prioridade. Os registros abaixo são históricos.
+
+## Prioridade atual — conectar o banco local existente, em 29/10/2026
+
+O usuário solicitou usar o MySQL local com os dados existentes e confirmou que `inova_nucleo` contém **dados fictícios de desenvolvimento**. Conexão em `127.0.0.1:3306`, MySQL 8.0.44, validada em leitura com as credenciais já configuradas, sem mostrá-las. Contagens: **25 contas, 100 profissionais e 498 avaliações**. Sete entradas no ledger, incluindo migration de 2025 ausente do diretório/histórico local consultado. Schema anterior ao atual, sem tabelas de gerências/sessões/limites e sem campos de estado/vínculos por ID.
+
+As 25 contas usam bcrypt; não converter ou redefinir senhas automaticamente. As 100 atribuições não coincidem exatamente com e-mails; 440 avaliações têm um candidato textual e 58 não têm candidato. Nenhum vínculo inferido/aplicado. TEXT/NULL e demais tabelas precisam ser preservados. [Diagnóstico e plano](PLANO_CONEXAO_MYSQL_LOCAL.md), [agregados sanitizados](evidencias/conexao-mysql-local/inspection.json).
+
+**API não foi trocada**; perfil anterior e serviços preservados. Não executar `knex migrate:latest`, aplicadores do perfil anterior, login ou gravações sobre esse banco sem novo plano/aprovação. Próximo lote proposto: backup criptografado e **nova cópia `inova_nucleo_compat_20261029` no mesmo MySQL local**, sem migrations, senhas ou vínculos alterados. Esse alvo/criação ainda aguardam autorização. A solicitação atual prioriza essa conexão; a exportação portável do lote B fica pendente. Inspeções foram somente leitura; código/configuração/credenciais não alterados neste lote. Os checkpoints abaixo são históricos.
+
+## Protótipo de pacote de chave concluído em 29/10/2026
+
+Após escolher pacote protegido por frase-senha separado do backup e receber a proposta do lote A, o usuário solicitou prosseguir. **Lote A implementado somente em memória, com material sintético**: `backend/lib/recovery/key-package.js` e 17 testes novos. Argon2id (64 MiB, três passagens, p=1) + AES-256-GCM; pacote autentica origem/hash do backup e somente entrega chave/SQL após autenticar ambos. Preservado `evaluation-backup-v1`; sem integração com CLI/launcher/rotas.
+
+**227/227 testes aprovados**, zero falhas/skips; diff sem erros. Medição sintética de três amostras: medianas de proteção/abertura 216/206 ms, RSS de pico 117 MiB no processo de medição; não é dimensionamento de produção. [Contrato, limites e resultado](PLANO_RECUPERACAO_PORTAVEL.md#8-resultado-do-lote-a-e-contrato-interno), [evidência sanitizada](evidencias/recuperacao-portavel/prototype-summary.json).
+
+Nenhum cofre/backup operacional foi lido, nenhuma chave real exportada, pacote gravado ou MySQL/SMTP/serviço alterado. Sem dependências novas, frontend/build/Chrome/migrations, outro host ou domínio definitivo neste lote. **Próximo escopo: planejar B**, escolhendo origem/backup, local concreto de guarda e arquivo novo antes de aprovar exportação operacional. C (restauração independente) continua separado. Não inferir que o protótipo já exporta chaves ou demonstra recuperação em outra máquina. Os checkpoints abaixo são históricos.
+
+## Planejamento da recuperação portável em 29/10/2026
+
+Após concluir a validação de Registros, o usuário solicitou prosseguir. Retomada a prioridade registrada de recuperação em outra máquina/proteção das chaves, **somente com planejamento**: [diagnóstico, alternativas, modelo técnico, lotes, arquivos, testes e critérios](PLANO_RECUPERACAO_PORTAVEL.md). Confirmadas no código as dependências distintas da chave `recovery`, da identidade autenticada da origem e das chaves dos manifestos privados. Não copiar o cofre inteiro nem reutilizar a identidade da origem para autorizar um destino.
+
+Próximo lote proposto: **A, protótipo em memória com material sintético**, preservando o formato atual dos backups e sem DPAPI/MySQL/arquivos operacionais. Ainda depende de aprovação do modelo. O usuário confirmou a preferência por **pacote protegido por frase-senha, guardado separadamente do backup**; essa resposta define a custódia, sem aprovar o modelo técnico/implementação. Exportação de chave real e restauração em novo alvo terão planos/aprovações específicos. Nenhum código, segredo, banco ou serviço alterado por este planejamento; testes anteriores não repetidos. Os checkpoints abaixo são históricos.
+
+## Concorrência MySQL de Registros concluída em 29/10/2026
+
+Após autorização explícita **somente da cópia `evaluation_isolated_0f8785e64029_v2_restore_20261029a001`**, execução concluída às **15:18:47, horário de São Paulo**. API principal pausada; backup/restauração de **9 tabelas/52 registros** com igualdade DDL/conteúdo e autenticação recuperada antecederam as fixtures. Duas esperas InnoDB reais observadas; requisições pelos dois POSTs resultaram em **um 204, um 409 e uma única inserção**. Duplicidade entre perfis/rotas, homônimos, transferência/autoria, data forjada e limites SQL de mês/ano/bissexto passaram. Contas e dados de negócio da origem integralmente preservados; zero migrations.
+
+API principal retomada com o mesmo perfil e baseline 14, `/session` anônimo 401, frontend `/registros` 200 e log de erros vazio. MySQL/frontend preservados. Backup `backup-20261029a001.evalbackup`, cópia e relatórios externos mantidos; nenhum arquivo temporário de credenciais/cofre remanescente. **Não repetir `ValidateMonthlyRecords` com esse ID**, não sobrescrever/apagar artefatos nem escolher outro alvo sem aprovação própria. A cópia contém fixtures e não é mais idêntica ao backup original. [Procedimento, resultado e limites](VALIDACAO_REGISTROS_LOCAL.md), [relatório SQL/HTTP](evidencias/registros-local/mysql-validation-report.json), [recuperação](evidencias/registros-local/mysql-recovery-report.json).
+
+Os **210 testes, build e 148 grupos Chrome** passaram na etapa imediatamente anterior; não foram repetidos nesta execução SQL, que não alterou código. Documentação/evidências atualizadas, sem commit/push/deploy ou testes em domínio definitivo. Próximos lotes de recuperação em outro host/proteção de chaves, auditoria administrativa durável e persistência dos critérios/submissão exigem planejamento/escopo próprios. Os checkpoints abaixo são históricos.
+
+## Validação local de Registros retomada em 29/10/2026
+
+Revisão Chrome com API integralmente simulada concluída: **148 grupos aprovados, 18 capturas, zero erros JS**, em 320/390/768/1440 px e temas claro/escuro. Inspeção visual de páginas, histórico e detalhes. Corrigido o foco por teclado no `summary` do modal e acrescentada orientação de rolagem do gráfico no celular. Ferramenta `playwright-core` 1.64.1 preparada offline apenas em cache ignorado, sem mudar dependências dos projetos nem baixar navegador. **210/210 testes**, build local, parser PowerShell e diff aprovados. [Plano e resultados](VALIDACAO_REGISTROS_LOCAL.md), [resumo sanitizado](evidencias/registros-local/summary.json).
+
+Runner `isolated-monthly-records.js` e ação `ValidateMonthlyRecords` preparados, com barreiras testadas em mocks. **Execução MySQL ainda não autorizada/realizada**: confirmação específica solicitada para backup e nova cópia `evaluation_isolated_0f8785e64029_v2_restore_20261029a001`, sem migrations/escrita de avaliações na origem; API local será pausada e retomada no procedimento aprovado. Não executar a ação até receber essa autorização. Os serviços existentes foram preservados nesta etapa. Sem testes em domínio definitivo, SMTP, commit/push ou deploy. Os checkpoints abaixo são históricos.
+
+## Registros: evolução aprovada em 29/10/2026
+
+Após retomar o projeto e solicitar abertura local, o usuário determinou **não realizar testes em domínio definitivo**. Em seguida aprovou o plano de pesquisa por período, resumo completo ao clicar no profissional, gráfico notas × meses e limite de uma avaliação por profissional no mês da gravação, independente do avaliador.
+
+Implementação em `Registros.vue`, `ProfessionalHistoryModal.vue`, `record-history.js`, CSS e `backend/lib/records.js`, com testes e documentação. A API rejeita duplicidade com 409; transação `READ COMMITTED` e bloqueio exclusivo do profissional serializam os dois endpoints de gravação. Sem migration ou alteração de avaliações antigas; arrays de critérios/submissão continuam no estado anterior. **204 testes aprovados**, zero falhas/skips, e build local em cache. [Descrição, regras, evidências e limites](REGISTROS_HISTORICO.md).
+
+API recarregada com o perfil fictício existente e mantida em segundo plano; log `serving: true`, `/session` anônimo 401. Frontend `/registros` e módulo atualizado responderam 200 em localhost:5173. MySQL 127.0.0.1:50470 preservado; conferir portas antes de iniciar duplicatas. Logs operacionais sanitizados ficam em `backend/node_modules/.cache/local-runtime/`, ignorados pelo Git.
+
+Concorrência real MySQL e revisão visual em navegador não foram executadas neste lote; os testes usam dados fictícios e simulação de bloqueios/DOM. Não repetir migrations, conciliação ou validações SQL antigas para testar essa regra: vários runners históricos gravam múltiplas avaliações no mesmo mês e precisarão de adequação/revisão em uma cópia autorizada. Nenhum commit/push/deploy deste lote foi solicitado. O checkpoint de Git anterior era `0713551`, em `master`; preservar alterações posteriores. Os registros abaixo são históricos.
+
 ## Pausa preparada e envio solicitado — 28/10/2026
 
 O usuário pediu para **preparar a continuidade para depois e enviar as alterações ao GitHub**. Está autorizado o commit/push do lote já concluído: migration 14, aplicador isolado, launcher, testes, evidências sanitizadas e documentação, incluindo a troca autorizada da porta MySQL. Essa autorização não aprova novas implementações, outras migrations/alvos, produção ou deploy.

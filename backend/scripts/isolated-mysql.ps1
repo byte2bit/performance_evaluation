@@ -1,5 +1,5 @@
 param(
-    [ValidateSet('Initialize', 'Start', 'NewSchema', 'Validate', 'ValidateLinks', 'Inventory', 'ReconcileReviewed', 'ValidateManagement', 'ActivateManagement', 'EnforceProfessionalDepartment', 'ServeManagementCopy', 'RecoveryTest', 'VisualReview', 'Stop', 'Serve', 'Info')]
+    [ValidateSet('Initialize', 'Start', 'NewSchema', 'Validate', 'ValidateLinks', 'Inventory', 'ReconcileReviewed', 'ValidateManagement', 'ActivateManagement', 'EnforceProfessionalDepartment', 'ServeManagementCopy', 'ValidateMonthlyRecords', 'RecoveryTest', 'VisualReview', 'Stop', 'Serve', 'Info')]
     [string]$Action = 'Info',
     [string]$ProfileDirectory,
     [string]$MySqlBinary = 'C:/Program Files/MySQL/MySQL Server 8.0/bin/mysqld.exe',
@@ -10,7 +10,9 @@ param(
     [string]$ManagementReportName,
     [string]$ApprovedDepartmentMapName,
     [string]$ConfirmDepartmentMap,
-    [string]$ConfirmProfessionalDepartment
+    [string]$ConfirmProfessionalDepartment,
+    [string]$MonthlyCopyId,
+    [string]$ConfirmMonthlyRecords
 )
 
 $ErrorActionPreference = 'Stop'
@@ -29,8 +31,11 @@ function Read-Vault([string]$directory) {
 }
 
 function Invoke-IsolatedNode([string]$verb, [string]$directory) {
+    if ($verb -eq 'validatemonthlyrecords' -and ($ConfirmMonthlyRecords -cne 'records:monthly:copy-only:baseline14' -or $MonthlyCopyId -cnotmatch '^[a-f0-9]{12}$')) {
+        throw 'Explicit monthly copy confirmation and identifier are required.'
+    }
     $secrets = Read-Vault $directory
-    if ($verb -in @('recoverytest', 'validatemanagement') -and -not $secrets.ContainsKey('recovery')) {
+    if ($verb -in @('recoverytest', 'validatemanagement', 'validatemonthlyrecords') -and -not $secrets.ContainsKey('recovery')) {
         $secrets.recovery = New-RandomSecret
         $plain = [Text.Encoding]::UTF8.GetBytes(($secrets | ConvertTo-Json -Compress))
         try {
@@ -53,7 +58,9 @@ function Invoke-IsolatedNode([string]$verb, [string]$directory) {
         FRONTEND_ORIGIN = $(if ($verb -eq 'servemanagementcopy') { 'http://127.0.0.1:5174' } else { 'http://localhost:5173' })
         SESSION_SAME_SITE = 'lax'
         TRUST_PROXY = $null
-        EVAL_ISOLATED_RECOVERY_KEY = $(if ($verb -in @('recoverytest', 'validatemanagement', 'activatemanagement', 'enforceprofessionaldepartment')) { $secrets.recovery } else { $null })
+        EVAL_ISOLATED_RECOVERY_KEY = $(if ($verb -in @('recoverytest', 'validatemanagement', 'activatemanagement', 'enforceprofessionaldepartment', 'validatemonthlyrecords')) { $secrets.recovery } else { $null })
+        EVAL_MONTHLY_COPY_ID = $(if ($verb -eq 'validatemonthlyrecords') { $MonthlyCopyId } else { $null })
+        EVAL_MONTHLY_CONFIRMATION = $(if ($verb -eq 'validatemonthlyrecords') { $ConfirmMonthlyRecords } else { $null })
         EVAL_REQUIRED_DEPARTMENT_CONFIRMATION = $(if ($verb -eq 'enforceprofessionaldepartment') { $ConfirmProfessionalDepartment } else { $null })
         EVAL_VISUAL_TOOL_DIRECTORY = $(if ($verb -eq 'visualreview') { $VisualToolDirectory } else { $null })
         EVAL_ISOLATED_LINKS_RECOVERY_REPORT = $(if ($verb -eq 'validatelinks') { $RecoveryReportName } else { $null })

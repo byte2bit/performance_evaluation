@@ -1,5 +1,9 @@
 # Backup e restauração no MySQL isolado
 
+**Último exercício, em 29/10/2026:** backup `backup-20261029a001.evalbackup`, baseline 14, restauração de **9 tabelas/52 registros** com igualdade DDL/conteúdo e login dos dois perfis. Depois foram executadas fixtures de concorrência mensal **somente na cópia**; origem/contas preservadas e API retomada. Backup/cópia/relatórios mantidos. [Resultados sanitizados](VALIDACAO_REGISTROS_LOCAL.md). Não repetir esse identificador nem sobrescrever a cópia existente.
+
+**Recuperação em outra máquina:** [lote A do plano](PLANO_RECUPERACAO_PORTAVEL.md#8-resultado-do-lote-a-e-contrato-interno) aprovado/implementado somente em memória e com material sintético; 227 testes aprovados. Não houve exportação de chave operacional, criação de pacote em arquivo ou provisionamento de destino. B/C precisam de planos/aprovações próprios. A recuperação local acima e o protótipo não comprovam recuperação independente em outro host. Os relatos inferiores são históricos.
+
 **Último backup pré-ativação de gerências:** `backup-49892036b2c4.evalbackup`, com restauração/igualdade de **8 tabelas/46 registros** e login dos dois perfis confirmados em 27/10/2026 às 21:31. Origem permaneceu intacta nessa etapa. Depois da validação em cópia, a origem recebeu a 13ª migration e o mapa aprovado, sem alteração das oito avaliações/contas/campos legados. A cópia `_restore_49892036b2c4` também passou a ter o mapa; não confundir seu estado atual com o backup anterior à migration. [Resultado e artefatos](PLANO_GESTAO_GERENCIAS.md#ativação-autorizada-na-origem). Relatos abaixo são históricos.
 
 Executado em 25/10/2026, a pedido do usuário, exclusivamente na instância fictícia descrita em [AMBIENTE_ISOLADO.md](AMBIENTE_ISOLADO.md). A origem e o serviço MySQL80 existente foram preservados. Não constitui validação de recuperação de produção.

@@ -1,0 +1,22 @@
+{
+  "dateLocal": "2026-10-29",
+  "scope": "Approved compatibility E1, only the existing fictitious local copy",
+  "target": "inova_nucleo_compat_20261029",
+  "implementation": "Two guarded Knex migrations, opt-in runner and PowerShell actions",
+  "unitTests": { "total": 256, "passed": 256, "failed": 0, "skipped": 0, "newE1Tests": 14 },
+  "sqlCompilation": "Passed without database execution",
+  "powershellSyntax": "Passed",
+  "gitDiffCheck": "Passed",
+  "livePreflight": "Authenticated backup and compared all original DDL and content",
+  "executionBlockedBy": "Missing REFERENCES privilege on the copy",
+  "ddlExecuted": false,
+  "migrationsExecuted": 0,
+  "sqlTransactionProbesExecuted": false,
+  "privilegesChanged": false,
+  "sourceChanged": false,
+  "copyChanged": false,
+  "credentialsPrinted": false,
+  "dependenciesChanged": false,
+  "applicationSwitched": false,
+  "smtpSent": false
+}

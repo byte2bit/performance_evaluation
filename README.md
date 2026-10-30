@@ -2,6 +2,10 @@
 
 Sistema web para avaliação de profissionais, consulta de avaliações e gestão de colaboradores. O projeto reúne um frontend Vue 3 e uma API Express com persistência MySQL, mantidos como um único sistema.
 
+**Conta 12 na cópia local:** senha redefinida posteriormente a E3, por solicitação do usuário. Credenciais apresentadas somente em janela local; para reabri-la, executar `./backend/scripts/local-inova-reset-password.ps1 -Action Show` no PowerShell 7. [Resultado e instruções](docs/REDEFINICAO_CONTA_LOCAL.md).
+
+**Prévia local com os dados existentes:** [abrir login](http://localhost:5174/login), API `http://localhost:8002`, conectadas à cópia `127.0.0.1:3306/inova_nucleo_compat_20261029`. Cinco gerências da conta 12, 100 profissionais e 395 avaliações vinculados; 103 avaliações pendentes com acesso administrativo. Origem preservada, 25 contas habilitadas com suas senhas atuais, atualização para Argon2id após login válido e SMTP bloqueado. **315 testes e build aprovados**, sem usar senhas existentes nas verificações. [Resultado e operação da prévia](docs/PLANO_MAPAS_PREVIA_INOVA.md#resultado-da-execução-e3).
+
 ## Funcionalidades
 
 | Área | Funcionalidades implementadas |
@@ -10,7 +14,7 @@ Sistema web para avaliação de profissionais, consulta de avaliações e gestã
 | Perfis | Administradores consultam todos os dados; o demandante atual consulta o histórico dos seus profissionais, inclusive avaliações anteriores. O anterior perde acesso, preservando a autoria. A autorização é aplicada pela API. |
 | Colaboradores | Cadastro e edição administrativos, gerência por seleção, listagem com pesquisa/ordenação e arquivamento com confirmação, preservando avaliações. |
 | Avaliação | Formulário com qualidade, prazo, disponibilidade e responsabilidade; notas em incrementos de 0,5, observações, critérios e cálculo de média, nível e desconto. **A submissão pela interface permanece desativada.** |
-| Registros | Consulta de avaliações, pesquisa, ordenação e exclusão administrativa com confirmação. A API também oferece uma listagem paginada. |
+| Registros | Consulta com pesquisa por texto/período, resumo completo por profissional e gráfico mensal das notas. Exclusão administrativa com confirmação e listagem paginada na API. Gravações limitadas a uma avaliação por profissional no mês. |
 | Exportação | Exportação administrativa dos registros em XLS. |
 | E-mail | Endpoints administrativos para mensagens de avaliação individual ou em grupo, com templates HTML e configuração SMTP externa. Exigem transporte configurado; envio real ainda não foi validado. |
 | Contas | CLI interativa para criar administradores/avaliadores, ativar ou desativar contas e alterar o perfil, com revogação de sessões afetadas. Não há cadastro público nem senha padrão. |
@@ -47,9 +51,9 @@ Consign carrega autenticação, middlewares, handlers e rotas nessa ordem. `back
 
 ## Desenvolvimento local
 
-**A aplicação principal está ativa em `http://localhost:5173`**, API `http://localhost:8001`, com as 14 migrations e o mapa aprovados no MySQL isolado. A Gerência de Testes reúne os dois profissionais e tem o avaliador atual como responsável; as oito avaliações foram preservadas. A prévia antiga foi encerrada, com seus dados mantidos para consulta. [Modelo, ativação e evidências](docs/PLANO_GESTAO_GERENCIAS.md).
+**Perfil principal anterior:** frontend configurado para `http://localhost:5173`, API `http://localhost:8001`, com as 14 migrations e o mapa aprovados no MySQL isolado. A Gerência de Testes reúne os dois profissionais e tem o avaliador atual como responsável; as oito avaliações foram preservadas. Na conferência E3, a API respondeu e o frontend 5173 não respondeu; esse frontend não foi iniciado/parado pelo lote. A prévia da cópia usa 5174/8002, conforme o aviso inicial. [Modelo e evidências do perfil anterior](docs/PLANO_GESTAO_GERENCIAS.md).
 
-O perfil documentado já possui as 14 migrations, as oito avaliações fictícias conciliadas e os dois profissionais vinculados à gerência aprovada. A leitura de avaliador/administrador foi reconfirmada por HTTP no baseline 14; Chrome é evidência do lote anterior. MySQL isolado em `127.0.0.1:50470`, API e frontend permanecem em execução; confira os serviços antes de iniciar duplicatas. Os comandos abaixo iniciam o ambiente existente quando necessário e não aplicam migrations em outros alvos.
+O perfil anterior já possui as 14 migrations, as oito avaliações fictícias conciliadas e os dois profissionais vinculados à gerência aprovada. A leitura de avaliador/administrador foi reconfirmada por HTTP no baseline 14; Chrome é evidência daquele lote. MySQL isolado em `127.0.0.1:50470`; confira os serviços antes de iniciar duplicatas. Os comandos abaixo são desse perfil anterior e não aplicam migrations em outros alvos. Para a cópia local, use o launcher de prévia indicado no início deste documento.
 
 O ambiente registrado usa **Node.js 24.12.0**, npm 11.6.2, PowerShell 7 e MySQL 8.0.44 isolado. As dependências de frontend e backend têm manifestos e lockfiles separados. A instalação precisa preservar esses lockfiles; Argon2 possui componente nativo.
 
@@ -98,6 +102,13 @@ Para validar o ciclo de processos do PM2 sem iniciar a aplicação ou acessar ba
 - [Gestão por gerências e ativação autorizada](docs/PLANO_GESTAO_GERENCIAS.md)
 - [Ambiente MySQL isolado](docs/AMBIENTE_ISOLADO.md)
 - [Backup e restauração](docs/BACKUP_RESTAURACAO.md)
+- [Plano de recuperação portável e proteção das chaves](docs/PLANO_RECUPERACAO_PORTAVEL.md)
+- [Conexão ao MySQL local existente: diagnóstico e plano](docs/PLANO_CONEXAO_MYSQL_LOCAL.md)
+- [Compatibilidade do MySQL legado: E1 concluído somente na cópia](docs/PLANO_COMPATIBILIDADE_INOVA.md)
+- [Acesso às contas legadas: serviço de credenciais, limites e rehash E2A](docs/PLANO_ACESSO_MYSQL_LOCAL.md)
+- [E2B concluído: validação SQL/HTTP e 25 contas ativadas somente na cópia](docs/PLANO_ATIVACAO_ACESSO_LOCAL.md)
+- [Revisão local dos responsáveis, vínculos aplicados e pendências](docs/REVISAO_MAPAS_INOVA.md)
+- [E3 concluído: conta 12 nas cinco gerências, 395 vínculos e prévia local separada](docs/PLANO_MAPAS_PREVIA_INOVA.md)
 - [Revisão visual](docs/REVISAO_VISUAL.md)
 - [Dependências e segurança](docs/DEPENDENCIAS_SEGURANCA.md)
 

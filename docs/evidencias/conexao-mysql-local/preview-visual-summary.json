@@ -1,0 +1,17 @@
+{
+  "success": true,
+  "viewportWidths": [
+    1440,
+    390
+  ],
+  "anonymousOnly": true,
+  "credentialsTyped": false,
+  "operationalLoginsAttempted": 0,
+  "pageErrors": 0,
+  "externalRequestsBlocked": true,
+  "captures": [
+    "login-1440.png",
+    "login-390.png"
+  ],
+  "completedUtc": "2026-10-30T03:13:58.039Z"
+}

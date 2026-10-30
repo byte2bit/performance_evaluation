@@ -70,6 +70,7 @@ test('ID selection disambiguates authorized namesakes while legacy ambiguous nam
     const reviewer = app.client(); await reviewer.login()
     const headers = { 'X-CSRF-Token': await reviewer.csrf() }
     for (const url of ['/registros', '/registros2']) {
+        app.state.recordedAt = url === '/registros' ? '2026-10-29 12:00:00' : '2026-11-01 00:00:00'
         const before = app.state.tables.registros.length
         assert.equal((await reviewer.request('POST', url, validEvaluation(), headers)).status, 409)
         assert.equal(app.state.tables.registros.length, before)
@@ -87,6 +88,7 @@ test('legacy names resolve only inside the current scope, while administrators m
     const reviewer = app.client(); await reviewer.login()
     const admin = app.client(); await admin.login('admin@example.invalid')
     for (const url of ['/registros', '/registros2']) {
+        app.state.recordedAt = url === '/registros' ? '2026-10-29 12:00:00' : '2026-11-01 00:00:00'
         assert.equal((await reviewer.request('POST', url, validEvaluation(), { 'X-CSRF-Token': await reviewer.csrf() })).status, 204)
         assert.equal(app.state.tables.registros.at(-1).colab_id, 1)
         const before = app.state.tables.registros.length

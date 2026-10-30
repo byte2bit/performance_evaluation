@@ -2,7 +2,7 @@ import { onMounted, onBeforeUnmount, watch } from 'vue'
 import { Modal } from 'flowbite'
 
 let activeModal = null
-const focusableSelector = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+const focusableSelector = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), summary, [tabindex]:not([tabindex="-1"])'
 
 export function useFlowbiteModal(element, visible) {
     let modal = null

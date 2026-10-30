@@ -69,11 +69,12 @@ function client(binaryDirectory, executable, config, args, input) {
     return result.stdout
 }
 
-async function recover({ profile, root, startApplication, browser }) {
+async function recover({ profile, root, startApplication, browser, backupId }) {
     const started = Date.now()
     assert.match(process.env.EVAL_ISOLATED_RECOVERY_KEY || '', /^[a-f0-9]{64}$/)
     const key = Buffer.from(process.env.EVAL_ISOLATED_RECOVERY_KEY, 'hex')
-    const id = randomBytes(6).toString('hex')
+    const id = backupId === undefined ? randomBytes(6).toString('hex') : backupId
+    assert.match(id, /^[a-f0-9]{12}$/)
     const target = profile.database + '_restore_' + id
     await assertFreshTarget(root, profile, target)
     const [marker] = await root.query('SELECT profile_id FROM ??.isolation_marker', [profile.database])

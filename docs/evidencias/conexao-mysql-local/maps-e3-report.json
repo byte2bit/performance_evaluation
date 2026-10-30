@@ -1,0 +1,40 @@
+{
+  "success": true,
+  "target": "inova_nucleo_compat_20261029",
+  "backupTables": 14,
+  "backupRows": 683,
+  "backupAuthenticated": true,
+  "rollbackVerified": true,
+  "departmentsCreated": 5,
+  "ownerAccountId": 12,
+  "professionalsLinked": 100,
+  "recordsLinked": 395,
+  "recordsPending": 103,
+  "pendingCollationOnly": 45,
+  "pendingWithoutCandidate": 58,
+  "accountsAndHashesPreserved": 25,
+  "historicalFieldsPreserved": true,
+  "sourceUnchanged": true,
+  "legacyLedgerEntriesPreserved": 7,
+  "compatibilityMigrations": 3,
+  "newMigrationBatch": 2,
+  "departmentRequired": true,
+  "unsignedAndForeignKeysPreserved": true,
+  "sqlAuthorizationScopes": [
+    {
+      "actor": "chosen-owner",
+      "recordsVisible": 498
+    },
+    {
+      "actor": "chosen-owner",
+      "recordsVisible": 498
+    },
+    {
+      "actor": "unassigned-evaluator",
+      "recordsVisible": 0
+    }
+  ],
+  "operationalLoginsAttempted": 0,
+  "previewNotYetStarted": true,
+  "completedUtc": "2026-10-30T02:53:27.225Z"
+}

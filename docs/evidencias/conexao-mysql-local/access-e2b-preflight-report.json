@@ -1,0 +1,17 @@
+{
+  "success": true,
+  "ready": true,
+  "target": "inova_nucleo_compat_20261029",
+  "tables": 14,
+  "rows": 683,
+  "accounts": 25,
+  "activeAccounts": 0,
+  "reviewedAccountMapMatches": true,
+  "e1StateMatches": true,
+  "sourceUnchanged": true,
+  "missingPrivileges": [],
+  "fixtureTablesAbsent": true,
+  "accountsChanged": false,
+  "applicationSwitched": false,
+  "completedUtc": "2026-10-30T02:12:29.760Z"
+}

@@ -1,0 +1,16 @@
+{
+  "success": true,
+  "previewLoginPage200": true,
+  "frontendApi8002Verified": true,
+  "anonymous401": true,
+  "exactCors5174": true,
+  "credentialsCors": true,
+  "separateHostOnlyHttpOnlyLaxCookie": true,
+  "missingCsrf403": true,
+  "primaryOriginNotAllowedOnPreview": true,
+  "primaryApiAnonymous401": true,
+  "primaryFrontendAvailable": false,
+  "primaryFrontendNotStartedOrStopped": true,
+  "operationalLoginsAttempted": 0,
+  "completedUtc": "2026-10-30T03:15:17.994Z"
+}

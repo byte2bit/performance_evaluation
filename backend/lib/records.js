@@ -10,6 +10,22 @@ function scopeRecords(db, query, user) {
     return isAdmin(user) ? query : query.whereIn('colab_id', scope(db('colab').select('id'), user, db))
 }
 
+// Use the database's calendar and capture the time after acquiring the
+// professional lock. The very same value is persisted, even at month rollover.
+const recordingClockSql = "SELECT DATE_FORMAT(CURRENT_TIMESTAMP, '%Y-%m-%d %H:%i:%s') AS recorded_at"
+function monthBounds(timestamp) {
+    if (typeof timestamp !== 'string' || !/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(timestamp)) throw new Error('Invalid database clock')
+    const year = Number(timestamp.slice(0, 4)), month = Number(timestamp.slice(5, 7))
+    if (month < 1 || month > 12) throw new Error('Invalid database month')
+    return { start: timestamp.slice(0, 7) + '-01 00:00:00',
+        end: `${month === 12 ? year + 1 : year}-${String(month === 12 ? 1 : month + 1).padStart(2, '0')}-01 00:00:00` }
+}
+function monthlyRecordQuery(trx, professionalId, timestamp) {
+    const { start, end } = monthBounds(timestamp)
+    return trx('registros').select('id').where({ colab_id: professionalId })
+        .where('created_at', '>=', start).where('created_at', '<', end).first()
+}
+
 function createRecords(db, { paginated = false } = {}) {
     const getReg = async (req, res) => {
         const paging = paginated ? validation.pagination(req.query) : null
@@ -35,6 +51,8 @@ function createRecords(db, { paginated = false } = {}) {
         const record = validation.evaluation(req.body)
         if (!record) return res.status(400).send('Dados de avaliação inválidos.')
         try {
+            // After waiting for the professional lock, read the preceding commit
+            // rather than reusing an earlier REPEATABLE READ snapshot.
             const saved = await db.transaction(async trx => {
                 const actor = await trx('users2').where({ id: req.user.id }).forShare().first()
                 if (!active(actor) || actor.session_version !== req.user.session_version) return 403
@@ -46,17 +64,21 @@ function createRecords(db, { paginated = false } = {}) {
                 const selected = candidates[0]
                 const department = await trx('gerencias').where({ id: selected.gerencia_id }).whereNull('deletedAt').forShare().first()
                 if (!department || (!isAdmin(actor) && department.demandante_id !== actor.id)) return 403
-                const professional = await trx('colab').select('id', 'colab', 'gerencia_id', 'deletedAt').where({ id: selected.id }).forShare().first()
+                const professional = await trx('colab').select('id', 'colab', 'gerencia_id', 'deletedAt').where({ id: selected.id }).forUpdate().first()
                 if (!professional || professional.deletedAt != null || professional.gerencia_id !== department.id) return 403
                 if (byId && professional.colab !== record.colab) return 409
                 record.colab_id = professional.id
                 record.colab = professional.colab
                 record.demandante = normalizeEmail(actor.email)
+                const [[clock]] = await trx.raw(recordingClockSql)
+                if (await monthlyRecordQuery(trx, professional.id, clock.recorded_at)) return 'duplicate-month'
+                record.created_at = clock.recorded_at
                 await trx('registros').insert(record)
                 return 204
-            })
+            }, { isolationLevel: 'read committed' })
             if (saved === 403) return res.status(403).send('Profissional fora do seu escopo.')
             if (saved === 409) return res.status(409).send('Seleção de profissional ambígua ou desatualizada.')
+            if (saved === 'duplicate-month') return res.status(409).send('Este profissional já possui uma avaliação neste mês.')
             return res.status(204).send()
         } catch { return res.status(500).send('Não foi possível salvar o registro.') }
     }
@@ -71,4 +93,4 @@ function createRecords(db, { paginated = false } = {}) {
     return { getReg, getRegById, saveReg, removeReg }
 }
 
-module.exports = { createRecords, scopeRecords }
+module.exports = { createRecords, scopeRecords, monthBounds, monthlyRecordQuery, recordingClockSql }

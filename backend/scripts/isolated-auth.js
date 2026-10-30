@@ -396,7 +396,7 @@ async function validateAuthentication(profile, report) {
 async function main() {
     const profile = loadProfile()
     const action = process.argv[2]
-    assert.ok(['ready', 'validate', 'validatelinks', 'inventory', 'reconcilereviewed', 'validatemanagement', 'activatemanagement', 'enforceprofessionaldepartment', 'servemanagementcopy', 'recoverytest', 'visualreview', 'stop', 'serve'].includes(action))
+    assert.ok(['ready', 'validate', 'validatelinks', 'inventory', 'reconcilereviewed', 'validatemanagement', 'activatemanagement', 'enforceprofessionaldepartment', 'servemanagementcopy', 'validatemonthlyrecords', 'recoverytest', 'visualreview', 'stop', 'serve'].includes(action))
     if (['validate', 'visualreview'].includes(action)) {
         // These historical fixtures predate department IDs. Never let their
         // generic migration path activate the new model on the source schema.
@@ -421,6 +421,14 @@ async function main() {
     try {
         const version = await verifyServer(root, profile)
         if (action === 'ready') { console.log(JSON.stringify({ ready: true, version })); return }
+        if (action === 'validatemonthlyrecords') {
+            phase = 'monthly-records-preconditions'
+            const report = await require('./isolated-monthly-records').validate({ profile, root, verifyServer, startApplication, browser,
+                confirmation: process.env.EVAL_MONTHLY_CONFIRMATION, copyId: process.env.EVAL_MONTHLY_COPY_ID,
+                progress(stage) { phase = 'monthly-records-' + stage; console.log(JSON.stringify({ phase })) } })
+            console.log(JSON.stringify(report))
+            return
+        }
         if (action === 'stop') { await root.query('SHUTDOWN'); console.log(JSON.stringify({ stopped: true })); return }
         if (action === 'enforceprofessionaldepartment') {
             phase = 'required-department-preconditions'

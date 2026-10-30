@@ -7,13 +7,14 @@ const { createPasswords, validPassword, validLoginPassword } = require('./passwo
 const { normalizeEmail, active, publicUser, isAdmin } = require('./identity')
 const { createStore } = require('./session-store')
 const { createLimits } = require('./limits')
+const { createCredentials } = require('./credentials')
 
 const invoke = (target, method, ...args) => new Promise((resolve, reject) => {
     target[method](...args, error => error ? reject(error) : resolve())
 })
 
 function createAuth({ db, config = readConfig(), store = createStore(db),
-    passwords = createPasswords(), limit, now = Date.now } = {}) {
+    passwords = createPasswords(), credentials = createCredentials({ db, passwords }), limit, now = Date.now } = {}) {
     const passport = new Passport()
     const cookie = { httpOnly: true, secure: config.production, sameSite: config.sameSite, path: '/' }
     const clearCookie = res => res.clearCookie(config.cookieName, cookie)
@@ -50,10 +51,7 @@ function createAuth({ db, config = readConfig(), store = createStore(db),
     })
     passport.use(new Strategy({ usernameField: 'email', passwordField: 'password' }, async (email, password, done) => {
         try {
-            const user = await db('users2').select('id', 'name', 'email', 'password', 'admin', 'active', 'deletedAt', 'session_version')
-                .where({ email: normalizeEmail(email) }).first()
-            const matches = await passwords.verify(user?.password, password)
-            done(null, matches && active(user) ? { ...publicUser(user), session_version: user.session_version } : false)
+            done(null, await credentials(email, password))
         } catch (error) { done(error) }
     }))
 

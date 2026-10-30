@@ -1,0 +1,35 @@
+{
+  "date": "2026-10-29",
+  "scope": "Read-only compatibility inspection; application connection not switched",
+  "userConfirmedDataClassification": "Fictitious development data",
+  "source": { "host": "127.0.0.1", "port": 3306, "database": "inova_nucleo", "mysqlVersion": "8.0.44" },
+  "connectionSucceeded": true,
+  "transactions": "REPEATABLE READ, CONSISTENT SNAPSHOT, READ ONLY; always rolled back",
+  "counts": { "users2": 25, "colab": 100, "registros": 498, "migrationEntries": 7 },
+  "accounts": { "notDeleted": 25, "notDeletedAdmins": 2, "bcryptFormat": 25, "argon2idFormat": 0 },
+  "missingTables": ["gerencias", "sessions", "auth_rate_limits"],
+  "missingColumns": {
+    "users2": ["active", "session_version"],
+    "colab": ["gerencia_id", "deletedAt"],
+    "registros": ["colab_id"]
+  },
+  "migrationRecordedButAbsentFromCurrentDirectory": "20250401232552_create_liderancas_at_table_registros.js",
+  "correspondenceAggregates": {
+    "professionalDuplicateNameGroups": 0,
+    "professionalsWithoutExactBinaryOwnerEmailMatch": 100,
+    "nonemptyDepartmentLabels": 5,
+    "departmentLabelsWithMultipleOwnerTexts": 0,
+    "recordsWithSingleNameCandidate": 440,
+    "recordsWithoutNameCandidate": 58,
+    "recordsWithAmbiguousNameCandidates": 0,
+    "textualNameMonthGroupsWithMultipleRecords": 25
+  },
+  "individualDataOrCredentialValuesPrinted": false,
+  "dataModified": false,
+  "schemaModified": false,
+  "passwordsModified": false,
+  "migrationsExecuted": false,
+  "applicationSwitched": false,
+  "copyCreated": false,
+  "smtpSent": false
+}

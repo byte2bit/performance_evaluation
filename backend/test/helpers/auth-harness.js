@@ -13,6 +13,7 @@ const password = 'synthetic-password-for-tests'
 function database() {
     const state = {
         now: Date.now(), queries: [], writes: [], limits: {}, mails: 0,
+        recordedAt: '2026-10-29 12:00:00', transactionOptions: [], lockEvents: [],
         tables: {
             users2: [
                 { id: 1, name: 'Administrador fictício', email: 'admin@example.invalid', admin: 1, active: 1, deletedAt: null, session_version: 0, password: 'hash:' + password },
@@ -26,7 +27,10 @@ function database() {
             registros: [{ id: 1, colab_id: 1, colab: 'Profissional A', demandante: email }, { id: 2, colab_id: 2, colab: 'Profissional B', demandante: 'other@example.invalid' }]
         }
     }
-    function db(table) {
+    // Simulate exclusive professional locks for concurrent HTTP fixture tests.
+    // This is not an InnoDB emulator; real SQL integration remains opt-in.
+    const locks = new Map()
+    function db(table, transaction = null) {
         assert.ok(Object.hasOwn(state.tables, table), 'Unexpected table in isolated fixture')
         const predicates = []
         let fields
@@ -40,10 +44,36 @@ function database() {
             else rows = rows.map(row => ({ ...row }))
             return first ? rows[0] : rows
         }
-        state.queries.push({ table, predicates })
+        const entry = { table, predicates, lock: null }
+        state.queries.push(entry)
+        async function lockRows() {
+            if (entry.lock !== 'update' || table !== 'colab' || !transaction) return
+            for (const row of selected().sort((a, b) => a.id - b.id)) {
+                if (transaction.locked.has(row.id)) continue
+                const previous = locks.get(row.id) || Promise.resolve()
+                let release
+                const held = new Promise(resolve => { release = resolve })
+                const tail = previous.then(() => held)
+                locks.set(row.id, tail)
+                state.onProfessionalLock?.(row.id)
+                await previous
+                transaction.locked.add(row.id)
+                state.lockEvents.push({ action: 'acquire', id: row.id })
+                transaction.releases.push(() => {
+                    state.lockEvents.push({ action: 'release', id: row.id })
+                    release()
+                    if (locks.get(row.id) === tail) locks.delete(row.id)
+                })
+            }
+        }
         const query = {
             select(...names) { fields = names; return this },
-            where(values) {
+            where(values, operator, comparison) {
+                if (typeof values === 'string') {
+                    assert.ok(['>=', '<'].includes(operator))
+                    predicates.push(row => row[values] != null && (operator === '>=' ? row[values] >= comparison : row[values] < comparison))
+                    return this
+                }
                 predicates.push(row => Object.entries(values).every(([key, value]) => typeof value === 'boolean'
                     ? (row[key] === true || row[key] === 1) === value : key === 'id' ? Number(row[key]) === Number(value) : row[key] === value))
                 return this
@@ -57,9 +87,9 @@ function database() {
                 assert.equal(sql, 'BINARY ?? = ?'); assert.equal(bindings[0], 'demandante')
                 predicates.push(row => row.demandante === bindings[1]); return this
             },
-            orderBy() { return this }, forUpdate() { return this }, forShare() { return this },
+            orderBy() { return this }, forUpdate() { entry.lock = 'update'; return this }, forShare() { entry.lock = 'share'; return this },
             limit(value) { limit = value; return this }, offset(value) { offset = value; return this },
-            first() { first = true; return Promise.resolve(result()) },
+            async first() { first = true; await lockRows(); return result() },
             fixtureRows() { return result() },
             then(resolve, reject) { return Promise.resolve(result()).then(resolve, reject) },
             async insert(value) {
@@ -80,21 +110,30 @@ function database() {
         }
         return query
     }
-    db.transaction = async callback => {
+    db.transaction = async (callback, options) => {
+        state.transactionOptions.push(options)
+        const context = { locked: new Set(), releases: [] }
+        const trx = table => db(table, context)
+        trx.raw = (...args) => db.raw(...args)
         const before = structuredClone(state.tables), writes = state.writes.length
-        try { return await callback(db) }
+        try { return await callback(trx) }
         catch (error) { state.tables = before; state.writes.length = writes; throw error }
+        finally { context.releases.reverse().forEach(release => release()) }
     }
-    db.raw = sql => { assert.equal(sql, 'session_version + 1'); return { increment: true } }
+    db.raw = sql => {
+        if (sql === require('../../lib/records').recordingClockSql) return Promise.resolve([[{ recorded_at: state.recordedAt }]])
+        assert.equal(sql, 'session_version + 1'); return { increment: true }
+    }
     return { db, state }
 }
 
-async function harness(t, { authConfig = config() } = {}) {
+async function harness(t, { authConfig = config(), passwordService, credentialsFactory } = {}) {
     const { db, state } = database()
     const store = new MemoryStore() // Tests only. Runtime always uses the SQL store.
-    const passwords = { async hash(value) { return 'hash:' + value }, async verify(hash, value) { return hash === 'hash:' + value } }
+    const passwords = passwordService || { async hash(value) { return 'hash:' + value }, async verify(hash, value) { return hash === 'hash:' + value } }
     const auth = createAuth({ db, config: authConfig, store, now: () => state.now,
         passwords,
+        credentials: credentialsFactory?.({ db, passwords, state }),
         limit: kind => (req, res, next) => {
             const status = state.limits[kind]
             return status ? res.status(status).send('synthetic limit/service response') : next()

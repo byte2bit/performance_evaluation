@@ -1,0 +1,28 @@
+{
+  "success": true,
+  "target": "inova_nucleo_compat_20261029",
+  "migrationsExecuted": 2,
+  "dedicatedLedger": "inova_compat_migrations",
+  "managedEngines": "InnoDB",
+  "originalTables": 9,
+  "originalRows": 680,
+  "coreCounts": {
+    "users2": 25,
+    "colab": 100,
+    "registros": 498
+  },
+  "legacyMigrationEntries": 7,
+  "legacyLedgerUnchanged": true,
+  "historicalFieldsAndHashesPreserved": true,
+  "otherSixTablesUnchanged": true,
+  "sourceUnchanged": true,
+  "accountsActive": 0,
+  "assignmentsApplied": 0,
+  "restrictiveForeignKeys": 3,
+  "transactionRolledBack": true,
+  "invalidChildUpdatesRejected": 2,
+  "privilegesChanged": false,
+  "applicationSwitched": false,
+  "copyPreserved": true,
+  "completedUtc": "2026-10-30T00:28:10.725Z"
+}

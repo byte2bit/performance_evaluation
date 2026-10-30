@@ -1,0 +1,101 @@
+{
+  "success": true,
+  "target": "inova_nucleo_compat_20261029",
+  "host": "127.0.0.1",
+  "port": 3306,
+  "userApprovedConcreteE3": true,
+  "mapsCompletedUtc": "2026-10-30T02:53:27.225Z",
+  "preflight": {
+    "ready": true,
+    "readOnly": true,
+    "completedUtc": "2026-10-30T02:52:28.723Z"
+  },
+  "sql": {
+    "backupTables": 14,
+    "backupRows": 683,
+    "backupAuthenticated": true,
+    "rollbackVerified": true,
+    "departments": 5,
+    "ownerAccountId": 12,
+    "professionalsLinked": 100,
+    "recordsLinked": 395,
+    "recordsPending": 103,
+    "pendingCollationOnly": 45,
+    "pendingWithoutCandidate": 58,
+    "accountsAndHashesPreservedAtMapStage": 25,
+    "historicalFieldsPreserved": true,
+    "sourceUnchanged": true,
+    "compatibilityMigrations": 3,
+    "legacyLedgerEntriesPreserved": 7,
+    "departmentRequired": true,
+    "unsignedAndForeignKeysPreserved": true
+  },
+  "sqlScopes": {
+    "distinctActorsVerified": 3,
+    "readOnly": true,
+    "results": [
+      {
+        "actor": "chosen-owner",
+        "recordsVisible": 498
+      },
+      {
+        "actor": "administrator",
+        "recordsVisible": 498
+      },
+      {
+        "actor": "unassigned-evaluator",
+        "recordsVisible": 0
+      }
+    ],
+    "initialDuplicateAdministratorActorCorrectedBySeparateReadOnlyCheck": true,
+    "completedUtc": "2026-10-30T03:03:25.909Z"
+  },
+  "tests": {
+    "command": "node --test backend/test/*.test.js frontend/test/*.test.js",
+    "passed": 315,
+    "failed": 0,
+    "skipped": 0,
+    "newE3Tests": 17,
+    "realDatabaseProofInSeparateSqlReports": true
+  },
+  "build": {
+    "success": true,
+    "vite": "6.4.4",
+    "modules": 269,
+    "apiUrl": "http://localhost:8002",
+    "output": "frontend/node_modules/.cache/inova-e3-build"
+  },
+  "preview": {
+    "api": "http://localhost:8002",
+    "frontend": "http://localhost:5174/login",
+    "runningAtFinalStatus": true,
+    "apiHealthIdentityVerified": true,
+    "frontendHealthIdentityVerified": true,
+    "cookieName": "evaluation.inova.local.sid",
+    "separateDpapiVault": true,
+    "smtpBlocked": true,
+    "operationalLoginsAttempted": 0,
+    "nativeBrowserControlUnavailable": true,
+    "defaultBrowserOpenRequested": true,
+    "anonymousHeadlessVisualReview": true
+  },
+  "httpReport": "preview-http-report.json",
+  "visualReport": "preview-visual-summary.json",
+  "preservation": {
+    "source": true,
+    "primaryApiResponded": true,
+    "primaryFrontendAvailable": false,
+    "primaryFrontendNotStartedOrStoppedByE3": true,
+    "primaryFrontendInitialAvailabilityNotRecorded": true,
+    "noDependencyOrEnvFileChanges": true,
+    "noCommitPushOrPublication": true
+  },
+  "limits": [
+    "No existing account password was used or reset by validations.",
+    "Authenticated navigation with existing accounts was not exercised.",
+    "The 103 pending evaluations require separate reviewed scope.",
+    "Preview may legitimately change sessions, limits, hashes or business data through authorized application use.",
+    "Stop ownership guards implemented; live Stop not exercised."
+  ],
+  "evidenceWrittenUtc": "2026-10-30T03:25:13.902Z"
+}

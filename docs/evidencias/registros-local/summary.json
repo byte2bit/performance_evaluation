@@ -1,0 +1,53 @@
+{
+  "date": "2026-10-29",
+  "scope": "Local UI review with mocked API; real SQL runner prepared but not executed",
+  "automatedTests": { "passed": 210, "failed": 0, "skipped": 0 },
+  "browserReview": {
+    "browser": "Installed Chrome, headless",
+    "api": "Fully mocked; business writes forbidden; external destinations blocked",
+    "widths": [320, 390, 768, 1440],
+    "themes": ["light", "dark"],
+    "passedGroups": 148,
+    "captures": 18,
+    "pageErrors": 0,
+    "visualInspection": "Page, initial history and evaluation detail captures inspected on desktop/mobile in both themes"
+  },
+  "checks": {
+    "developmentBuild": true,
+    "powershellParser": true,
+    "javascriptSyntax": true,
+    "gitDiffWhitespace": true,
+    "projectDependencyManifestsUnchanged": true
+  },
+  "fixes": ["Include summary in modal keyboard focus cycle", "Explain horizontal chart scrolling on mobile"],
+  "temporaryTool": {
+    "package": "playwright-core",
+    "version": "1.64.1",
+    "installation": "Offline from existing npm cache into ignored node_modules/.cache only",
+    "browserDownloaded": false
+  },
+  "realSql": {
+    "executed": true,
+    "status": "Explicitly authorized for this copy only; completed successfully",
+    "copyDatabase": "evaluation_isolated_0f8785e64029_v2_restore_20261029a001",
+    "completedUtc": "2026-10-29T18:18:47.481Z",
+    "recoveredTables": 9,
+    "recoveredRowsIncludingControlTables": 52,
+    "twoInnoDbWaitsObserved": true,
+    "concurrentHttpStatuses": [204, 409],
+    "exactlyOneConcurrentInsert": true,
+    "sourceBusinessUnchanged": true,
+    "sourceBusinessWritesExecuted": false,
+    "migrationsExecuted": 0,
+    "backupAndCopyPreserved": true,
+    "temporaryCredentialFilesRemaining": 0,
+    "mainApiResumed": true,
+    "anonymousSessionHttpStatus": 401,
+    "frontendRecordsHttpStatus": 200,
+    "report": "mysql-validation-report.json",
+    "recoveryReport": "mysql-recovery-report.json"
+  },
+  "definitiveDomainTested": false,
+  "smtpSent": false,
+  "deployed": false
+}

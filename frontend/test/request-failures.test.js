@@ -5,6 +5,7 @@ import test from 'node:test'
 import vm from 'node:vm'
 import { fileURLToPath } from 'node:url'
 import { parse } from '@vue/compiler-sfc'
+import { filterRecords, formatRecordDate, periodError } from '../src/components/utils/record-history.js'
 
 const frontend = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const user = { admin: false, email: 'reviewer@example.invalid' }
@@ -21,7 +22,8 @@ function page(name, axios, identity = user) {
     vm.runInNewContext(descriptor.script.content.replace(/^import .*$/gm, '')
         .replace('export default ', 'module.exports = '), {
         module, axios, toast, dados: identity, Vue3EasyDataTable: {},
-        ManagementPage: {}, Excel: {}, ConfirmDeleteModal: {}, exportFromJSON: {}, excelParser: () => ({})
+        ManagementPage: {}, Excel: {}, ConfirmDeleteModal: {}, ProfessionalHistoryModal: {}, filterRecords, formatRecordDate, periodError,
+        exportFromJSON: {}, excelParser: () => ({})
     }, { filename, timeout: 1000 })
     const options = module.exports
     const instance = { ...options.data() }
@@ -96,7 +98,8 @@ test('Registros: authorized history from previous authors remains visible with d
     const { instance, notifications } = page('Registros', { async get() { return { data: rows } } })
     await instance.loadRegs()
     assert.deepEqual(Array.from(instance.colabcUser, row => row.id), [1, 2])
-    assert.equal(instance.registros[0].created_at, '25/10/2026')
+    assert.equal(instance.registros[0].created_at, '2026-10-25T12:00:00.000Z')
+    assert.equal(instance.formatRecordDate(instance.registros[0].created_at), '25/10/2026')
     assert.equal(notifications.length, 0)
 })
 

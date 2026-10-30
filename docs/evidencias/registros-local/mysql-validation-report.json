@@ -1,0 +1,27 @@
+{
+  "success": true,
+  "sourceDatabase": "evaluation_isolated_0f8785e64029_v2",
+  "copyDatabase": "evaluation_isolated_0f8785e64029_v2_restore_20261029a001",
+  "sourceBusinessUnchanged": true,
+  "recoveryReport": "recovery-report-20261029a001.json",
+  "migrationsExecuted": 0,
+  "copyPreserved": true,
+  "checks": {
+    "concurrentHttpStatuses": [
+      204,
+      409
+    ],
+    "twoInnoDbWaitsObserved": true,
+    "exactlyOneConcurrentInsert": true,
+    "sessionAuthorPreserved": true,
+    "storedDateInDatabaseMonth": true,
+    "bothEndpointsRejectDuplicates": true,
+    "clientTimestampIgnored": true,
+    "namesakesRemainIndependent": true,
+    "transferPreservesAuthorsAndMonthlyLimit": true,
+    "sqlMonthYearAndLeapBoundaries": true,
+    "sessionTimezone": "SYSTEM",
+    "utcOffsetMinutes": -180
+  },
+  "completedUtc": "2026-10-29T18:18:47.481Z"
+}

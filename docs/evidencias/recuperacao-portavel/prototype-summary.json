@@ -1,0 +1,59 @@
+{
+  "date": "2026-10-29",
+  "scope": "Approved lot A: in-memory key-package prototype with synthetic material only",
+  "format": "evaluation-recovery-key-v1",
+  "existingBackupFormatPreserved": "evaluation-backup-v1",
+  "code": "backend/lib/recovery/key-package.js",
+  "tests": {
+    "newCases": 17,
+    "newPassed": 17,
+    "completeSuitePassed": 227,
+    "failed": 0,
+    "skipped": 0
+  },
+  "cryptography": {
+    "package": "argon2 0.45.1 (already installed)",
+    "kdf": "Argon2id v19",
+    "memoryKiB": 65536,
+    "iterations": 3,
+    "parallelism": 1,
+    "derivedKeyBytes": 32,
+    "saltBytes": 16,
+    "cipher": "AES-256-GCM",
+    "nonceBytes": 12,
+    "tagBytes": 16,
+    "authenticatedSourceAndBackupHash": true,
+    "bothPackageAndBackupAuthenticatedBeforeReturningSecrets": true
+  },
+  "limits": {
+    "packageBytes": 4096,
+    "backupEnvelopeBytes": 67108864,
+    "passphraseUnicodeCharacters": [20, 256],
+    "costParametersAllowlistedBeforeKdf": true,
+    "globalConcurrencyLimitImplemented": false
+  },
+  "syntheticMeasurement": {
+    "node": "v24.12.0",
+    "samples": 3,
+    "wrapMs": [222, 195, 216],
+    "openMs": [219, 206, 194],
+    "wrapMedianMs": 216,
+    "openMedianMs": 206,
+    "packageSizeBytes": [581, 581, 581],
+    "startingRssMiB": 53,
+    "peakRssMiB": 117,
+    "limitation": "Small synthetic payload, one benchmark process; machine also running tests. Not a throughput, production sizing or memory-bound guarantee."
+  },
+  "diffWhitespaceCheckPassed": true,
+  "projectDependencyFilesChangedInThisLot": false,
+  "operationalVaultOrBackupRead": false,
+  "operationalKeysExported": false,
+  "packageFilesWritten": false,
+  "databaseAccessed": false,
+  "migrationsExecuted": false,
+  "smtpSent": false,
+  "frontendChangedInThisLot": false,
+  "servicesChangedInThisLot": false,
+  "anotherHostValidated": false,
+  "definitiveDomainTested": false
+}

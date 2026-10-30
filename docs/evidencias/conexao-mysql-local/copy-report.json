@@ -1,0 +1,34 @@
+{
+  "success": true,
+  "source": {
+    "host": "127.0.0.1",
+    "port": 3306,
+    "database": "inova_nucleo"
+  },
+  "target": "inova_nucleo_compat_20261029",
+  "mysqlVersion": "8.0.44",
+  "tablesCompared": 9,
+  "rowsCompared": 680,
+  "coreCounts": {
+    "users2": 25,
+    "colab": 100,
+    "registros": 498
+  },
+  "sourceEngine": "MyISAM",
+  "schemaDefault": {
+    "charset": "utf8mb4",
+    "collation": "utf8mb4_0900_ai_ci"
+  },
+  "sourceReadLocksUsed": true,
+  "globalLockUsed": false,
+  "ddlAndContentMatch": true,
+  "sourceUnchanged": true,
+  "encryptedBackup": "backup.evalbackup",
+  "encryptedManifest": "manifest.evalinventory",
+  "accountHashesPreserved": true,
+  "migrationsExecuted": 0,
+  "accountsOrLinksChanged": false,
+  "applicationSwitched": false,
+  "copyPreserved": true,
+  "completedUtc": "2026-10-29T19:45:58.999Z"
+}

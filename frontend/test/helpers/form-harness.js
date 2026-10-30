@@ -137,7 +137,7 @@ export function memoryDocument() {
     return { document, renderer, create }
 }
 
-export async function mountForm(t) {
+export async function mountForm(t, { componentFile = 'src/components/pages/Home.vue', props = {} } = {}) {
     const { document, renderer, create } = memoryDocument()
     const restoreDocument = installDocumentGlobals(document)
     const requests = []
@@ -194,13 +194,13 @@ export async function mountForm(t) {
         cache.set(file, result)
         return result
     }
-    const Home = load(path.join(frontend, 'src/components/pages/Home.vue')).default
+    const Home = load(path.join(frontend, componentFile)).default
     const pinia = Pinia.createPinia()
     Pinia.setActivePinia(pinia)
     const visible = Vue.ref(true)
     const root = create('root')
     document.body.append(root)
-    const app = renderer.createApp({ render: () => visible.value ? Vue.h(Home) : Vue.h('div') })
+    const app = renderer.createApp({ render: () => visible.value ? Vue.h(Home, props) : Vue.h('div') })
     app.use(pinia)
     app.directive('sanitize', {})
     app.mount(root)

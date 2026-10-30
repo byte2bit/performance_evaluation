@@ -1,6 +1,10 @@
 # Backend — API de avaliação de desempenho
 
-**Estado atual:** gestão por gerências ativada no perfil MySQL isolado original, com 14 migrations. A 14ª tornou `colab.gerencia_id` obrigatório, após autorização, backup/restauração e SQL/HTTP na cópia antes da origem. API principal retomada em localhost:8001, MySQL isolado em 127.0.0.1:50470; dois profissionais na Gerência de Testes do avaliador atual, oito avaliações e contas/demais campos preservados. `Serve` exige estrutura/baseline 14. Outros ambientes não foram ativados. [Modelo, endpoints, concorrência e evidências](../docs/PLANO_GESTAO_GERENCIAS.md).
+**Senha da conta 12:** posteriormente a E3, redefinida a pedido do usuário somente na cópia local, com backup cifrado, Argon2id e revogação por versão. E-mail e senha aparecem apenas na janela local; reabrir com `./backend/scripts/local-inova-reset-password.ps1 -Action Show` na raiz, PowerShell 7. Não repetir Reset/ResumePrepared. [Resultado e detalhes](../docs/REDEFINICAO_CONTA_LOCAL.md).
+
+**Prévia da cópia local E3 em execução:** API `http://localhost:8002`, frontend [localhost:5174/login](http://localhost:5174/login), banco exclusivo `127.0.0.1:3306/inova_nucleo_compat_20261029`. Cinco gerências da conta 12, 100 profissionais e 395 avaliações vinculados; 103 pendentes administrativos. Três migrations próprias, origem/histórico/hashes preservados. Launcher `scripts/local-inova-preview.ps1` compõe bcrypt/rehash somente nesse perfil, usa cofre/cookie próprios e bloqueia SMTP; bootstrap padrão segue Argon2id. **315 testes e build passaram**, sem autenticar contas existentes. [Execução, comandos e limites](../docs/PLANO_MAPAS_PREVIA_INOVA.md#resultado-da-execução-e3). O parágrafo abaixo descreve o perfil anterior: a API 8001 respondeu na conferência E3; o frontend 5173 não respondeu e não foi iniciado/parado pelo lote.
+
+**Perfil principal anterior:** gestão por gerências ativada no MySQL isolado original, com 14 migrations. A 14ª tornou `colab.gerencia_id` obrigatório, após autorização, backup/restauração e SQL/HTTP na cópia antes da origem. API em localhost:8001, MySQL isolado em 127.0.0.1:50470; dois profissionais na Gerência de Testes do avaliador atual, oito avaliações e contas/demais campos preservados. O `Serve` desse perfil exige estrutura/baseline 14; a prévia E3 tem launcher/trilha próprios. [Modelo, endpoints, concorrência e evidências do perfil anterior](../docs/PLANO_GESTAO_GERENCIAS.md).
 
 API Express do [Sistema de Avaliação de Desempenho](../README.md), com Knex/MySQL, autenticação por Passport Local e sessões persistentes. Implementa as regras de acesso e validação usadas pela interface Vue.
 
@@ -40,6 +44,8 @@ O vínculo por `registros.colab_id` tem a **12ª migration aplicada no perfil is
 | `POST /mail` e `POST /mail2` | Enviar mensagem de avaliação | Administrador, com CSRF e limitação |
 
 `/registros2` devolve uma lista JSON com `page=1`, `limit=25` e teto de 100 itens por página; `/registros` mantém a lista completa no escopo autorizado. Notas aceitas: 1 a 5 em passos de 0,5, com média/nível/desconto consistentes. Entradas inválidas retornam 400; detalhes e payload fictício em [PLANO_VALIDACAO_API.md](../docs/PLANO_VALIDACAO_API.md).
+
+Os dois POSTs permitem somente uma avaliação por `colab_id` no mês da gravação, independentemente do avaliador. Duplicidade retorna 409; sucesso permanece 204. A transação usa bloqueio exclusivo do profissional e `READ COMMITTED`, sem migration ou remoção de duplicidades antigas. [Calendário, concorrência e limites](../docs/REGISTROS_HISTORICO.md).
 
 Avaliações incluem `colab_id`; `demandante` preserva o autor original. Para novas gravações, enviar o ID e nome do profissional. Clientes antigos podem enviar somente nome quando há um único correspondente autorizado; ambiguidade ou conflito nome/ID retorna 409, sem gravação. ID inexistente/fora de escopo retorna 403, sem fallback por nome. Leituras de registros sem vínculo são administrativas até conciliação. A consulta do responsável atual ocorre na mesma instrução SQL, antes da paginação.
 
@@ -113,3 +119,27 @@ As ações `Validate`, `RecoveryTest` e `VisualReview` são opt-in. `Validate` g
 `Inventory` é somente leitura no MySQL e grava detalhe criptografado externo. `ReconcileReviewed` é uma operação de escrita específica do mapa confirmado R01–R08 → P01: os oito vínculos já foram aplicados no perfil fictício, após backup/cópia e testes. Não repetir o lote, inferir novos mapas ou usar `ValidateLinks` no schema com 12 migrations. [Autorização, comandos históricos e evidências](../docs/REVISAO_CONCILIACAO.md#aplicação-confirmada-e-executada).
 
 Recuperação de senha por e-mail, purga de expirados, revisão de dados em outros alvos e configuração operacional permanecem pendentes. Acompanhe [PLANO_EVOLUCAO.md](../docs/PLANO_EVOLUCAO.md) e [DEPENDENCIAS_SEGURANCA.md](../docs/DEPENDENCIAS_SEGURANCA.md).
+
+## Compatibilidade do MySQL local legado
+
+O lote E1 foi aprovado apenas para a cópia fictícia `127.0.0.1:3306/inova_nucleo_compat_20261029`. As duas migrations específicas ficam em `compat/inova/migrations`, fora da cadeia compartilhada. A aplicação continua no perfil anterior; não apontar `knexfile.js` à cópia nem usar `knex migrate:latest` para este procedimento.
+
+`local-mysql-copy.ps1 -Action PreflightCompatibility` confere backup, baseline, destino, concorrentes e privilégios sem DDL; `ApplyCompatibility` usa a mesma conferência antes de criar o ledger próprio/aplicar. Ambas exigem a confirmação literal descrita no [plano E1](../docs/PLANO_COMPATIBILIDADE_INOVA.md#implementação-aprovada-e-conferência-real--29102026) e acesso ao cofre DPAPI já existente. Não repetir criação/inventário anteriores.
+
+Após o bloqueio inicial por `REFERENCES`, nova conferência retornou `ready=true` e **E1 foi aplicado/validado somente na cópia**: duas migrations, três tabelas InnoDB, três FKs e rollback reais. Dados/hashes/ledger legado e origem preservados; contas ainda inativas e nenhum vínculo aplicado. O runner não alterou privilégios. **Não repetir essas ações neste alvo**, nem criar/inventariar/apagar novamente; os artefatos e o schema preparado devem ser preservados. Os 256 testes daquela preparação foram sucedidos pelos 285 da implementação E2A abaixo.
+
+### Compatibilidade de senhas — E2A
+
+[E2A aprovado e concluído](../docs/PLANO_ACESSO_MYSQL_LOCAL.md#resultado-de-e2a-e-contrato-interno--29102026), originalmente em código e dados sintéticos. `createCredentials` é usado pelo Passport; o default continua Argon2id, sem rehash no login comum. A comparação `$2a$10$` exige adaptador explícito `createLegacyBcrypt`, que tem fila/tempo/workers limitados e `close()`. Em E3, somente o launcher específico da prévia local passou a injetá-lo; bootstrap padrão e perfil isolado permanecem sem o adaptador. Não habilitar por campo HTTP ou variável global.
+
+Com o adaptador, login válido de conta ativa prepara Argon2id antes do lock, relê/bloqueia/confere a conta em transação, atualiza hash/versão condicionalmente e somente então permite criar sessão. Sem ativação, reset ou alteração de perfil. Senhas legadas são limitadas a 72 bytes UTF-8, sem truncamento/NUL; formatos diferentes seguem rejeitados. Novas senhas continuam com a política atual.
+
+E2A passou com **285 testes** (29 novos), criptografia e HTTP reais sobre fixtures públicas/sintéticas e DB/SQL simulados. Não houve conexão operacional naquele lote. E2B posteriormente foi aprovado/aplicado conforme resultado abaixo. Não usar `accounts.js activate` para preservar senha, pois esse comando a redefine.
+
+### E2B aplicado na cópia
+
+[E2B concluído em 29/10/2026, 23:15](../docs/PLANO_ATIVACAO_ACESSO_LOCAL.md#resultado-real--29102026): backup atualizado/autenticado de 14 tabelas/683 linhas, SQL/HTTP real em três tabelas próprias e ativação das **25 contas existentes** com hashes/perfis preservados e versões um. Outros dados e origem intactos. **298 testes passaram**; dois waiters InnoDB e respostas 200/401 observados no ensaio. As três tabelas foram removidas, e servidor/worker/pools encerrados.
+
+Ferramentas: `local-mysql-access.js`, `local-access-fixtures.js`, `local-access-guard.js` e ações opt-in `PreflightAccess`/`ActivateAccess`. Os comandos já foram executados; **não repetir** com esse alvo/artefatos. Nenhuma conta existente foi autenticada, a API principal não foi trocada e o bootstrap padrão continua sem adaptador legado. Backup/manifests permanecem protegidos fora do Git; sem grants, novas migrations, dependências ou SMTP.
+
+**E3 aprovado e concluído:** cinco gerências sob a conta 12, 100 profissionais e 395 avaliações vinculados, preservando os 103 restantes (45 por collation/58 sem candidato). Terceira migration própria aplicada e prévia separada ativa em 5174/8002. [Resultado, arquivos, evidências e operação](../docs/PLANO_MAPAS_PREVIA_INOVA.md#resultado-da-execução-e3), [roteiro de revisão](../docs/REVISAO_MAPAS_INOVA.md). Não repetir mapas/migrations, inferir vínculos adicionais, alterar autoria ou apagar histórico.

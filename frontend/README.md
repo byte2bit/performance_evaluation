@@ -2,6 +2,8 @@
 
 Interface Vue 3 do [sistema de avaliação](../README.md), com Vite, Vue Router, Pinia, Axios, Tailwind CSS 4 e Flowbite JS. O código existente combina Composition API e Options API, predominantemente em JavaScript, com um exemplo de seleção em TypeScript.
 
+**Prévia da cópia MySQL local:** [http://localhost:5174/login](http://localhost:5174/login), com `VITE_API_URL=http://localhost:8002` somente no processo iniciado pelo launcher `backend/scripts/local-inova-preview.ps1`. Vite usa porta estrita e cache separado; nenhum `.env` ou dependência foi alterado. Backend conectado exclusivamente à cópia preparada, com cofre/cookie próprios e SMTP bloqueado. Entrar com e-mail e senha atuais; as verificações automatizadas de UI foram anônimas, sem preencher credenciais. [Resultado e comandos de operação](../docs/PLANO_MAPAS_PREVIA_INOVA.md#resultado-da-execução-e3).
+
 ## Telas e funcionalidades
 
 | Rota | Funcionalidade | Acesso |
@@ -10,7 +12,7 @@ Interface Vue 3 do [sistema de avaliação](../README.md), com Vite, Vue Router,
 | `/senha` | Troca de senha autenticada. | Autenticado |
 | `/` | Seleção de profissionais e formulário com notas de qualidade, prazo, disponibilidade e responsabilidade, observações, critérios e resumo. | Autenticado |
 | `/inserir` | Cadastro de colaboradores com matrícula, PPU, serviço, função, lideranças, gerência e demandante. | Administrador |
-| `/registros` | Tabela de avaliações com pesquisa, ordenação e confirmação de exclusão administrativa. | Autenticado |
+| `/registros` | Tabela com pesquisa por texto/período, resumo completo por profissional, gráfico mensal das notas e exclusão administrativa com confirmação. | Autenticado |
 | `/colabs` | Tabela de colaboradores com pesquisa, ordenação e confirmação de exclusão administrativa. | Autenticado |
 | `/excel` | Exportação dos registros em XLS. | Administrador |
 | `/checkall` | Exemplo auxiliar de seleção de checkboxes, incluindo selecionar todos. | Autenticado |
